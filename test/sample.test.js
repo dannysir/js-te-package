@@ -14,3 +14,23 @@ describe('Math operations', () => {
 test('strings are equal', () => {
   expect('hello').toBe('hello');
 });
+
+describe('1단계', () => {
+  describe('2단계', () => {
+    test('테스트', () => {
+      expect([1, 2, 3]).toEqual([1, 2, 3]);
+    });
+  });
+});
+
+describe('1단계', () => {
+  describe('2단계', () => {
+    describe('3단계', () => {
+      describe('4단계', () => {
+        test('테스트', () => {
+          expect([1, 2, 3]).toEqual([1, 2, 3]);
+        });
+      });
+    });
+  });
+});
