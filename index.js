@@ -1,26 +1,17 @@
 import {
   CHECK,
-  CROSS, DEFAULT_COUNT,
-  DIRECTORY_DELIMITER,
-  EMPTY,
+  CROSS, DEFAULT_COUNT, DIRECTORY_DELIMITER, EMPTY,
   getErrorMsg,
   getTestResultMsg,
   RUNNING_TEST_MSG
 } from "./constants.js";
+import {Tests} from "./src/tests.js";
 
-const tests = [];
-let currentDescribe = null;
+const tests = new Tests();
 
-export function test(description, fn) {
-  tests.push({ description, fn, suite: currentDescribe });
-}
+export const test = (description, fn) => tests.test(description, fn);
 
-export function describe(suiteName, fn) {
-  const previousDescribe = currentDescribe;
-  currentDescribe = suiteName;
-  fn();
-  currentDescribe = previousDescribe;
-}
+export const describe = (suiteName, fn) => tests.describe(suiteName, fn);
 
 export function expect(actual) {
   return {
@@ -43,13 +34,13 @@ export async function run() {
 
   console.log(RUNNING_TEST_MSG);
 
-  for (const test of tests) {
+  for (const test of tests.getTests()) {
     try {
       await test.fn();
-      console.log(`${CHECK}${test.suite ? test.suite + DIRECTORY_DELIMITER : EMPTY}${test.description}`);
+      console.log(CHECK + (test.path === '' ? EMPTY : test.path + DIRECTORY_DELIMITER) + test.description);
       passed++;
     } catch (error) {
-      console.log(`${CROSS}${test.suite ? test.suite + DIRECTORY_DELIMITER : EMPTY}${test.description}`);
+      console.log(CROSS + test.path + test.description);
       console.log(`  ${error.message}\n`);
       failed++;
     }
