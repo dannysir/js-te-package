@@ -15,15 +15,24 @@ export const test = (description, fn) => tests.test(description, fn);
 export const describe = (suiteName, fn) => tests.describe(suiteName, fn);
 
 export function expect(actual) {
+  let value = actual;
+  if (typeof actual === 'function') {
+    try {
+      value = actual();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   return {
     toBe(expected) {
-      if (actual !== expected) {
-        throw new Error(getErrorMsg(expected, actual));
+      if (value !== expected) {
+        throw new Error(getErrorMsg(expected, value));
       }
     },
     toEqual(expected) {
-      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-        throw new Error(getErrorMsg(expected, actual));
+      if (JSON.stringify(value) !== JSON.stringify(expected)) {
+        throw new Error(getErrorMsg(expected, value));
       }
     },
     toThrow(expected) {
