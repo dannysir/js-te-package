@@ -15,6 +15,22 @@ test('strings are equal', () => {
   expect('hello').toBe('hello');
 });
 
+test('[ERROR] - wrong test', () => {
+  expect('hello').toBe('helle');
+});
+
+test('[ERROR] - expect throw Error', () => {
+  expect(() => {
+    throw new Error('ERROR');
+  }).toBe('ERROR');
+});
+
+test('[ERROR] - test throw Error', () => {
+  const tmp = () => { throw new Error('INNER ERROR'); };
+  tmp();
+  expect(1).toBe('ERROR');
+});
+
 describe('1단계', () => {
   describe('2단계', () => {
     test('테스트', () => {
