@@ -1,10 +1,11 @@
 import {
   CHECK,
   CROSS, DEFAULT_COUNT, DIRECTORY_DELIMITER, EMPTY,
-  getErrorMsg,
+  getErrorMsg, RESULT_TITLE,
 } from "./constants.js";
 import {Tests} from "./src/tests.js";
-import {bold, green, red} from "./utils/consoleColor.js";
+import {green, red} from "./utils/consoleColor.js";
+import {getTestResultMsg} from "./utils/makeMessage.js";
 
 const tests = new Tests();
 
@@ -39,10 +40,10 @@ export const expect = (actual) => {
     toThrow(expected) {
       try {
         value = runArgFnc(actual);
-      }catch (e) {
+      } catch (e) {
         if (!e.message.includes(expected)) {
           throw new Error(getErrorMsg(expected, e.message));
-        }else return;
+        } else return;
       }
     },
     toBeTruthy() {
@@ -78,7 +79,7 @@ export const run = async () => {
     }
   }
 
-  console.log(`\nTests: ${green(passed + ' passed')}, ${red(failed + ' failed')}, ${bold(passed + failed + ' total')}`);
+  console.log(getTestResultMsg(RESULT_TITLE.TESTS, passed, failed));
 
   tests.clearTests();
 

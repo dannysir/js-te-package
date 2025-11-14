@@ -3,7 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 import * as jsTe from '../index.js';
-import {bold, green, red, yellow} from "../utils/consoleColor.js";
+import { green, yellow} from "../utils/consoleColor.js";
+import {getTestResultMsg} from "../utils/makeMessage.js";
+import {RESULT_TITLE} from "../constants.js";
 
 let totalPassed = 0;
 let totalFailed = 0;
@@ -55,7 +57,7 @@ for (const file of testFiles) {
   totalFailed += failed;
 }
 
-console.log(`\nTotal Result: ${green(totalPassed + ' passed')}, ${red(totalFailed + ' failed')}, ${bold(totalPassed + totalFailed + ' total')}\n`);
+console.log(getTestResultMsg(RESULT_TITLE.TOTAL, totalPassed, totalFailed));
 
 if (totalFailed > 0) {
   process.exit(1);

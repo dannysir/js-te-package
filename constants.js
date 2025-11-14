@@ -2,11 +2,10 @@ export const getErrorMsg = (expect, actual) => {
   return `Expected ${JSON.stringify(expect)} but got ${JSON.stringify(actual)}`;
 };
 
-export const getTestResultMsg = (success, fail) => {
-  return `\nTests: ${success} passed, ${fail} failed, ${success + fail} total`;
+export const RESULT_TITLE = {
+  TESTS: 'Tests: ',
+  TOTAL : 'Total Result: '
 };
-
-export const RUNNING_TEST_MSG = 'Running tests...\n';
 
 export const CHECK = '✓ ';
 
