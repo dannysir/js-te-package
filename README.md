@@ -5,7 +5,7 @@ Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워�
 ## 설치
 
 ```bash
-npm install --save-dev js-te
+npm install --save-dev @dannysir/js-te
 ```
 
 ## 빠른 시작
