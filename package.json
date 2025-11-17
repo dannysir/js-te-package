@@ -1,6 +1,6 @@
 {
   "name": "@dannysir/js-te",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "JavaScript test library",
   "main": "index.js",
