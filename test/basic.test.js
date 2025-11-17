@@ -27,3 +27,18 @@ test('[mocking] - mocking random function', async () => {
   const {play} = await import('../src/test-helper/game.js');
   expect(play()).toBe(30);
 });
+
+test.each([
+  [1, 2, 3, 6],
+  [3, 4, 5, 12],
+  [10, 20, 13, 43],
+  [10, 12, 13, 35],
+])('[each test] - input : %s, %s, %s, %s', (a, b, c, result) => {
+  expect(a + b + c).toBe(result);
+});
+
+test.each([
+  [{ name : 'dannysir', age : null}],
+])('[each test placeholder] - input : %o', (arg) => {
+  expect(arg.name).toBe('dannysir');
+});
