@@ -19,8 +19,20 @@
     "url": "git+https://github.com/dannysir/Js-Te.git"
   },
   "keywords": [
-    "JavaScript",
-    "test"
+    "javascript",
+    "test",
+    "testing",
+    "jest",
+    "mocking"
+  ],
+  "files": [
+    "bin/",
+    "src/tests.js",
+    "src/mock",
+    "utils/",
+    "index.js",
+    "constants.js",
+    "babelTransformImport.js"
   ],
   "author": "dannysir",
   "license": "ISC",
