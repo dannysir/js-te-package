@@ -81,7 +81,7 @@ export const run = async () => {
     } catch (error) {
       const errorDirectory = red(CROSS) + test.path + test.description
       console.log(errorDirectory);
-      console.log(red(`  ${error.message}`));
+      console.log(red(`  Error Message : ${error.message}`));
       failed++;
     }
   }

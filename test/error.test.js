@@ -4,7 +4,7 @@ test('[ERROR - toBe] - string', () => {
   expect('hello').toBe('helle');
 });
 
-test('[ERROR - throw Error in test logic]', () => {
+test('[ERROR - throw Error] - in test logic', () => {
   const tmp = () => {
     throw new Error('INNER ERROR');
   };
