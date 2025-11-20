@@ -44,6 +44,11 @@ package.json에 추가.
 npm test
 ```
 
+### 예시 출력 화면
+
+<p align='center'>
+  <img width="585" height="902" alt="스크린샷 2025-11-20 오후 12 22 27" src="https://github.com/user-attachments/assets/3d087a61-cc44-4f5b-8a2f-efd5f15c12b7" />
+</p>
 
 # API
 
