@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import {transformSync} from '@babel/core';
 import * as jsTe from '../index.js';
-import {green, yellow} from "../utils/consoleColor.js";
+import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
 import {BABEL, PATH, RESULT_TITLE} from "../constants.js";
 import { babelTransformImport } from '../babelTransformImport.js';
@@ -35,8 +35,13 @@ const transformFile = (filePath) => {
 
 const restoreFiles = () => {
   for (const [filePath, originalCode] of originalFiles.entries()) {
-    fs.writeFileSync(filePath, originalCode);
+    try {
+      fs.writeFileSync(filePath, originalCode);
+    } catch (error) {
+      console.error(red(`Failed to restore ${filePath}: ${error.message}`));
+    }
   }
+  originalFiles.clear();
 };
 
 const findTestFiles = (dir) => {
@@ -92,32 +97,41 @@ const findAllSourceFiles = (dir) => {
   return files;
 }
 
-const sourceFiles = findAllSourceFiles(process.cwd());
 
-for (const file of sourceFiles) {
-  transformFile(file);
-}
+const main = async () => {
+  try {
+    const sourceFiles = findAllSourceFiles(process.cwd());
+    for (const file of sourceFiles) {
+      transformFile(file);
+    }
 
-const testFiles = findTestFiles(process.cwd());
+    const testFiles = findTestFiles(process.cwd());
 
-console.log(`\nFound ${green(testFiles.length)} test file(s)`);
+    console.log(`\nFound ${green(testFiles.length)} test file(s)`);
 
-for (const file of testFiles) {
-  console.log(`\n${yellow(file)}\n`);
+    for (const file of testFiles) {
+      console.log(`\n${yellow(file)}\n`);
 
-  transformFile(file);
+      transformFile(file);
+      await import(path.resolve(file));
 
-  await import(path.resolve(file));
+      const {passed, failed} = await jsTe.run();
+      totalPassed += passed;
+      totalFailed += failed;
+    }
 
-  const {passed, failed} = await jsTe.run();
-  totalPassed += passed;
-  totalFailed += failed;
-}
+    console.log(getTestResultMsg(RESULT_TITLE.TOTAL, totalPassed, totalFailed));
 
-restoreFiles();
+    return totalFailed > 0 ? 1 : 0;
 
-console.log(getTestResultMsg(RESULT_TITLE.TOTAL, totalPassed, totalFailed));
+  } catch (error) {
+    console.log(red('\n✗ Test execution failed'));
+    console.log(red(`  Error: ${error.message}\n`));
+    return 1;
+  } finally {
+    restoreFiles();
+  }
+};
 
-if (totalFailed > 0) {
-  process.exit(1);
-}
+const exitCode = await main();
+process.exit(exitCode);
