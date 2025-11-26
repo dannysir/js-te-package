@@ -7,16 +7,17 @@ import {findAllSourceFiles, findTestFiles} from "./utils/findFiles.js";
 import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
 import {RESULT_TITLE} from "../constants.js";
-
-let totalPassed = 0;
-let totalFailed = 0;
-
-Object.keys(jsTe).forEach(key => {
-  global[key] = jsTe[key];
-});
+import {run} from "../src/testRunner.js";
 
 const main = async () => {
   try {
+    let totalPassed = 0;
+    let totalFailed = 0;
+
+    Object.keys(jsTe).forEach(key => {
+      global[key] = jsTe[key];
+    });
+
     const sourceFiles = findAllSourceFiles(process.cwd());
     for (const file of sourceFiles) {
       transformFiles(file);
@@ -32,7 +33,7 @@ const main = async () => {
       transformFiles(file);
       await import(path.resolve(file));
 
-      const {passed, failed} = await jsTe.run();
+      const {passed, failed} = await run();
       totalPassed += passed;
       totalFailed += failed;
     }

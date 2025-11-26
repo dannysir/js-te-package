@@ -1,7 +1,3 @@
-export const getErrorMsg = (expect, actual) => {
-  return `Expected ${JSON.stringify(expect)} but got ${JSON.stringify(actual)}`;
-};
-
 export const RESULT_TITLE = {
   TESTS: 'Tests: ',
   TOTAL : 'Total Result: '
@@ -46,5 +42,4 @@ export const PATH = {
   TEST_FILE: '.test.js',
   JAVASCRIPT_FILE: '.js',
   BIN: 'bin',
-
 };

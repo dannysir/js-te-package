@@ -1,5 +1,3 @@
-import {beforeEach, describe, expect, mock, test} from "../index.js";
-
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
     describe('3단계', () => {

@@ -27,7 +27,7 @@
   ],
   "files": [
     "bin/",
-    "src/tests.js",
+    "src/testManager.js",
     "src/mock",
     "utils/",
     "index.js",
