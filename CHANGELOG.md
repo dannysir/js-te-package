@@ -1,5 +1,18 @@
 # CHANGE LOG
 
+## [0.1.2] 2025-11-27
+
+### 추가
+- 레포지토리 변경으로 인해 깃허브 경로 수정
+- cli.js
+  - transformFiles : babel을 통한 코드 변경 로직 분리 
+  - findFiles : 사용자의 테스트 파일과 파일을 찾는 로직 분리
+- index.js
+  - run 함수의 경우 사용자가 사용할 필요가 없기 때문에 index.js에서 분리
+  - expect로직과 matcher 로직을 분리
+- tests.js 파일명 수정
+  - 클래스를 직접 export하는 방식에서 선언된 변수를 export하는 방식으로 변경
+
 ## [0.1.1] 2025-11-24
 
 ### 추가
