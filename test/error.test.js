@@ -1,5 +1,3 @@
-import {expect, test} from "../index.js";
-
 test('[ERROR - toBe] - string', () => {
   expect('hello').toBe('helle');
 });

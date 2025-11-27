@@ -1,6 +1,6 @@
 import {DIRECTORY_DELIMITER} from "../constants.js";
 
-export class Tests {
+class TestManager {
   #tests = [];
   #testDepth = [];
   #beforeEachArr = [];
@@ -70,3 +70,5 @@ export class Tests {
     });
   }
 }
+
+export const testManager = new TestManager();

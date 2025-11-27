@@ -1,5 +1,3 @@
-import {expect, test} from "../index.js";
-
 test('[matcher : toBe] - number', () => {
   expect(1 + 1).toBe(2);
 });
