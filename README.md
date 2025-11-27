@@ -324,7 +324,7 @@ export const random = () => Math.random();
 
 ## 링크
 
-- [GitHub](https://github.com/dannysir/Js-Te)
+- [GitHub](https://github.com/dannysir/js-te-package)
 
 ## 만든 이유
 

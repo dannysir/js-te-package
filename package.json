@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dannysir/Js-Te.git"
+    "url": "git+https://github.com/dannysir/js-te-package.git"
   },
   "keywords": [
     "javascript",
@@ -37,9 +37,9 @@
   "author": "dannysir",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dannysir/Js-Te/issues"
+    "url": "https://github.com/dannysir/js-te-package/issues"
   },
-  "homepage": "https://github.com/dannysir/Js-Te#readme",
+  "homepage": "https://github.com/dannysir/js-te-package#readme",
   "dependencies": {
     "@babel/core": "^7.28.5",
     "@babel/generator": "^7.28.5",
