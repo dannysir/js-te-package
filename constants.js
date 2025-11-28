@@ -42,4 +42,5 @@ export const PATH = {
   TEST_FILE: '.test.js',
   JAVASCRIPT_FILE: '.js',
   BIN: 'bin',
+  DIST: 'dist',
 };
