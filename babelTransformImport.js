@@ -38,6 +38,12 @@ export const babelTransformImport = ({types: t}) => {
 
         const moduleVarName = nodePath.scope.generateUidIdentifier(BABEL.MODULE);
 
+        /*
+        -예시-
+        const _module = mockStore.has('./random.js')
+          ? mockStore.get('./random.js')
+          : await import('./random.js');
+        */
         const moduleDeclaration = t.variableDeclaration(BABEL.CONST, [
           t.variableDeclarator(
             moduleVarName,
@@ -86,22 +92,36 @@ export const babelTransformImport = ({types: t}) => {
       },
 
       // CommonJS require() 처리
-      CallExpression(nodePath, state) {
-        // require() 호출이 아니면 무시
-        if (!t.isIdentifier(nodePath.node.callee, { name: 'require' })) {
+      VariableDeclarator(nodePath, state) {
+        // init : require문
+        const init = nodePath.node.init;
+
+        if (!init || !t.isCallExpression(init)) {
           return;
         }
 
-        // require의 인자가 문자열 리터럴이 아니면 무시 (동적 require는 처리 안 함)
-        if (!t.isStringLiteral(nodePath.node.arguments[0])) {
+        if (!t.isIdentifier(init.callee, { name: 'require' })) {
           return;
         }
 
-        const source = nodePath.node.arguments[0].value;
+        const requireArgs = init.arguments;
+
+        if (!requireArgs || requireArgs.length === 0) {
+          return;
+        }
+
+        if (!t.isStringLiteral(requireArgs[0])) {
+          return;
+        }
+
+        if (nodePath.node._transformed) {
+          return;
+        }
+
+        const source = requireArgs[0].value;
         const currentFilePath = state.filename || process.cwd();
         const currentDir = path.dirname(currentFilePath);
 
-        // 절대 경로로 변환
         let absolutePath;
         if (source.startsWith(BABEL.PERIOD)) {
           absolutePath = path.resolve(currentDir, source);
@@ -109,12 +129,12 @@ export const babelTransformImport = ({types: t}) => {
           absolutePath = source;
         }
 
-        // require() 호출을 mockStore 체크 로직으로 변환
-        // require('./game.js')
-        // ↓
-        // mockStore.has('/abs/path') ? mockStore.get('/abs/path') : require('./game.js')
+        /*
+        const _module1 = mockStore.has('/absolute/path/to/game.js')
+        ? mockStore.get('/absolute/path/to/game.js')
+        : require('./game.js');
+         */
         const transformedRequire = t.conditionalExpression(
-          // mockStore.has(absolutePath)
           t.callExpression(
             t.memberExpression(
               t.identifier(MOCK.STORE_NAME),
@@ -122,7 +142,6 @@ export const babelTransformImport = ({types: t}) => {
             ),
             [t.stringLiteral(absolutePath)]
           ),
-          // mockStore.get(absolutePath)
           t.callExpression(
             t.memberExpression(
               t.identifier(MOCK.STORE_NAME),
@@ -130,14 +149,14 @@ export const babelTransformImport = ({types: t}) => {
             ),
             [t.stringLiteral(absolutePath)]
           ),
-          // require(원래경로)
           t.callExpression(
             t.identifier('require'),
             [t.stringLiteral(source)]
           )
         );
 
-        nodePath.replaceWith(transformedRequire);
+        nodePath.node._transformed = true;
+        nodePath.node.init = transformedRequire;
       }
     }
   };
