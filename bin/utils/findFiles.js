@@ -38,7 +38,7 @@ export const findAllSourceFiles = (dir) => {
     const items = fs.readdirSync(directory);
 
     for (const item of items) {
-      if (item === PATH.NODE_MODULES || item === PATH.BIN || item === PATH.TEST_DIRECTORY) continue;
+      if (item === PATH.NODE_MODULES || item === PATH.BIN || item === PATH.TEST_DIRECTORY || item === PATH.DIST) continue;
 
       const fullPath = path.join(directory, item);
       const stat = fs.statSync(fullPath);

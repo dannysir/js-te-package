@@ -18,4 +18,4 @@ export const expect = (actual) => {
       toBeFalsy(actual);
     }
   }
-}
+};

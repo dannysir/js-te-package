@@ -1,23 +1,35 @@
 {
   "name": "@dannysir/js-te",
   "version": "0.1.2",
-  "type": "module",
   "description": "JavaScript test library",
-  "main": "index.js",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
   "exports": {
-    ".": "./index.js",
-    "./src/mock/store.js": "./src/mock/store.js"
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./src/mock/store.js": {
+      "import": "./dist/mock/store.esm.js",
+      "require": "./dist/mock/store.cjs.js"
+    }
   },
   "bin": {
     "js-te": "./bin/cli.js"
   },
   "scripts": {
-    "test": "node bin/cli.js"
+    "build": "rollup -c",
+    "test": "node bin/cli.js",
+    "prepublishOnly": "npm run build"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dannysir/js-te-package.git"
-  },
+  "files": [
+    "bin/",
+    "dist/",
+    "utils/",
+    "src/",
+    "babelTransformImport.js",
+    "constants.js"
+  ],
   "keywords": [
     "javascript",
     "test",
@@ -25,25 +37,18 @@
     "jest",
     "mocking"
   ],
-  "files": [
-    "bin/",
-    "src/testManager.js",
-    "src/mock",
-    "utils/",
-    "index.js",
-    "constants.js",
-    "babelTransformImport.js"
-  ],
   "author": "dannysir",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/dannysir/js-te-package/issues"
-  },
-  "homepage": "https://github.com/dannysir/js-te-package#readme",
   "dependencies": {
     "@babel/core": "^7.28.5",
     "@babel/generator": "^7.28.5",
     "@babel/parser": "^7.28.5",
     "@babel/traverse": "^7.28.5"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "rimraf": "^6.1.2",
+    "rollup": "^4.53.3"
   }
 }

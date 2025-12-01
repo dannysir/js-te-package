@@ -1,5 +1,5 @@
 import {testManager} from "./src/testManager.js";
-import {clearAllMocks, isMocked, mock, unmock} from './src/mock/store.js';
+import {clearAllMocks, isMocked, mock, unmock, mockStore} from './src/mock/store.js';
 import {expect} from "./src/expect.js";
 
 export const test = (description, fn) => testManager.test(description, fn);
@@ -11,4 +11,4 @@ export const beforeEach = (fn) => testManager.beforeEach(fn);
 
 export {expect};
 
-export {mock, clearAllMocks, unmock, isMocked};
+export {mock, clearAllMocks, unmock, isMocked, mockStore};

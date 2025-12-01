@@ -5,14 +5,16 @@ export const babelTransformImport = ({types: t}) => {
   return {
     visitor: {
       Program(path) {
-        const importStatement = t.ImportDeclaration(
-          [t.importSpecifier(
-            t.identifier(MOCK.STORE_NAME),
-            t.identifier(MOCK.STORE_NAME)
-          )],
-          t.stringLiteral(MOCK.STORE_PATH)
-        );
-        path.node.body.unshift(importStatement);
+        const mockStoreDeclaration = t.VariableDeclaration('const', [
+          t.VariableDeclarator(
+            t.Identifier(MOCK.STORE_NAME),
+            t.MemberExpression(
+              t.Identifier('global'),
+              t.Identifier(MOCK.STORE_NAME)
+            )
+          )
+        ]);
+        path.node.body.unshift(mockStoreDeclaration);
       },
 
       ImportDeclaration(nodePath, state) {
@@ -36,6 +38,12 @@ export const babelTransformImport = ({types: t}) => {
 
         const moduleVarName = nodePath.scope.generateUidIdentifier(BABEL.MODULE);
 
+        /*
+        -예시-
+        const _module = mockStore.has('./random.js')
+          ? mockStore.get('./random.js')
+          : await import('./random.js');
+        */
         const moduleDeclaration = t.variableDeclaration(BABEL.CONST, [
           t.variableDeclarator(
             moduleVarName,
@@ -81,6 +89,74 @@ export const babelTransformImport = ({types: t}) => {
         const extractDeclaration = t.variableDeclaration(BABEL.CONST, extractDeclarations);
 
         nodePath.replaceWithMultiple([moduleDeclaration, extractDeclaration]);
+      },
+
+      // CommonJS require() 처리
+      VariableDeclarator(nodePath, state) {
+        // init : require문
+        const init = nodePath.node.init;
+
+        if (!init || !t.isCallExpression(init)) {
+          return;
+        }
+
+        if (!t.isIdentifier(init.callee, { name: 'require' })) {
+          return;
+        }
+
+        const requireArgs = init.arguments;
+
+        if (!requireArgs || requireArgs.length === 0) {
+          return;
+        }
+
+        if (!t.isStringLiteral(requireArgs[0])) {
+          return;
+        }
+
+        if (nodePath.node._transformed) {
+          return;
+        }
+
+        const source = requireArgs[0].value;
+        const currentFilePath = state.filename || process.cwd();
+        const currentDir = path.dirname(currentFilePath);
+
+        let absolutePath;
+        if (source.startsWith(BABEL.PERIOD)) {
+          absolutePath = path.resolve(currentDir, source);
+        } else {
+          absolutePath = source;
+        }
+
+        /*
+        const _module1 = mockStore.has('/absolute/path/to/game.js')
+        ? mockStore.get('/absolute/path/to/game.js')
+        : require('./game.js');
+         */
+        const transformedRequire = t.conditionalExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier(MOCK.STORE_NAME),
+              t.identifier(BABEL.HAS)
+            ),
+            [t.stringLiteral(absolutePath)]
+          ),
+          t.callExpression(
+            t.memberExpression(
+              t.identifier(MOCK.STORE_NAME),
+              t.identifier(BABEL.GET)
+            ),
+            [t.stringLiteral(absolutePath)]
+          ),
+          t.callExpression(
+            t.identifier('require'),
+            [t.stringLiteral(source)]
+          )
+        );
+
+        nodePath.node._transformed = true;
+        nodePath.node.init = transformedRequire;
       }
     }
   };

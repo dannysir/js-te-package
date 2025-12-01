@@ -19,7 +19,7 @@ describe('[function return test] - expect arg', () => {
 });
 
 test('[mocking] - mocking random function', async () => {
-  mock('/Users/san/Js-Te/test-helper/random.js', {
+  mock('/Users/san/js-te-package/test-helper/random.js', {
     random: () => 3,
   });
   const {play} = await import('../test-helper/game.js');
