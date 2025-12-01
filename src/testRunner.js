@@ -25,4 +25,4 @@ export const run = async () => {
   testManager.clearTests();
 
   return {passed, failed};
-}
+};
