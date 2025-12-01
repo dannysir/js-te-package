@@ -43,29 +43,4 @@ export default [
       commonjs()
     ]
   },
-  {
-    input: 'src/mock/store.js',
-    output: {
-      file: 'dist/mock/store.esm.js',
-      format: 'esm',
-      sourcemap: true
-    },
-    plugins: [
-      nodeResolve(),
-      commonjs()
-    ]
-  },
-  {
-    input: 'src/mock/store.js',
-    output: {
-      file: 'dist/mock/store.cjs.js',
-      format: 'cjs',
-      sourcemap: true,
-      exports: 'named'
-    },
-    plugins: [
-      nodeResolve(),
-      commonjs()
-    ]
-  }
 ];
