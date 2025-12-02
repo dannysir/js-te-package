@@ -1,18 +1,39 @@
 #!/usr/bin/env node
 
 import path from 'path';
-import * as jsTe from '../index.js';
+import fs from 'fs';
 import {restoreFiles, transformFiles} from "./utils/transformFiles.js";
 import {findAllSourceFiles, findTestFiles} from "./utils/findFiles.js";
 import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
 import {RESULT_TITLE} from "../constants.js";
-import {run} from "../src/testRunner.js";
+
+// 사용자 프로젝트의 module type 확인
+const getUserModuleType = () => {
+  try {
+    const pkgPath = path.join(process.cwd(), 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    return pkg.type === 'module' ? 'esm' : 'cjs';
+  } catch {
+    return 'cjs'; // package.json 없으면 기본값은 CJS
+  }
+};
 
 const main = async () => {
   try {
     let totalPassed = 0;
     let totalFailed = 0;
+
+    const moduleType = getUserModuleType();
+
+    let jsTe;
+    if (moduleType === 'esm') {
+      jsTe = await import('@dannysir/js-te');
+    } else {
+      const { createRequire } = await import('module');
+      const require = createRequire(import.meta.url);
+      jsTe = require('@dannysir/js-te');
+    }
 
     Object.keys(jsTe).forEach(key => {
       global[key] = jsTe[key];
@@ -33,7 +54,7 @@ const main = async () => {
       transformFiles(file);
       await import(path.resolve(file));
 
-      const {passed, failed} = await run();
+      const {passed, failed} = await jsTe.run();
       totalPassed += passed;
       totalFailed += failed;
     }
