@@ -36,14 +36,28 @@ export const babelTransformImport = ({types: t}) => {
 
         const specifiers = nodePath.node.specifiers;
 
+        const originalVarName = nodePath.scope.generateUidIdentifier('original');
         const moduleVarName = nodePath.scope.generateUidIdentifier(BABEL.MODULE);
 
         /*
-        -예시-
-        const _module = mockStore.has('./random.js')
-          ? mockStore.get('./random.js')
-          : await import('./random.js');
+        Transformed code for partial mocking support in ESM:
+
+        const _original = await import('./random.js');
+        const _module = mockStore.has('/path/to/random.js')
+          ? { ..._original, ...mockStore.get('/path/to/random.js') }
+          : _original;
+        const {random1, random2} = _module;
         */
+
+        const originalDeclaration = t.variableDeclaration(BABEL.CONST, [
+          t.variableDeclarator(
+            originalVarName,
+            t.awaitExpression(
+              t.importExpression(t.stringLiteral(source))
+            )
+          )
+        ]);
+
         const moduleDeclaration = t.variableDeclaration(BABEL.CONST, [
           t.variableDeclarator(
             moduleVarName,
@@ -52,13 +66,16 @@ export const babelTransformImport = ({types: t}) => {
                 t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
                 [t.stringLiteral(absolutePath)]
               ),
-              t.callExpression(
-                t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
-                [t.stringLiteral(absolutePath)]
-              ),
-              t.awaitExpression(
-                t.importExpression(t.stringLiteral(source))
-              )
+              t.objectExpression([
+                t.spreadElement(originalVarName),
+                t.spreadElement(
+                  t.callExpression(
+                    t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
+                    [t.stringLiteral(absolutePath)]
+                  )
+                )
+              ]),
+              originalVarName
             )
           )
         ]);
@@ -88,29 +105,13 @@ export const babelTransformImport = ({types: t}) => {
 
         const extractDeclaration = t.variableDeclaration(BABEL.CONST, extractDeclarations);
 
-        nodePath.replaceWithMultiple([moduleDeclaration, extractDeclaration]);
+        nodePath.replaceWithMultiple([originalDeclaration, moduleDeclaration, extractDeclaration]);
       },
 
-      // CommonJS require() 처리
-      VariableDeclarator(nodePath, state) {
-        // init : require문
-        const init = nodePath.node.init;
+      VariableDeclaration(nodePath, state) {
+        const declarations = nodePath.node.declarations;
 
-        if (!init || !t.isCallExpression(init)) {
-          return;
-        }
-
-        if (!t.isIdentifier(init.callee, { name: 'require' })) {
-          return;
-        }
-
-        const requireArgs = init.arguments;
-
-        if (!requireArgs || requireArgs.length === 0) {
-          return;
-        }
-
-        if (!t.isStringLiteral(requireArgs[0])) {
+        if (!declarations || declarations.length === 0) {
           return;
         }
 
@@ -118,9 +119,25 @@ export const babelTransformImport = ({types: t}) => {
           return;
         }
 
-        const source = requireArgs[0].value;
-        const currentFilePath = state.filename || process.cwd();
-        const currentDir = path.dirname(currentFilePath);
+        const newDeclarations = [];
+        let hasTransformation = false;
+
+        for (const declarator of declarations) {
+          const init = declarator.init;
+
+          if (!init ||
+            !t.isCallExpression(init) ||
+            !t.isIdentifier(init.callee, { name: 'require' }) ||
+            !init.arguments[0] ||
+            !t.isStringLiteral(init.arguments[0])) {
+            newDeclarations.push(declarator);
+            continue;
+          }
+
+          hasTransformation = true;
+          const source = init.arguments[0].value;
+          const currentFilePath = state.filename || process.cwd();
+          const currentDir = path.dirname(currentFilePath);
 
         let absolutePath;
         if (source.startsWith(BABEL.PERIOD)) {
@@ -129,34 +146,72 @@ export const babelTransformImport = ({types: t}) => {
           absolutePath = source;
         }
 
-        /*
-        const _module1 = mockStore.has('/absolute/path/to/game.js')
-        ? mockStore.get('/absolute/path/to/game.js')
-        : require('./game.js');
-         */
-        const transformedRequire = t.conditionalExpression(
-          t.callExpression(
-            t.memberExpression(
-              t.identifier(MOCK.STORE_NAME),
-              t.identifier(BABEL.HAS)
-            ),
-            [t.stringLiteral(absolutePath)]
-          ),
-          t.callExpression(
-            t.memberExpression(
-              t.identifier(MOCK.STORE_NAME),
-              t.identifier(BABEL.GET)
-            ),
-            [t.stringLiteral(absolutePath)]
-          ),
-          t.callExpression(
-            t.identifier('require'),
-            [t.stringLiteral(source)]
-          )
-        );
+          /*
+          Transformed code for partial mocking support:
 
-        nodePath.node._transformed = true;
-        nodePath.node.init = transformedRequire;
+          const _original = require('./random');
+          const _module = mockStore.has('/path/to/random.js')
+            ? { ..._original, ...mockStore.get('/path/to/random.js') }
+            : _original;
+          */
+
+          const originalVar = nodePath.scope.generateUidIdentifier('original');
+          const originalDeclarator = t.variableDeclarator(
+            originalVar,
+            t.callExpression(
+              t.identifier('require'),
+              [t.stringLiteral(source)]
+            )
+          );
+
+          const transformedRequire = t.conditionalExpression(
+            t.callExpression(
+              t.memberExpression(
+                t.identifier(MOCK.STORE_NAME),
+                t.identifier(BABEL.HAS)
+              ),
+              [t.stringLiteral(absolutePath)]
+            ),
+            t.objectExpression([
+              t.spreadElement(originalVar),
+              t.spreadElement(
+                t.callExpression(
+                  t.memberExpression(
+                    t.identifier(MOCK.STORE_NAME),
+                    t.identifier(BABEL.GET)
+                  ),
+                  [t.stringLiteral(absolutePath)]
+                )
+              )
+            ]),
+            originalVar
+          );
+
+          if (t.isObjectPattern(declarator.id) || t.isArrayPattern(declarator.id)) {
+            const tempVar = nodePath.scope.generateUidIdentifier('module');
+
+            newDeclarations.push(originalDeclarator);
+
+            newDeclarations.push(
+              t.variableDeclarator(tempVar, transformedRequire)
+            );
+
+            newDeclarations.push(
+              t.variableDeclarator(declarator.id, tempVar)
+            );
+          } else {
+            newDeclarations.push(originalDeclarator);
+
+            newDeclarations.push(
+              t.variableDeclarator(declarator.id, transformedRequire)
+            );
+          }
+        }
+
+        if (hasTransformation) {
+          nodePath.node.declarations = newDeclarations;
+          nodePath.node._transformed = true;
+        }
       }
     }
   };
