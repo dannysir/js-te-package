@@ -8,14 +8,13 @@ import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
 import {RESULT_TITLE} from "../constants.js";
 
-// 사용자 프로젝트의 module type 확인
 const getUserModuleType = () => {
   try {
     const pkgPath = path.join(process.cwd(), 'package.json');
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
     return pkg.type === 'module' ? 'esm' : 'cjs';
   } catch {
-    return 'cjs'; // package.json 없으면 기본값은 CJS
+    return 'cjs';
   }
 };
 
