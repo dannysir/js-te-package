@@ -1,5 +1,18 @@
 # CHANGE LOG
 
+## [0.2.0] 2025-12-02
+
+### 추가
+
+- CommonJS 지원 
+  - require() 구문을 사용하는 프로젝트에서도 사용 가능 
+  - ESM(import)과 CommonJS(require) 모두 지원 
+  - Rollup을 통한 dual package 배포 (ESM + CJS)
+- 부분 모킹(Partial Mocking) 지원 
+  - 모듈의 일부 함수만 모킹하고 나머지는 원본 유지 가능 
+  - 스프레드 연산자를 활용한 모킹 방식 개선 
+  - ESM과 CommonJS 모두에서 부분 모킹 동작
+
 ## [0.1.2] 2025-11-27
 
 ### 추가

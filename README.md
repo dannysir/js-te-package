@@ -127,16 +127,16 @@ expect(0).toBeFalsy();
 
 ### 동작 원리
 
-Babel을 사용해서 import 구문을 변환하여 mock 함수를 가져오도록 했습니다.
+Babel을 사용해서 import/require 구문을 변환하여 mock 함수를 가져오도록 했습니다.
 
 1. 테스트 파일 찾기
    1. `mock(path, mockObj)` 선언 확인
    2. `path`를 key로 이용해 Map에 저장
 2. Babel로 코드 변환
-   1. 전체 파일의 import문 확인
-   2. (0.0.3 버전 추가) import 경로를 **절대 경로**로 변환
-   2. import 경로(절대 경로)가 Map에 존재하면 mock 객체로 변환
-   3. import 경로(절대 경로)가 Map에 없다면 그대로 import
+    1. 전체 파일의 import/require문 확인
+    2. (0.0.3 버전 추가) import 경로를 **절대 경로**로 변환
+    2. import 경로(절대 경로)가 Map에 존재하면 mock 객체로 변환
+    3. import 경로(절대 경로)가 Map에 없다면 그대로 import
 3. 테스트 실행
 4. 원본 파일 복구
 
@@ -147,9 +147,46 @@ Babel을 사용해서 import 구문을 변환하여 mock 함수를 가져오도�
 **🚨 주의사항**
 
 1. 반드시 경로는 절대 경로로 입력해주세요.
-   - babel이 import문에서 절대 경로로 변환하여 확인을 하기 때문에 반드시 절대 경로로 등록해주세요.
+    - babel이 import문에서 절대 경로로 변환하여 확인을 하기 때문에 반드시 절대 경로로 등록해주세요.
 2. import문을 반드시 mocking 이후에 선언해주세요.
-   - mocking 전에 import를 하게 되면 mocking되기 전의 모듈을 가져오게 됩니다.
+    - mocking 전에 import를 하게 되면 mocking되기 전의 모듈을 가져오게 됩니다.
+
+**💡 부분 모킹(Partial Mocking)**
+
+0.1.3 버전부터 모듈의 일부 함수만 모킹하고 나머지는 원본을 사용할 수 있습니다.
+
+```javascript
+// math.js
+export const add = (a, b) => a + b;
+export const subtract = (a, b) => a - b;
+export const multiply = (a, b) => a * b;
+
+// math.test.js
+test('부분 모킹 예제', async () => {
+  // multiply만 모킹하고 add, subtract는 원본 사용
+  mock('/Users/san/Js-Te/math.js', {
+    multiply: () => 100  // multiply만 모킹
+  });
+  
+  const { add, subtract, multiply } = await import('./math.js');
+  
+  expect(add(2, 3)).toBe(5);        // 원본 함수 사용
+  expect(subtract(5, 3)).toBe(2);   // 원본 함수 사용
+  expect(multiply(2, 3)).toBe(100); // 모킹된 함수 사용
+});
+```
+
+**📦 모듈 시스템 지원**
+
+ESM(import)과 CommonJS(require) 모두 지원합니다.
+
+```javascript
+// ESM 방식
+import { random } from './random.js';
+
+// CommonJS 방식
+const { random } = require('./random.js');
+```
 
 ```javascript
 // random.js
@@ -157,6 +194,9 @@ export const random = () => Math.random();
 
 // game.js
 import { random } from './random.js'; // 자유롭게 import하면 babel에서 절대 경로로 변환하여 판단합니다.
+// 또는 CommonJS 방식도 지원
+// const { random } = require('./random.js');
+
 export const play = () => random() * 10;
 
 // game.test.js
@@ -166,9 +206,9 @@ test('랜덤 함수 모킹', async () => {
     random: () => 0.5
   });
   
-  // 2. 그 다음 import
-  // 상단에 import문을 입력할 경우 
+  // 2. 그 다음 import (CommonJS도 가능)
   const { play } = await import('./game.js');
+  // 또는: const { play } = require('./game.js');
   
   // 3. 모킹된 값 사용
   expect(play()).toBe(5);
@@ -300,6 +340,7 @@ describe('문자열 테스트', () => {
 
 ### 모킹 예제
 
+#### 전체 모킹
 ```javascript
 // mocking.test.js
 test('[mocking] - mocking random function', async () => {
@@ -309,7 +350,6 @@ test('[mocking] - mocking random function', async () => {
   const {play} = await import('../src/test-helper/game.js');
   expect(play()).toBe(30);
 });
-
 
 // game.js
 import {random} from '/test-helper/random.js'
@@ -322,9 +362,31 @@ export const play = () => {
 export const random = () => Math.random();
 ```
 
+#### 부분 모킹
+```javascript
+// calculator.js
+export const add = (a, b) => a + b;
+export const subtract = (a, b) => a - b;
+export const multiply = (a, b) => a * b;
+
+// calculator.test.js
+test('[partial mocking] - mock only multiply', async () => {
+  // multiply만 모킹, add와 subtract는 원본 사용
+  mock('/Users/san/Js-Te/calculator.js', {
+    multiply: (a, b) => 999
+  });
+  
+  const { add, subtract, multiply } = await import('./calculator.js');
+  
+  expect(add(2, 3)).toBe(5);        // 원본: 5
+  expect(subtract(5, 2)).toBe(3);   // 원본: 3
+  expect(multiply(2, 3)).toBe(999); // 모킹: 999
+});
+```
+
 ## 링크
 
-- [GitHub](https://github.com/dannysir/js-te-package)
+- [GitHub](https://github.com/dannysir/Js-Te)
 
 ## 만든 이유
 
