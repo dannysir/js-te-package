@@ -2,6 +2,26 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
+
+## [📎 최근 업데이트 0.2.3v](https://github.com/dannysir/js-te-package/blob/feature-import-hoisting/CHANGELOG.md)
+
+
+### 문서 수정
+- README.md 내에 type 설정 관련 설명 수정
+    - 0.2.1 버전부터 ESM 방식과 Common JS 방식 모두 허용
+    - 개발 블로그 링크 추가
+
+### 설정 수정
+- package.json
+    - 레포지토리 및 이슈 링크 추가
+
+### `rollup.config.js` output 파일명 수정
+- 기존 `.cjs.js`와 같은 이름에서 `.cjs`로 수정
+- `esm.js`에서 `.mjs`로 수정
+
+
+
+---
 ## 설치
 
 ```bash
