@@ -3,7 +3,7 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.2.3v](https://github.com/dannysir/js-te-package/blob/feature-import-hoisting/CHANGELOG.md)
+## [📎 최근 업데이트 0.2.3v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
 
 
 ### 문서 수정
