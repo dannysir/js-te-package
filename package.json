@@ -2,23 +2,22 @@
   "name": "@dannysir/js-te",
   "version": "0.2.2",
   "description": "JavaScript test library",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.esm.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
-    "./src/mock/store.js": {
-      "import": "./dist/mock/store.esm.js",
-      "require": "./dist/mock/store.cjs.js"
-    }
+    "./src/mock/store.js": "./src/mock/store.js"
   },
   "bin": {
     "js-te": "./bin/cli.js"
   },
   "scripts": {
-    "build": "rollup -c",
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
     "test": "node bin/cli.js",
     "prepublishOnly": "npm run build"
   },

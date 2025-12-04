@@ -5,7 +5,7 @@ export default [
   {
     input: 'index.js',
     output: {
-      file: 'dist/index.esm.js',
+      file: 'dist/index.mjs',
       format: 'esm',
       sourcemap: true
     },
@@ -25,7 +25,7 @@ export default [
   {
     input: 'index.js',
     output: {
-      file: 'dist/index.cjs.js',
+      file: 'dist/index.cjs',
       format: 'cjs',
       sourcemap: true,
       exports: 'named'
