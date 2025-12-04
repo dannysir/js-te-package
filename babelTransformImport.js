@@ -40,8 +40,6 @@ export const babelTransformImport = ({types: t}) => {
         const moduleVarName = nodePath.scope.generateUidIdentifier(BABEL.MODULE);
 
         /*
-        Transformed code for partial mocking support in ESM:
-
         const _original = await import('./random.js');
         const _module = mockStore.has('/path/to/random.js')
           ? { ..._original, ...mockStore.get('/path/to/random.js') }
@@ -147,8 +145,6 @@ export const babelTransformImport = ({types: t}) => {
         }
 
           /*
-          Transformed code for partial mocking support:
-
           const _original = require('./random');
           const _module = mockStore.has('/path/to/random.js')
             ? { ..._original, ...mockStore.get('/path/to/random.js') }

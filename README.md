@@ -29,10 +29,12 @@ describe('[단순 연산 테스트]', () => {
 
 package.json에 추가.
 
-- type을 module로 설정해주세요.
+- ~~type을 module로 설정해주세요.~~
+> ✅ 0.2.1 버전부터 common js 방식을 지원합니다.
+
 ```json
 {
-  "type": "module",
+  "type": "module", // 0.2.1 버전부터 common js도 사용 가능
   "scripts": {
     "test": "js-te"
   }
@@ -387,6 +389,7 @@ test('[partial mocking] - mock only multiply', async () => {
 ## 링크
 
 - [GitHub](https://github.com/dannysir/Js-Te)
+- [블로그 포스트](https://velog.io/@dannysir/series/npm-테스트-라이브러리-만들기)
 
 ## 만든 이유
 
