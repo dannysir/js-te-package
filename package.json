@@ -49,5 +49,12 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "rimraf": "^6.1.2",
     "rollup": "^4.53.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dannysir/js-te-package"
+  },
+  "bugs": {
+    "url": "https://github.com/dannysir/js-te-package/issues"
   }
 }
