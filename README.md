@@ -153,7 +153,7 @@ Babel을 사용해서 import/require 구문을 변환하여 mock 함수를 가�
 
 **💡 부분 모킹(Partial Mocking)**
 
-0.1.3 버전부터 모듈의 일부 함수만 모킹하고 나머지는 원본을 사용할 수 있습니다.
+0.2.1 버전부터 모듈의 일부 함수만 모킹하고 나머지는 원본을 사용할 수 있습니다.
 
 ```javascript
 // math.js
@@ -378,9 +378,9 @@ test('[partial mocking] - mock only multiply', async () => {
   
   const { add, subtract, multiply } = await import('./calculator.js');
   
-  expect(add(2, 3)).toBe(5);        // 원본: 5
-  expect(subtract(5, 2)).toBe(3);   // 원본: 3
-  expect(multiply(2, 3)).toBe(999); // 모킹: 999
+  expect(add(2, 3)).toBe(5);        
+  expect(subtract(5, 2)).toBe(3);   
+  expect(multiply(2, 3)).toBe(999); 
 });
 ```
 
