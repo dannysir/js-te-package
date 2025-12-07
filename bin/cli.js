@@ -7,6 +7,7 @@ import {findAllSourceFiles, findTestFiles} from "./utils/findFiles.js";
 import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
 import {RESULT_TITLE} from "../constants.js";
+import {collectMockedPaths} from "../src/mock/collectMocks.js";
 
 const getUserModuleType = () => {
   try {
@@ -38,19 +39,19 @@ const main = async () => {
       global[key] = jsTe[key];
     });
 
+    const testFiles = findTestFiles(process.cwd());
+    console.log(`\nFound ${green(testFiles.length)} test file(s)`);
+
+    const mockedPaths = collectMockedPaths(testFiles);
+
     const sourceFiles = findAllSourceFiles(process.cwd());
     for (const file of sourceFiles) {
-      transformFiles(file);
+      transformFiles(file, mockedPaths);
     }
-
-    const testFiles = findTestFiles(process.cwd());
-
-    console.log(`\nFound ${green(testFiles.length)} test file(s)`);
 
     for (const file of testFiles) {
       console.log(`\n${yellow(file)}\n`);
 
-      transformFiles(file);
       await import(path.resolve(file));
 
       const {passed, failed} = await jsTe.run();

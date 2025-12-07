@@ -6,19 +6,19 @@ import {red} from "../../utils/consoleColor.js";
 
 const originalFiles = new Map();
 
-export const transformFiles = (filePath) => {
+export const transformFiles = (filePath, mockPath) => {
   const originalCode = fs.readFileSync(filePath, 'utf-8');
   originalFiles.set(filePath, originalCode);
 
   const transformed = transformSync(originalCode, {
     filename: filePath,
-    plugins: [babelTransformImport],
+    plugins: [babelTransformImport(mockPath)],
     parserOpts: {
       sourceType: BABEL.MODULE,
       plugins: ['dynamicImport']
     }
   });
-
+  console.log(transformed.code);
   fs.writeFileSync(filePath, transformed.code);
 };
 
