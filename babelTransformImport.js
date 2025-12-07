@@ -35,16 +35,17 @@ export const babelTransformImport = ({types: t}) => {
         }
 
         const specifiers = nodePath.node.specifiers;
-
         const originalVarName = nodePath.scope.generateUidIdentifier('original');
-        const moduleVarName = nodePath.scope.generateUidIdentifier(BABEL.MODULE);
 
         /*
+
         const _original = await import('./random.js');
-        const _module = mockStore.has('/path/to/random.js')
-          ? { ..._original, ...mockStore.get('/path/to/random.js') }
-          : _original;
-        const {random1, random2} = _module;
+        const random = (...args) => {
+          const module = mockStore.has('/path/to/random.js')
+            ? { ..._original, ...mockStore.get('/path/to/random.js') }
+            : _original;
+          return module.random(...args);
+        };
         */
 
         const originalDeclaration = t.variableDeclaration(BABEL.CONST, [
@@ -56,29 +57,7 @@ export const babelTransformImport = ({types: t}) => {
           )
         ]);
 
-        const moduleDeclaration = t.variableDeclaration(BABEL.CONST, [
-          t.variableDeclarator(
-            moduleVarName,
-            t.conditionalExpression(
-              t.callExpression(
-                t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
-                [t.stringLiteral(absolutePath)]
-              ),
-              t.objectExpression([
-                t.spreadElement(originalVarName),
-                t.spreadElement(
-                  t.callExpression(
-                    t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
-                    [t.stringLiteral(absolutePath)]
-                  )
-                )
-              ]),
-              originalVarName
-            )
-          )
-        ]);
-
-        const extractDeclarations = specifiers.map(spec => {
+        const wrapperDeclarations = specifiers.map(spec => {
           let importedName, localName;
 
           if (t.isImportDefaultSpecifier(spec)) {
@@ -88,7 +67,44 @@ export const babelTransformImport = ({types: t}) => {
             localName = spec.local.name;
             return t.variableDeclarator(
               t.identifier(localName),
-              moduleVarName
+              t.newExpression(
+                t.identifier('Proxy'),
+                [
+                  originalVarName,
+                  t.objectExpression([
+                    t.objectProperty(
+                      t.identifier('get'),
+                      t.arrowFunctionExpression(
+                        [t.identifier('target'), t.identifier('prop')],
+                        t.conditionalExpression(
+                          t.callExpression(
+                            t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
+                            [t.stringLiteral(absolutePath)]
+                          ),
+                          t.logicalExpression(
+                            '??',
+                            t.memberExpression(
+                              t.objectExpression([
+                                t.spreadElement(t.identifier('target')),
+                                t.spreadElement(
+                                  t.callExpression(
+                                    t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
+                                    [t.stringLiteral(absolutePath)]
+                                  )
+                                )
+                              ]),
+                              t.identifier('prop'),
+                              true
+                            ),
+                            t.memberExpression(t.identifier('target'), t.identifier('prop'), true)
+                          ),
+                          t.memberExpression(t.identifier('target'), t.identifier('prop'), true)
+                        )
+                      )
+                    )
+                  ])
+                ]
+              )
             );
           } else {
             importedName = spec.imported.name;
@@ -97,13 +113,44 @@ export const babelTransformImport = ({types: t}) => {
 
           return t.variableDeclarator(
             t.identifier(localName),
-            t.memberExpression(moduleVarName, t.identifier(importedName))
+            t.arrowFunctionExpression(
+              [t.restElement(t.identifier('args'))],
+              t.blockStatement([
+                t.variableDeclaration(BABEL.CONST, [
+                  t.variableDeclarator(
+                    t.identifier(BABEL.MODULE),
+                    t.conditionalExpression(
+                      t.callExpression(
+                        t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
+                        [t.stringLiteral(absolutePath)]
+                      ),
+                      t.objectExpression([
+                        t.spreadElement(originalVarName),
+                        t.spreadElement(
+                          t.callExpression(
+                            t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
+                            [t.stringLiteral(absolutePath)]
+                          )
+                        )
+                      ]),
+                      originalVarName
+                    )
+                  )
+                ]),
+                t.returnStatement(
+                  t.callExpression(
+                    t.memberExpression(t.identifier(BABEL.MODULE), t.identifier(importedName)),
+                    [t.spreadElement(t.identifier('args'))]
+                  )
+                )
+              ])
+            )
           );
         });
 
-        const extractDeclaration = t.variableDeclaration(BABEL.CONST, extractDeclarations);
+        const wrapperDeclaration = t.variableDeclaration(BABEL.CONST, wrapperDeclarations);
 
-        nodePath.replaceWithMultiple([originalDeclaration, moduleDeclaration, extractDeclaration]);
+        nodePath.replaceWithMultiple([originalDeclaration, wrapperDeclaration]);
       },
 
       VariableDeclaration(nodePath, state) {
@@ -125,7 +172,7 @@ export const babelTransformImport = ({types: t}) => {
 
           if (!init ||
             !t.isCallExpression(init) ||
-            !t.isIdentifier(init.callee, { name: 'require' }) ||
+            !t.isIdentifier(init.callee, {name: 'require'}) ||
             !init.arguments[0] ||
             !t.isStringLiteral(init.arguments[0])) {
             newDeclarations.push(declarator);
@@ -137,69 +184,136 @@ export const babelTransformImport = ({types: t}) => {
           const currentFilePath = state.filename || process.cwd();
           const currentDir = path.dirname(currentFilePath);
 
-        let absolutePath;
-        if (source.startsWith(BABEL.PERIOD)) {
-          absolutePath = path.resolve(currentDir, source);
-        } else {
-          absolutePath = source;
-        }
-
-          /*
-          const _original = require('./random');
-          const _module = mockStore.has('/path/to/random.js')
-            ? { ..._original, ...mockStore.get('/path/to/random.js') }
-            : _original;
-          */
+          let absolutePath;
+          if (source.startsWith(BABEL.PERIOD)) {
+            absolutePath = path.resolve(currentDir, source);
+          } else {
+            absolutePath = source;
+          }
 
           const originalVar = nodePath.scope.generateUidIdentifier('original');
-          const originalDeclarator = t.variableDeclarator(
-            originalVar,
-            t.callExpression(
-              t.identifier('require'),
-              [t.stringLiteral(source)]
+
+          /*
+
+          const _original = require('./random');
+          const random = (...args) => {
+            const module = mockStore.has('/path/to/random.js')
+              ? { ..._original, ...mockStore.get('/path/to/random.js') }
+              : _original;
+            return module.random(...args);
+          };
+          */
+
+          newDeclarations.push(
+            t.variableDeclarator(
+              originalVar,
+              t.callExpression(
+                t.identifier('require'),
+                [t.stringLiteral(source)]
+              )
             )
           );
 
-          const transformedRequire = t.conditionalExpression(
-            t.callExpression(
-              t.memberExpression(
-                t.identifier(MOCK.STORE_NAME),
-                t.identifier(BABEL.HAS)
-              ),
-              [t.stringLiteral(absolutePath)]
-            ),
-            t.objectExpression([
-              t.spreadElement(originalVar),
-              t.spreadElement(
-                t.callExpression(
-                  t.memberExpression(
-                    t.identifier(MOCK.STORE_NAME),
-                    t.identifier(BABEL.GET)
-                  ),
-                  [t.stringLiteral(absolutePath)]
+          if (t.isObjectPattern(declarator.id)) {
+            const properties = declarator.id.properties;
+
+            properties.forEach(prop => {
+              const key = prop.key.name;
+              const localName = prop.value.name;
+
+              newDeclarations.push(
+                t.variableDeclarator(
+                  t.identifier(localName),
+                  t.arrowFunctionExpression(
+                    [t.restElement(t.identifier('args'))],
+                    t.blockStatement([
+                      t.variableDeclaration(BABEL.CONST, [
+                        t.variableDeclarator(
+                          t.identifier(BABEL.MODULE),
+                          t.conditionalExpression(
+                            t.callExpression(
+                              t.memberExpression(
+                                t.identifier(MOCK.STORE_NAME),
+                                t.identifier(BABEL.HAS)
+                              ),
+                              [t.stringLiteral(absolutePath)]
+                            ),
+                            t.objectExpression([
+                              t.spreadElement(originalVar),
+                              t.spreadElement(
+                                t.callExpression(
+                                  t.memberExpression(
+                                    t.identifier(MOCK.STORE_NAME),
+                                    t.identifier(BABEL.GET)
+                                  ),
+                                  [t.stringLiteral(absolutePath)]
+                                )
+                              )
+                            ]),
+                            originalVar
+                          )
+                        )
+                      ]),
+                      t.returnStatement(
+                        t.callExpression(
+                          t.memberExpression(
+                            t.identifier(BABEL.MODULE),
+                            t.identifier(key)
+                          ),
+                          [t.spreadElement(t.identifier('args'))]
+                        )
+                      )
+                    ])
+                  )
+                )
+              );
+            });
+          } else {
+            newDeclarations.push(
+              t.variableDeclarator(
+                declarator.id,
+                t.arrowFunctionExpression(
+                  [t.restElement(t.identifier('args'))],
+                  t.blockStatement([
+                    t.variableDeclaration(BABEL.CONST, [
+                      t.variableDeclarator(
+                        t.identifier(BABEL.MODULE),
+                        t.conditionalExpression(
+                          t.callExpression(
+                            t.memberExpression(
+                              t.identifier(MOCK.STORE_NAME),
+                              t.identifier(BABEL.HAS)
+                            ),
+                            [t.stringLiteral(absolutePath)]
+                          ),
+                          t.objectExpression([
+                            t.spreadElement(originalVar),
+                            t.spreadElement(
+                              t.callExpression(
+                                t.memberExpression(
+                                  t.identifier(MOCK.STORE_NAME),
+                                  t.identifier(BABEL.GET)
+                                ),
+                                [t.stringLiteral(absolutePath)]
+                              )
+                            )
+                          ]),
+                          originalVar
+                        )
+                      )
+                    ]),
+                    t.returnStatement(
+                      t.callExpression(
+                        t.memberExpression(
+                          t.identifier(BABEL.MODULE),
+                          t.identifier('default')
+                        ),
+                        [t.spreadElement(t.identifier('args'))]
+                      )
+                    )
+                  ])
                 )
               )
-            ]),
-            originalVar
-          );
-
-          if (t.isObjectPattern(declarator.id) || t.isArrayPattern(declarator.id)) {
-            const tempVar = nodePath.scope.generateUidIdentifier('module');
-
-            newDeclarations.push(originalDeclarator);
-
-            newDeclarations.push(
-              t.variableDeclarator(tempVar, transformedRequire)
-            );
-
-            newDeclarations.push(
-              t.variableDeclarator(declarator.id, tempVar)
-            );
-          } else {
-            newDeclarations.push(originalDeclarator);
-
-            newDeclarations.push(
-              t.variableDeclarator(declarator.id, transformedRequire)
             );
           }
         }
@@ -211,4 +325,4 @@ export const babelTransformImport = ({types: t}) => {
       }
     }
   };
-};
+}
