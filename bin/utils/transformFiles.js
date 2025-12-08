@@ -18,7 +18,7 @@ export const transformFiles = (filePath, mockPath) => {
       plugins: ['dynamicImport']
     }
   });
-  console.log(transformed.code);
+
   fs.writeFileSync(filePath, transformed.code);
 };
 

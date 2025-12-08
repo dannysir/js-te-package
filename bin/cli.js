@@ -51,6 +51,7 @@ const main = async () => {
 
     for (const file of testFiles) {
       console.log(`\n${yellow(file)}\n`);
+      transformFiles(file, mockedPaths);
 
       await import(path.resolve(file));
 
