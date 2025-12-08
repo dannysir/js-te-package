@@ -27,6 +27,7 @@
     "utils/",
     "src/",
     "babelTransformImport.js",
+    "babelCollectMocks.js",
     "constants.js"
   ],
   "keywords": [
