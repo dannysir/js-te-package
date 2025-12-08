@@ -3,23 +3,19 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.2.3v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
+## [📎 최근 업데이트 0.3.0v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
 
 
-### 문서 수정
-- README.md 내에 type 설정 관련 설명 수정
-    - 0.2.1 버전부터 ESM 방식과 Common JS 방식 모두 허용
-    - 개발 블로그 링크 추가
-
-### 설정 수정
-- package.json
-    - 레포지토리 및 이슈 링크 추가
-
-### `rollup.config.js` output 파일명 수정
-- 기존 `.cjs.js`와 같은 이름에서 `.cjs`로 수정
-- `esm.js`에서 `.mjs`로 수정
-
-
+### `mock` 이후 import를 해야하는 문제 해결
+- 문제 : 기존의 경우 모킹 기능 이용시 반드시 동적 import문을 mock 다음에 작성해야 했음
+- 해결
+  - 기존 `mockStore`를 직접 비교하여 import하는 방식에서 wrapper 패턴을 이용하도록 적용
+  - 모듈을 새로운 함수로 만들어 함수를 실행할 때마다 `mockStore`와 비교하여 값을 리턴하도록 수정
+### 모듈 변환 최적화
+- 문제 : 앞선 변경으로 인해 모든 파일의 모듈들이 사용될 때마다 `mockStore`와 비교하는 로직이 실행됨
+- 해결
+  - `cli`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
+  - 미리 확인한 mock 경로를 이용해 import문이 만약 저장된 경로일 때만 babel 변환
 
 ---
 ## 설치
@@ -155,10 +151,23 @@ Babel을 사용해서 import/require 구문을 변환하여 mock 함수를 가�
    1. `mock(path, mockObj)` 선언 확인
    2. `path`를 key로 이용해 Map에 저장
 2. Babel로 코드 변환
-    1. 전체 파일의 import/require문 확인
-    2. (0.0.3 버전 추가) import 경로를 **절대 경로**로 변환
-    2. import 경로(절대 경로)가 Map에 존재하면 mock 객체로 변환
-    3. import 경로(절대 경로)가 Map에 없다면 그대로 import
+```jsx
+// 0.3.0 버전 이후
+const _original = await import('./random.js');
+const random = (...args) => {
+  const module = mockStore.has('/path/to/random.js')
+    ? { ..._original, ...mockStore.get('/path/to/random.js') }
+    : _original;
+  return module.random(...args);
+};
+
+// 0.3.0 버전 이전
+const _original = await import('./random.js');
+const _module = mockStore.has('/path/to/random.js')
+  ? { ..._original, ...mockStore.get('/path/to/random.js') }
+  : _original;
+const {random1, random2} = _module;
+```
 3. 테스트 실행
 4. 원본 파일 복구
 
@@ -170,8 +179,10 @@ Babel을 사용해서 import/require 구문을 변환하여 mock 함수를 가�
 
 1. 반드시 경로는 절대 경로로 입력해주세요.
     - babel이 import문에서 절대 경로로 변환하여 확인을 하기 때문에 반드시 절대 경로로 등록해주세요.
-2. import문을 반드시 mocking 이후에 선언해주세요.
-    - mocking 전에 import를 하게 되면 mocking되기 전의 모듈을 가져오게 됩니다.
+2. ~~import문을 반드시 mocking 이후에 선언해주세요.~~
+    - ~~mocking 전에 import를 하게 되면 mocking되기 전의 모듈을 가져오게 됩니다.~~
+
+> **0.3.0 버전부터 import문을 mock선언 이후에 하지 않아도 됩니다.**
 
 **💡 부분 모킹(Partial Mocking)**
 
@@ -184,13 +195,12 @@ export const subtract = (a, b) => a - b;
 export const multiply = (a, b) => a * b;
 
 // math.test.js
+const { add, multiply } = import('./math.js'); // 0.3.0 버전부터는 최상단에 선언 가능
+
 test('부분 모킹 예제', async () => {
-  // multiply만 모킹하고 add, subtract는 원본 사용
-  mock('/Users/san/Js-Te/math.js', {
-    multiply: () => 100  // multiply만 모킹
+  mock('/Users/san/untitled/index.js', {
+    multiply: () => 100
   });
-  
-  const { add, subtract, multiply } = await import('./math.js');
   
   expect(add(2, 3)).toBe(5);        // 원본 함수 사용
   expect(subtract(5, 3)).toBe(2);   // 원본 함수 사용
@@ -222,17 +232,15 @@ import { random } from './random.js'; // 자유롭게 import하면 babel에서 �
 export const play = () => random() * 10;
 
 // game.test.js
+import {play} from './game.js';
+
 test('랜덤 함수 모킹', async () => {
   // 1. 먼저 모킹
   mock('/Users/san/Js-Te/test-helper/random.js', { // 반드시 절대 경로로 등록
     random: () => 0.5
   });
   
-  // 2. 그 다음 import (CommonJS도 가능)
-  const { play } = await import('./game.js');
-  // 또는: const { play } = require('./game.js');
-  
-  // 3. 모킹된 값 사용
+  // 2. 모킹된 값 사용
   expect(play()).toBe(5);
 });
 ```
@@ -365,11 +373,14 @@ describe('문자열 테스트', () => {
 #### 전체 모킹
 ```javascript
 // mocking.test.js
+import {random} from '../src/test-helper/game.js'; // 0.2.4 버전부터 import문 상단 배치 가능
+
 test('[mocking] - mocking random function', async () => {
   mock('/Users/san/Js-Te/test-helper/random.js', {
     random: () => 3,
   });
-  const {play} = await import('../src/test-helper/game.js');
+  // 0.3.0 버전 이전까지는 반드시 mock 이후 동적 import문 작성
+  // const {play} = await import('../src/test-helper/game.js');
   expect(play()).toBe(30);
 });
 
@@ -413,7 +424,7 @@ test('[partial mocking] - mock only multiply', async () => {
 
 ## 만든 이유
 
-우아한테크코스 과제하면서 Jest 써보고 테스트 프레임워크가 어떻게 동작하는지 궁금해서 만들어봤습니다.
+Jest를 사용하며 JavaScript 테스트 라이브러리의 구조가 궁금하여 만들게 되었습니다.
 
 ## 라이선스
 
