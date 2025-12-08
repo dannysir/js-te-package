@@ -2,11 +2,11 @@ import path from 'path';
 import { BABEL } from "./constants.js";
 
 export const createMockCollectorPlugin = (mockedPaths) => {
-  return ({ types: t }) => {
+  return ({types: t}) => {
     return {
       visitor: {
         CallExpression(nodePath, state) {
-          if (!t.isIdentifier(nodePath.node.callee, { name: 'mock' })) {
+          if (!t.isIdentifier(nodePath.node.callee, {name: 'mock'})) {
             return;
           }
 

@@ -13,7 +13,7 @@
     "./src/mock/store.js": "./src/mock/store.js"
   },
   "bin": {
-    "js-te": "./bin/cli.js"
+    "js-te": "bin/cli.js"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -52,7 +52,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dannysir/js-te-package"
+    "url": "git+https://github.com/dannysir/js-te-package.git"
   },
   "bugs": {
     "url": "https://github.com/dannysir/js-te-package/issues"
