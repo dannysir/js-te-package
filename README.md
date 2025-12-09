@@ -195,7 +195,7 @@ export const subtract = (a, b) => a - b;
 export const multiply = (a, b) => a * b;
 
 // math.test.js
-const { add, multiply } = import('./math.js'); // 0.3.0 버전부터는 최상단에 선언 가능
+const { add, subtract, multiply } = import('./math.js'); // 0.3.0 버전부터는 최상단에 선언 가능
 
 test('부분 모킹 예제', async () => {
   mock('/Users/san/untitled/index.js', {
