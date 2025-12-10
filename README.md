@@ -3,7 +3,7 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.3.0v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
+## [📎 최근 업데이트 0.3.2v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
 
 
 ### `mock` 이후 import를 해야하는 문제 해결
@@ -16,6 +16,10 @@ Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워�
 - 해결
   - `cli`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
   - 미리 확인한 mock 경로를 이용해 import문이 만약 저장된 경로일 때만 babel 변환
+### 기타 수정
+- README 오타 수정
+  - 부분 모킹오류 수정
+- package.json내 누락된 files 추가
 
 ---
 ## 설치
