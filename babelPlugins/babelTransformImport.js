@@ -1,5 +1,7 @@
-import path from 'path';
 import {BABEL, MOCK} from "../constants.js";
+import {findAbsolutePath, shouldTransform} from "./utils/pathHelper.js";
+import {getModuleInfo} from "./utils/getModuleInfo.js";
+import {createNamespaceWrapper, createOriginalDeclaration, createWrapperFunction} from "./utils/wrapperCreator.js";
 
 export const babelTransformImport = (mockedPaths = null) => {
   return ({types: t}) => {
@@ -26,16 +28,9 @@ export const babelTransformImport = (mockedPaths = null) => {
           }
 
           const currentFilePath = state.filename || process.cwd();
-          const currentDir = path.dirname(currentFilePath);
+          const absolutePath = findAbsolutePath(source, currentFilePath);
 
-          let absolutePath;
-          if (source.startsWith(BABEL.PERIOD)) {
-            absolutePath = path.resolve(currentDir, source);
-          } else {
-            absolutePath = source;
-          }
-
-          if (mockedPaths && !mockedPaths.has(absolutePath)) {
+          if (!shouldTransform(absolutePath, mockedPaths)) {
             return;
           }
 
@@ -53,82 +48,38 @@ export const babelTransformImport = (mockedPaths = null) => {
           };
           */
 
-          const originalDeclaration = t.variableDeclaration(BABEL.CONST, [
-            t.variableDeclarator(
-              originalVarName,
-              t.awaitExpression(
-                t.importExpression(t.stringLiteral(source))
-              )
-            )
-          ]);
+          const originalDeclaration = createOriginalDeclaration(
+            t,
+            originalVarName,
+            source,
+            false
+          );
 
           const wrapperDeclarations = specifiers.map(spec => {
-            let importedName, localName;
-
             if (t.isImportDefaultSpecifier(spec)) {
-              importedName = 'default';
-              localName = spec.local.name;
+              return createWrapperFunction(
+                t,
+                'default',
+                spec.local.name,
+                absolutePath,
+                originalVarName
+              );
             } else if (t.isImportNamespaceSpecifier(spec)) {
-              localName = spec.local.name;
-              return t.variableDeclarator(
-                t.identifier(localName),
-                t.conditionalExpression(
-                  t.callExpression(
-                    t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
-                    [t.stringLiteral(absolutePath)]
-                  ),
-                  t.objectExpression([
-                    t.spreadElement(originalVarName),
-                    t.spreadElement(
-                      t.callExpression(
-                        t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
-                        [t.stringLiteral(absolutePath)]
-                      )
-                    )
-                  ]),
-                  originalVarName
-                )
+              return createNamespaceWrapper(
+                t,
+                spec.local.name,
+                absolutePath,
+                originalVarName
               );
             } else {
-              importedName = spec.imported.name;
-              localName = spec.local.name;
+              return createWrapperFunction(
+                t,
+                spec.imported.name,
+                spec.local.name,
+                absolutePath,
+                originalVarName
+              );
             }
-
-            return t.variableDeclarator(
-              t.identifier(localName),
-              t.arrowFunctionExpression(
-                [t.restElement(t.identifier('args'))],
-                t.blockStatement([
-                  t.variableDeclaration(BABEL.CONST, [
-                    t.variableDeclarator(
-                      t.identifier(BABEL.MODULE),
-                      t.conditionalExpression(
-                        t.callExpression(
-                          t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
-                          [t.stringLiteral(absolutePath)]
-                        ),
-                        t.objectExpression([
-                          t.spreadElement(originalVarName),
-                          t.spreadElement(
-                            t.callExpression(
-                              t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
-                              [t.stringLiteral(absolutePath)]
-                            )
-                          )
-                        ]),
-                        originalVarName
-                      )
-                    )
-                  ]),
-                  t.returnStatement(
-                    t.callExpression(
-                      t.memberExpression(t.identifier(BABEL.MODULE), t.identifier(importedName)),
-                      [t.spreadElement(t.identifier('args'))]
-                    )
-                  )
-                ])
-              )
-            );
           });
 
           const wrapperDeclaration = t.variableDeclaration(BABEL.CONST, wrapperDeclarations);
@@ -151,29 +102,18 @@ export const babelTransformImport = (mockedPaths = null) => {
           let hasTransformation = false;
 
           for (const declarator of declarations) {
-            const init = declarator.init;
+            const requireInfo = getModuleInfo(t, declarator);
 
-            if (!init ||
-              !t.isCallExpression(init) ||
-              !t.isIdentifier(init.callee, {name: 'require'}) ||
-              !init.arguments[0] ||
-              !t.isStringLiteral(init.arguments[0])) {
+            if (!requireInfo) {
               newDeclarations.push(declarator);
               continue;
             }
 
-            const source = init.arguments[0].value;
+            const {source} = requireInfo;
             const currentFilePath = state.filename || process.cwd();
-            const currentDir = path.dirname(currentFilePath);
+            const absolutePath = findAbsolutePath(source, currentFilePath);
 
-            let absolutePath;
-            if (source.startsWith(BABEL.PERIOD)) {
-              absolutePath = path.resolve(currentDir, source);
-            } else {
-              absolutePath = source;
-            }
-
-            if (mockedPaths && !mockedPaths.has(absolutePath)) {
+            if (!shouldTransform(absolutePath, mockedPaths)) {
               newDeclarations.push(declarator);
               continue;
             }
@@ -210,97 +150,23 @@ export const babelTransformImport = (mockedPaths = null) => {
                 const localName = prop.value.name;
 
                 newDeclarations.push(
-                  t.variableDeclarator(
-                    t.identifier(localName),
-                    t.arrowFunctionExpression(
-                      [t.restElement(t.identifier('args'))],
-                      t.blockStatement([
-                        t.variableDeclaration(BABEL.CONST, [
-                          t.variableDeclarator(
-                            t.identifier(BABEL.MODULE),
-                            t.conditionalExpression(
-                              t.callExpression(
-                                t.memberExpression(
-                                  t.identifier(MOCK.STORE_NAME),
-                                  t.identifier(BABEL.HAS)
-                                ),
-                                [t.stringLiteral(absolutePath)]
-                              ),
-                              t.objectExpression([
-                                t.spreadElement(originalVar),
-                                t.spreadElement(
-                                  t.callExpression(
-                                    t.memberExpression(
-                                      t.identifier(MOCK.STORE_NAME),
-                                      t.identifier(BABEL.GET)
-                                    ),
-                                    [t.stringLiteral(absolutePath)]
-                                  )
-                                )
-                              ]),
-                              originalVar
-                            )
-                          )
-                        ]),
-                        t.returnStatement(
-                          t.callExpression(
-                            t.memberExpression(
-                              t.identifier(BABEL.MODULE),
-                              t.identifier(key)
-                            ),
-                            [t.spreadElement(t.identifier('args'))]
-                          )
-                        )
-                      ])
-                    )
+                  createWrapperFunction(
+                    t,
+                    key,
+                    localName,
+                    absolutePath,
+                    originalVar
                   )
                 );
               });
             } else {
               newDeclarations.push(
-                t.variableDeclarator(
-                  declarator.id,
-                  t.arrowFunctionExpression(
-                    [t.restElement(t.identifier('args'))],
-                    t.blockStatement([
-                      t.variableDeclaration(BABEL.CONST, [
-                        t.variableDeclarator(
-                          t.identifier(BABEL.MODULE),
-                          t.conditionalExpression(
-                            t.callExpression(
-                              t.memberExpression(
-                                t.identifier(MOCK.STORE_NAME),
-                                t.identifier(BABEL.HAS)
-                              ),
-                              [t.stringLiteral(absolutePath)]
-                            ),
-                            t.objectExpression([
-                              t.spreadElement(originalVar),
-                              t.spreadElement(
-                                t.callExpression(
-                                  t.memberExpression(
-                                    t.identifier(MOCK.STORE_NAME),
-                                    t.identifier(BABEL.GET)
-                                  ),
-                                  [t.stringLiteral(absolutePath)]
-                                )
-                              )
-                            ]),
-                            originalVar
-                          )
-                        )
-                      ]),
-                      t.returnStatement(
-                        t.callExpression(
-                          t.memberExpression(
-                            t.identifier(BABEL.MODULE),
-                            t.identifier('default')
-                          ),
-                          [t.spreadElement(t.identifier('args'))]
-                        )
-                      )
-                    ])
-                  )
+                createWrapperFunction(
+                  t,
+                  'default',
+                  declarator.id.name,
+                  absolutePath,
+                  originalVar
                 )
               );
             }
