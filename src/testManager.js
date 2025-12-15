@@ -1,4 +1,7 @@
-import {DIRECTORY_DELIMITER} from "../constants.js";
+import {DEFAULT_COUNT, DIRECTORY_DELIMITER, RESULT_TITLE} from "../constants.js";
+import {formatFailureMessage, formatSuccessMessage} from "../utils/formatString.js";
+import {clearAllMocks} from "./mock/store.js";
+import {getTestResultMsg} from "../utils/makeMessage.js";
 
 class TestManager {
   #tests = [];
@@ -50,6 +53,29 @@ class TestManager {
     this.#tests = [];
     this.#testDepth = [];
     this.#beforeEachArr = [];
+  }
+
+  async run() {
+    let passed = DEFAULT_COUNT;
+    let failed = DEFAULT_COUNT;
+
+    for (const test of testManager.getTests()) {
+      try {
+        await test.fn();
+        console.log(formatSuccessMessage(test));
+        passed++;
+        clearAllMocks();
+      } catch (error) {
+        console.log(formatFailureMessage(test, error));
+        failed++;
+      }
+    }
+
+    console.log(getTestResultMsg(RESULT_TITLE.TESTS, passed, failed));
+
+    testManager.clearTests();
+
+    return {passed, failed};
   }
 
   #formatDescription(args, description) {

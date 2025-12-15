@@ -1,6 +1,6 @@
 import fs from 'fs';
 import {transformSync} from "@babel/core";
-import {babelTransformImport} from "../../babelTransformImport.js";
+import {babelTransformImport} from "../../babelPlugins/babelTransformImport.js";
 import {BABEL} from "../../constants.js";
 import {red} from "../../utils/consoleColor.js";
 

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import {transformSync} from "@babel/core";
 import {BABEL} from "../../constants.js";
-import {createMockCollectorPlugin} from "../../babelCollectMocks.js";
+import {createMockCollectorPlugin} from "../../babelPlugins/babelCollectMocks.js";
 
 export const collectMockedPaths = (testFiles) => {
   const mockedPaths = new Set();
@@ -19,7 +19,6 @@ export const collectMockedPaths = (testFiles) => {
         }
       });
     } catch (error) {
-      // 파싱 에러는 무시 (어차피 테스트 실행 시 에러 발생)
       console.warn(`Warning: Failed to scan ${testFile} for mocks`);
     }
   }

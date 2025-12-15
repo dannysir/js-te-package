@@ -1,5 +1,5 @@
 import path from 'path';
-import {BABEL, MOCK} from "./constants.js";
+import {BABEL, MOCK} from "../constants.js";
 
 export const babelTransformImport = (mockedPaths = null) => {
   return ({types: t}) => {
