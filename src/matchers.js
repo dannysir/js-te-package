@@ -1,4 +1,3 @@
-
 import {getErrorMsg, getThrowErrorMsg} from "../utils/formatString.js";
 
 const runArgFnc = (actual) => {
