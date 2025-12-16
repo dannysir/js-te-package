@@ -1,4 +1,5 @@
-import { BABEL, MOCK } from "../../constants.js";
+
+import {BABEL, MOCK} from "../../constants/babel.js";
 
 /**
  * Mock wrapper 함수를 생성하는 헬퍼

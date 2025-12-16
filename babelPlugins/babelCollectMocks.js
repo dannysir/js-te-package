@@ -1,5 +1,6 @@
 import path from 'path';
-import { BABEL } from "../constants.js";
+
+import {BABEL} from "../constants/babel.js";
 
 export const createMockCollectorPlugin = (mockedPaths) => {
   return ({types: t}) => {

@@ -1,7 +1,8 @@
-import {BABEL, MOCK} from "../constants.js";
+
 import {findAbsolutePath, shouldTransform} from "./utils/pathHelper.js";
 import {getModuleInfo} from "./utils/getModuleInfo.js";
 import {createNamespaceWrapper, createOriginalDeclaration, createWrapperFunction} from "./utils/wrapperCreator.js";
+import {BABEL, MOCK} from "../constants/babel.js";
 
 export const babelTransformImport = (mockedPaths = null) => {
   return ({types: t}) => {

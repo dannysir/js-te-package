@@ -1,8 +1,8 @@
 import fs from 'fs';
 import {transformSync} from "@babel/core";
 import {babelTransformImport} from "../../babelPlugins/babelTransformImport.js";
-import {BABEL} from "../../constants.js";
 import {red} from "../../utils/consoleColor.js";
+import {BABEL} from "../../constants/babel.js";
 
 const originalFiles = new Map();
 

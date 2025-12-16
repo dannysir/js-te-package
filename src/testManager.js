@@ -1,7 +1,7 @@
-import {DEFAULT_COUNT, DIRECTORY_DELIMITER, RESULT_TITLE} from "../constants.js";
 import {formatFailureMessage, formatSuccessMessage} from "../utils/formatString.js";
 import {clearAllMocks} from "./mock/store.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
+import {DEFAULT_COUNT, RESULT_MSG} from "../constants/index.js";
 
 class TestManager {
   #tests = [];
@@ -27,7 +27,7 @@ class TestManager {
         }
         await fn();
       },
-      path: this.#testDepth.join(DIRECTORY_DELIMITER),
+      path: this.#testDepth.join(RESULT_MSG.DIRECTORY_DELIMITER),
     }
     this.#tests.push(testObj);
   }
@@ -71,7 +71,7 @@ class TestManager {
       }
     }
 
-    console.log(getTestResultMsg(RESULT_TITLE.TESTS, passed, failed));
+    console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed));
 
     testManager.clearTests();
 

@@ -1,5 +1,6 @@
 import path from 'path';
-import { BABEL } from "../../constants.js";
+
+import {BABEL} from "../../constants/babel.js";
 
 /**
  * 상대/절대 경로를 절대 경로로 변환

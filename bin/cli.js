@@ -6,8 +6,9 @@ import {restoreFiles, transformFiles} from "./utils/transformFiles.js";
 import {findAllSourceFiles, findTestFiles} from "./utils/findFiles.js";
 import {green, red, yellow} from "../utils/consoleColor.js";
 import {getTestResultMsg} from "../utils/makeMessage.js";
-import {RESULT_TITLE} from "../constants.js";
 import {collectMockedPaths} from "../src/mock/collectMocks.js";
+
+import {DEFAULT_COUNT, PATH, RESULT_MSG} from "../constants/index.js";
 
 const getUserModuleType = () => {
   try {
@@ -21,18 +22,18 @@ const getUserModuleType = () => {
 
 const main = async () => {
   try {
-    let totalPassed = 0;
-    let totalFailed = 0;
+    let totalPassed = DEFAULT_COUNT;
+    let totalFailed = DEFAULT_COUNT;
 
     const moduleType = getUserModuleType();
 
     let jsTe;
     if (moduleType === 'esm') {
-      jsTe = await import('@dannysir/js-te');
+      jsTe = await import(PATH.DANNYSIR_JS_TE);
     } else {
       const { createRequire } = await import('module');
       const require = createRequire(import.meta.url);
-      jsTe = require('@dannysir/js-te');
+      jsTe = require(PATH.DANNYSIR_JS_TE);
     }
 
     Object.keys(jsTe).forEach(key => {
@@ -60,7 +61,7 @@ const main = async () => {
       totalFailed += failed;
     }
 
-    console.log(getTestResultMsg(RESULT_TITLE.TOTAL, totalPassed, totalFailed));
+    console.log(getTestResultMsg(RESULT_MSG.TOTAL, totalPassed, totalFailed));
 
     return totalFailed > 0 ? 1 : 0;
 
