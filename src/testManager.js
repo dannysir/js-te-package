@@ -1,7 +1,7 @@
-import {formatFailureMessage, formatSuccessMessage} from "../utils/formatString.js";
+import {formatFailureMessage, formatSuccessMessage, getMatcherForReplace, placeHolder} from "./utils/formatString.js";
 import {clearAllMocks} from "./mock/store.js";
-import {getTestResultMsg} from "../utils/makeMessage.js";
-import {DEFAULT_COUNT, RESULT_MSG} from "../constants/index.js";
+import {NUM, RESULT_MSG} from "../constants/index.js";
+import {getTestResultMsg} from "../bin/utils/messages.js";
 
 class TestManager {
   #tests = [];
@@ -56,8 +56,8 @@ class TestManager {
   }
 
   async run() {
-    let passed = DEFAULT_COUNT;
-    let failed = DEFAULT_COUNT;
+    let passed = NUM.ZERO;
+    let failed = NUM.ZERO;
 
     for (const test of testManager.getTests()) {
       try {
@@ -80,19 +80,12 @@ class TestManager {
 
   #formatDescription(args, description) {
     let argIndex = 0;
-    return description.replace(/%([so])/g, (match, type) => {
+    return description.replace(getMatcherForReplace(), (match, type) => {
       if (argIndex >= args.length) return match;
 
-      const arg = args[argIndex++];
+      const formatter = placeHolder[type];
 
-      switch (type) {
-        case 's':
-          return arg;
-        case 'o':
-          return JSON.stringify(arg);
-        default:
-          return match;
-      }
+      return formatter ? formatter(args[argIndex++]) : match;
     });
   }
 }

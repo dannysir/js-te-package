@@ -17,4 +17,13 @@ export const RESULT_MSG = {
   EMPTY: '',
 };
 
-export const DEFAULT_COUNT = 0;
+export const NUM = {
+  ZERO: 0,
+  ONE: 1,
+};
+
+export const MODULE_TYPE = {
+  MODULE: 'module',
+  ESM: 'esm',
+  CJS: 'cjs',
+};
