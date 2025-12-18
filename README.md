@@ -3,24 +3,26 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.3.2v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
+## [📎 최근 업데이트 0.3.2v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md) & 주요 업데이트 내용
 
-
-### `mock` 이후 import를 해야하는 문제 해결
+### `mock` 이후 import를 해야하는 문제 해결 (0.3.0v)
 - 문제 : 기존의 경우 모킹 기능 이용시 반드시 동적 import문을 mock 다음에 작성해야 했음
 - 해결
   - 기존 `mockStore`를 직접 비교하여 import하는 방식에서 wrapper 패턴을 이용하도록 적용
   - 모듈을 새로운 함수로 만들어 함수를 실행할 때마다 `mockStore`와 비교하여 값을 리턴하도록 수정
-### 모듈 변환 최적화
+### 모듈 변환 최적화 (0.3.0v)
 - 문제 : 앞선 변경으로 인해 모든 파일의 모듈들이 사용될 때마다 `mockStore`와 비교하는 로직이 실행됨
 - 해결
-  - `cli`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
+  - `cli.js`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
   - 미리 확인한 mock 경로를 이용해 import문이 만약 저장된 경로일 때만 babel 변환
-### 기타 수정
-- README 오타 수정
-  - 부분 모킹오류 수정
-- package.json내 누락된 files 추가
-
+### 리펙토링 (0.3.2v)
+- 불필요하게 거대한 로직 분리
+  - `cli.js` 내부 로직 분리 & `cli.js` 내부에서는 전체 흐름만 관리하도록 수정
+  - 바벨 플러그인 코드내 중복되는 코드 제거
+- 디렉토리 구조 변경
+  - 기존 디렉토리 내부에 있던 유틸 디렉토리를 통합된 유틸로 관리
+  - bin 내부에 존재하는 로직을 `cli.js`를 제외하고 전부 src 디렉토리로 옮김
+  - 분리된 디렉토리를 src 내부에서 관리하도록 수정 (ex: `babelTransformImport.js`)
 ---
 ## 설치
 

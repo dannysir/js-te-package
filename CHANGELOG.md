@@ -2,6 +2,21 @@
 
 ## [0.3.2] 2025-12-10
 
+### 리펙토링
+- cli.js
+  - `main()`에서 관리하던 전체 흐름을 `setupEnvironment.js`, `setupFiles.js`, `runTests.js`로 분리
+  - `main()`에서는 흐름만 관리하도록 수정
+- babel 플러그인
+  - 플러그인 내부에 중복된 Wrapper 패턴 생성 로직 분리
+  - 플러그인 내부에서는 AST를 이용한 로직 생성만 집중하도록 만듬
+- JSDoc 추가
+  - babel과 관련된 로직 및 사용자가 사용하는 로직에 JSDoc 추가
+  - JSDoc을 통해 매개변수와 리턴 타입에 대해 명시하고 함수의 역할 및 사용 예시를 추가
+- 그 외 리펙토링 사항
+  - 코드 스타일 통일
+    - 일부 function 코드를 arrow function 코드로 수정
+  - 미흡한 상수화 보완
+
 ### 문서 오류 수정
 
 - README.md 내 오타 수정
