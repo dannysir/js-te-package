@@ -18,4 +18,4 @@ export const getModuleInfo = (t, declarator) => {
   return {
     source: init.arguments[0].value
   };
-}
+};

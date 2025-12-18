@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 
-import {PATH} from "../../constants/index.js";
+import {PATH} from "../constants/index.js";
 
 /**
  * 테스트 파일을 찾는 로직입니다.
@@ -64,4 +64,4 @@ export const findAllSourceFiles = (dir) => {
 
   walk(dir);
   return files;
-}
+};

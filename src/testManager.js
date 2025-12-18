@@ -1,7 +1,7 @@
 import {formatFailureMessage, formatSuccessMessage, getMatcherForReplace, placeHolder} from "./utils/formatString.js";
 import {clearAllMocks} from "./mock/store.js";
-import {NUM, RESULT_MSG} from "../constants/index.js";
-import {getTestResultMsg} from "../bin/utils/messages.js";
+import {NUM, RESULT_MSG} from "./constants/index.js";
+import {getTestResultMsg} from "./utils/messages.js";
 
 class TestManager {
   #tests = [];
