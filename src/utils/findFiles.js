@@ -1,15 +1,21 @@
 import fs from 'fs';
 import path from 'path';
-import {PATH} from "../../constants.js";
 
+
+import {PATH} from "../constants/index.js";
+
+/**
+ * 테스트 파일을 찾는 로직입니다.
+ * @param {string} dir
+ * @returns {string[]}
+ */
 export const findTestFiles = (dir) => {
   const files = [];
 
-  const walk = (directory, inTestDir = false) => {
+  const walk = (directory) => {
     const items = fs.readdirSync(directory);
     const dirName = path.basename(directory);
-
-    const isTestDir = dirName === PATH.TEST_DIRECTORY || inTestDir;
+    const isTestDir = dirName === PATH.TEST_DIRECTORY;
 
     for (const item of items) {
       if (item === PATH.NODE_MODULES) continue;
@@ -31,6 +37,11 @@ export const findTestFiles = (dir) => {
   return files;
 }
 
+/**
+ * 테스트 파일을 포함한 전체 파일을 찾는 함수입니다.
+ * @param {string} dir
+ * @returns {string[]}
+ */
 export const findAllSourceFiles = (dir) => {
   const files = [];
 
@@ -53,4 +64,4 @@ export const findAllSourceFiles = (dir) => {
 
   walk(dir);
   return files;
-}
+};

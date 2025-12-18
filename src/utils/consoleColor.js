@@ -1,4 +1,4 @@
-import {COLORS} from "../constants.js";
+import {COLORS} from "../constants/view.js";
 
 export const colorize = (text, color) => `${color}${text}${COLORS.reset}`;
 

@@ -1,4 +1,7 @@
-import {DIRECTORY_DELIMITER} from "../constants.js";
+import {formatFailureMessage, formatSuccessMessage, getMatcherForReplace, placeHolder} from "./utils/formatString.js";
+import {clearAllMocks} from "./mock/store.js";
+import {NUM, RESULT_MSG} from "./constants/index.js";
+import {getTestResultMsg} from "./utils/messages.js";
 
 class TestManager {
   #tests = [];
@@ -24,7 +27,7 @@ class TestManager {
         }
         await fn();
       },
-      path: this.#testDepth.join(DIRECTORY_DELIMITER),
+      path: this.#testDepth.join(RESULT_MSG.DIRECTORY_DELIMITER),
     }
     this.#tests.push(testObj);
   }
@@ -52,21 +55,37 @@ class TestManager {
     this.#beforeEachArr = [];
   }
 
+  async run() {
+    let passed = NUM.ZERO;
+    let failed = NUM.ZERO;
+
+    for (const test of testManager.getTests()) {
+      try {
+        await test.fn();
+        console.log(formatSuccessMessage(test));
+        passed++;
+        clearAllMocks();
+      } catch (error) {
+        console.log(formatFailureMessage(test, error));
+        failed++;
+      }
+    }
+
+    console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed));
+
+    testManager.clearTests();
+
+    return {passed, failed};
+  }
+
   #formatDescription(args, description) {
     let argIndex = 0;
-    return description.replace(/%([so])/g, (match, type) => {
+    return description.replace(getMatcherForReplace(), (match, type) => {
       if (argIndex >= args.length) return match;
 
-      const arg = args[argIndex++];
+      const formatter = placeHolder[type];
 
-      switch (type) {
-        case 's':
-          return arg;
-        case 'o':
-          return JSON.stringify(arg);
-        default:
-          return match;
-      }
+      return formatter ? formatter(args[argIndex++]) : match;
     });
   }
 }

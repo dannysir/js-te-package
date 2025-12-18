@@ -24,11 +24,8 @@
   "files": [
     "bin/",
     "dist/",
-    "utils/",
     "src/",
-    "babelTransformImport.js",
-    "babelCollectMocks.js",
-    "constants.js"
+    "index.js"
   ],
   "keywords": [
     "javascript",

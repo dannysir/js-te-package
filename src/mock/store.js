@@ -1,17 +1,17 @@
 export const mockStore = new Map();
 
-export function clearAllMocks() {
+export const clearAllMocks = () => {
   mockStore.clear();
 }
 
-export function mock(modulePath, mockExports) {
+export const mock = (modulePath, mockExports) => {
   mockStore.set(modulePath, mockExports);
 }
 
-export function unmock(modulePath) {
+export const unmock = (modulePath) => {
   mockStore.delete(modulePath);
 }
 
-export function isMocked(modulePath) {
+export const isMocked = (modulePath) => {
   return mockStore.has(modulePath);
 }
