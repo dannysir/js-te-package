@@ -1,12 +1,16 @@
-import {formatFailureMessage, formatSuccessMessage, getMatcherForReplace, placeHolder} from "./utils/formatString.js";
+import {formatFailureMessage, formatSuccessMessage} from "./utils/formatString.js";
 import {clearAllMocks} from "./mock/store.js";
 import {NUM, RESULT_MSG} from "./constants/index.js";
-import {getTestResultMsg} from "./utils/messages.js";
+import {getTestResultMsg} from "./cli/utils/messages.js";
 
 class TestManager {
   #tests = [];
   #testDepth = [];
   #beforeEachArr = [];
+  #placeHolder = {
+    's': (value) => value,
+    'o': (value) => JSON.stringify(value),
+  };
 
   describe(str, fn) {
     this.#testDepth.push(str);
@@ -78,12 +82,16 @@ class TestManager {
     return {passed, failed};
   }
 
+  #getMatcherForReplace = () => {
+    return new RegExp(`%([${Object.keys(this.#placeHolder).join('')}])`, 'g')
+  };
+
   #formatDescription(args, description) {
     let argIndex = 0;
-    return description.replace(getMatcherForReplace(), (match, type) => {
+    return description.replace(this.#getMatcherForReplace(), (match, type) => {
       if (argIndex >= args.length) return match;
 
-      const formatter = placeHolder[type];
+      const formatter = this.#placeHolder[type];
 
       return formatter ? formatter(args[argIndex++]) : match;
     });

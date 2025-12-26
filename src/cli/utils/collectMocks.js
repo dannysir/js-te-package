@@ -1,7 +1,7 @@
 import fs from 'fs';
 import {transformSync} from "@babel/core";
-import {createMockCollectorPlugin} from "../babelPlugins/babelCollectMocks.js";
-import {BABEL} from "../constants/babel.js";
+import {createMockCollectorPlugin} from "../../babelPlugins/babelCollectMocks.js";
+import {BABEL} from "../../constants/babel.js";
 
 export const collectMockedPaths = (testFiles) => {
   const mockedPaths = new Set();

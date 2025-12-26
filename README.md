@@ -3,7 +3,7 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.3.2v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md) & 주요 업데이트 내용
+## [📎 최근 업데이트 0.3.3v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md) & 주요 업데이트 내용
 
 ### `mock` 이후 import를 해야하는 문제 해결 (0.3.0v)
 - 문제 : 기존의 경우 모킹 기능 이용시 반드시 동적 import문을 mock 다음에 작성해야 했음
