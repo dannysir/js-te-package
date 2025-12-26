@@ -1,5 +1,5 @@
 import {findAllSourceFiles, findTestFiles} from "./utils/findFiles.js";
-import {collectMockedPaths} from "../mock/collectMocks.js";
+import {collectMockedPaths} from "./utils/collectMocks.js";
 import {transformFiles} from "./utils/transformFiles.js";
 
 export const setupFiles = () => {
