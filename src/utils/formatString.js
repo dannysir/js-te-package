@@ -13,19 +13,10 @@ export const formatFailureMessage = (test, error) => {
   return messages.join('\n');
 };
 
-export const getErrorMsg = (expect, actual) => {
+export const formatErrorMsg = (expect, actual) => {
   return `Expected ${JSON.stringify(expect)} but got ${JSON.stringify(actual)}`;
 };
 
-export const getThrowErrorMsg = (expect) => {
+export const formatThrowErrorMsg = (expect) => {
   return `Expected function to throw an error containing "${expect}", but it did not throw`;
-};
-
-export const placeHolder = {
-  's': (value) => value,
-  'o': (value) => JSON.stringify(value),
-};
-
-export const getMatcherForReplace = () => {
-  return new RegExp(`%([${Object.keys(placeHolder).join('')}])`, 'g')
 };

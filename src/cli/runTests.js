@@ -1,6 +1,6 @@
 import path from 'path';
-import {getFilePath} from "../utils/messages.js";
-import {transformFiles} from "../utils/transformFiles.js";
+import {getFilePath} from "./utils/messages.js";
+import {transformFiles} from "./utils/transformFiles.js";
 import {NUM} from "../constants/index.js";
 
 export const runTests = async (jsTe, mockedPaths, testFiles) => {

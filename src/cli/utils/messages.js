@@ -1,4 +1,4 @@
-import {bold, green, red, yellow} from "./consoleColor.js";
+import {bold, green, red, yellow} from "../../utils/consoleColor.js";
 
 export const getTestResultMsg = (title, success, fail) => {
   let msg = '\n';
