@@ -1,3 +1,6 @@
+import {play} from "../test-helper/game.js";
+import {random} from "../test-helper/random.js";
+
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
     describe('3단계', () => {
@@ -23,7 +26,19 @@ test('[mocking] - mocking random function', async () => {
     random: () => 3,
   });
   const {play} = await import('../test-helper/game.js');
+
   expect(play()).toBe(30);
+});
+
+test('[mocking] - mockReturnValueOnce test', async () => {
+  const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
+    random: () => 1,
+  });
+  const result = 3;
+
+  mocked.random.mockReturnValueOnce(result);
+
+  expect(random()).toBe(result);
 });
 
 test.each([
