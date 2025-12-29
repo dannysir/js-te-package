@@ -1,3 +1,5 @@
+import {changeModuleExports} from "./utils/changeModuleExports.js";
+
 export const mockStore = new Map();
 
 export const clearAllMocks = () => {
@@ -5,7 +7,9 @@ export const clearAllMocks = () => {
 }
 
 export const mock = (modulePath, mockExports) => {
-  mockStore.set(modulePath, mockExports);
+  const mockedExports = changeModuleExports(mockExports);
+  mockStore.set(modulePath, mockedExports);
+  return mockStore.get(modulePath);
 }
 
 export const unmock = (modulePath) => {
