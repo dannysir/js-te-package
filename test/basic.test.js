@@ -1,5 +1,6 @@
 import {play} from "../test-helper/game.js";
 import {random} from "../test-helper/random.js";
+import {expect} from "../src/expect.js";
 
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
@@ -21,24 +22,41 @@ describe('[function return test] - expect arg', () => {
   });
 });
 
-test('[mocking] - mocking random function', async () => {
-  mock('/Users/san/js-te-package/test-helper/random.js', {
-    random: () => 3,
+describe('[mocking] - mocking test', () => {
+  test('[mock module] - mocking random function', async () => {
+    mock('/Users/san/js-te-package/test-helper/random.js', {
+      random: () => 3,
+    });
+
+    expect(play()).toBe(30);
   });
-  const {play} = await import('../test-helper/game.js');
 
-  expect(play()).toBe(30);
-});
+  test('[mock module mockReturnValueOnce] - mocking function test', async () => {
+    const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
+      random: () => 1,
+    });
+    const result = 3;
 
-test('[mocking] - mockReturnValueOnce test', async () => {
-  const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
-    random: () => 1,
+    mocked.random.mockReturnValueOnce(result);
+
+    expect(random()).toBe(result);
   });
-  const result = 3;
 
-  mocked.random.mockReturnValueOnce(result);
+  test('[mock function] - mockReturnValueOnce, mockReturnValue', () => {
+    const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
+      random
+    });
+    const input = [2, 4, 6, 8, 10];
+    const defaultValue = -1;
 
-  expect(random()).toBe(result);
+    mocked.random.mockReturnValueOnce(...input);
+    mocked.random.mockReturnValue(defaultValue);
+
+    input.forEach(value => {
+      expect(random()).toBe(value);
+    });
+    expect(random()).toBe(defaultValue);
+  });
 });
 
 test.each([
