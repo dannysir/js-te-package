@@ -1,9 +1,14 @@
 import {mockFunctions} from "./mockFunctions.js";
 
-const makeMockFnc = (implementation) => {
+/**
+ * 목업 함수로 변환하는 로직
+ * @param {function} [implementation] - 목업 함수 로직 (선택, 기본값: () => null)
+ * @returns {(function(...*): *) & MockMethods} 호출 가능하면서 목업 메서드를 가진 함수
+ */
+const makeMockFnc = (implementation = (() => null)) => {
   const state = {
     returnQueue: [],
-    curImplement: implementation || (() => null)
+    curImplement: implementation,
   };
 
   const mockFn = (...args) => {
