@@ -1,6 +1,5 @@
 import {play} from "../test-helper/game.js";
 import {random} from "../test-helper/random.js";
-import {expect} from "../src/expect.js";
 
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
@@ -56,6 +55,15 @@ describe('[mocking] - mocking test', () => {
       expect(random()).toBe(value);
     });
     expect(random()).toBe(defaultValue);
+  });
+
+  test('[mock function] - fn, mockImplementation', () => {
+    const mockFunc = fn();
+    const add = (a, b) => a + b;
+
+    mockFunc.mockImplementation(add);
+
+    expect(mockFunc(1, 2)).toBe(3);
   });
 });
 
