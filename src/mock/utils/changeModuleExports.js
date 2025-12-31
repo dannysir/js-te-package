@@ -5,7 +5,7 @@ import {mockFunctions} from "./mockFunctions.js";
  * @param {function} [implementation] - 목업 함수 로직 (선택, 기본값: () => null)
  * @returns {(function(...*): *) & MockMethods} 호출 가능하면서 목업 메서드를 가진 함수
  */
-const makeMockFnc = (implementation = (() => null)) => {
+export const makeMockFnc = (implementation = (() => null)) => {
   const state = {
     returnQueue: [],
     curImplement: implementation,
@@ -18,7 +18,7 @@ const makeMockFnc = (implementation = (() => null)) => {
     return state.curImplement(...args);
   };
 
-  const methods = mockFunctions(state);
+  const methods = mockFunctions(mockFn, state);
   Object.assign(mockFn, methods);
 
   return mockFn;

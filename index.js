@@ -1,6 +1,7 @@
 import {testManager} from "./src/testManager.js";
 import {clearAllMocks, isMocked, mock, unmock, mockStore} from './src/mock/store.js';
 import {expect} from "./src/expect.js";
+import {makeMockFnc} from "./src/mock/utils/changeModuleExports.js";
 
 /**
  * 테스트 케이스를 정의합니다.
@@ -88,3 +89,5 @@ export const run = () => testManager.run();
 export {expect};
 
 export {mock, clearAllMocks, unmock, isMocked, mockStore};
+
+export const fn = makeMockFnc;

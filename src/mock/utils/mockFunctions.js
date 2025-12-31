@@ -8,31 +8,31 @@
  */
 
 /**
- * 목업 함수 리턴
+ * @param {function} mockFn
  * @param {Object} state
  * @returns {{mockImplementation(*): this, mockReturnValueOnce(...[*]): this, mockReturnValue(*): this, mockClear(): this}|*}
  */
-export const mockFunctions = (state) => {
+export const mockFunctions = (mockFn, state) => {
   return {
     mockImplementation(newImpl) {
       state.curImplement = newImpl;
-      return this;
+      return mockFn;
     },
 
     mockReturnValueOnce(...value) {
       state.returnQueue.push(...value);
-      return this;
+      return mockFn;
     },
 
     mockReturnValue(value) {
       state.curImplement = () => value;
-      return this;
+      return mockFn;
     },
 
     mockClear() {
       state.returnQueue = [];
       state.curImplement = () => null;
-      return this;
+      return mockFn;
     },
   }
 };
