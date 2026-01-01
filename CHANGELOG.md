@@ -1,5 +1,19 @@
 # CHANGE LOG
 
+## [0.4.0] 2026-01-01
+
+### 추가
+
+- Mock Functions 기능 추가
+  - `fn()` - 모킹 가능한 함수 생성
+  - `mockImplementation()` - mock 함수의 구현 로직 변경
+  - `mockReturnValue()` - mock 함수가 항상 특정 값을 반환하도록 설정
+  - `mockReturnValueOnce()` - mock 함수가 한 번만 특정 값을 반환하도록 설정
+  - `mockClear()` - mock 함수의 상태 초기화
+- Module Mocking 개선
+  - `mock()` 함수가 모듈의 모든 함수를 자동으로 mock function으로 변환
+  - 변환된 mock functions에 대해 `mockImplementation()`, `mockReturnValue()` 등의 메서드 사용 가능
+
 ## [0.3.3] 2025-12-26
 
 ### 리펙토링
