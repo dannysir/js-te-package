@@ -3,26 +3,19 @@
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
 
-## [📎 최근 업데이트 0.3.3v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md) & 주요 업데이트 내용
+## [📎 최근 업데이트 0.4.0v](https://github.com/dannysir/js-te-package/blob/main/CHANGELOG.md)
 
-### `mock` 이후 import를 해야하는 문제 해결 (0.3.0v)
-- 문제 : 기존의 경우 모킹 기능 이용시 반드시 동적 import문을 mock 다음에 작성해야 했음
-- 해결
-  - 기존 `mockStore`를 직접 비교하여 import하는 방식에서 wrapper 패턴을 이용하도록 적용
-  - 모듈을 새로운 함수로 만들어 함수를 실행할 때마다 `mockStore`와 비교하여 값을 리턴하도록 수정
-### 모듈 변환 최적화 (0.3.0v)
-- 문제 : 앞선 변경으로 인해 모든 파일의 모듈들이 사용될 때마다 `mockStore`와 비교하는 로직이 실행됨
-- 해결
-  - `cli.js`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
-  - 미리 확인한 mock 경로를 이용해 import문이 만약 저장된 경로일 때만 babel 변환
-### 리펙토링 (0.3.2v)
-- 불필요하게 거대한 로직 분리
-  - `cli.js` 내부 로직 분리 & `cli.js` 내부에서는 전체 흐름만 관리하도록 수정
-  - 바벨 플러그인 코드내 중복되는 코드 제거
-- 디렉토리 구조 변경
-  - 기존 디렉토리 내부에 있던 유틸 디렉토리를 통합된 유틸로 관리
-  - bin 내부에 존재하는 로직을 `cli.js`를 제외하고 전부 src 디렉토리로 옮김
-  - 분리된 디렉토리를 src 내부에서 관리하도록 수정 (ex: `babelTransformImport.js`)
+### Mock Functions 기능 추가
+- `fn()` 함수로 모킹 가능한 함수 생성
+- Mock function 메서드 지원
+    - `mockImplementation()` - 함수 구현 로직 변경
+    - `mockReturnValue()` - 고정된 반환값 설정
+    - `mockReturnValueOnce()` - 일회성 반환값 설정 (여러 번 호출 가능)
+    - `mockClear()` - mock 상태 초기화
+### Module Mocking 개선
+- `mock()` 함수가 모듈의 모든 함수를 자동으로 mock function으로 변환
+- 변환된 함수들도 `mockImplementation()`, `mockReturnValue()` 등 사용 가능
+
 ---
 ## 설치
 
@@ -36,7 +29,7 @@ npm install --save-dev @dannysir/js-te
 
 `*.test.js` 파일을 만들면 자동으로 찾아서 실행합니다.
 
-별도의 import문 없이 `describe`와 `test`, `expect` 로직이 사용 가능합니다. 
+별도의 import문 없이 `describe`와 `test`, `expect` 로직이 사용 가능합니다.
 
 ```javascript
 // math.test.js
@@ -177,18 +170,188 @@ const {random1, random2} = _module;
 3. 테스트 실행
 4. 원본 파일 복구
 
-### `mock(모듈 절대 경로), mock객체)`
+### Mock Functions
+
+**0.4.0 버전부터 Jest와 유사한 Mock Functions 기능을 제공합니다.**
+
+`fn()` 함수로 생성한 mock function은 반환값 제어 등의 기능을 제공합니다.
+
+### `fn(implementation : optional)`
+
+모킹 가능한 함수를 생성합니다.
+
+```javascript
+import { fn } from '@dannysir/js-te';
+
+test('mock function 기본 사용', () => {
+  const mockFn = fn();
+  
+  mockFn('test');
+  mockFn(1, 2, 3);
+  
+  // mock 함수는 기본적으로 undefined 반환
+  expect(mockFn()).toBe(undefined);
+});
+
+test('초기 구현과 함께 생성', () => {
+  const mockFn = fn((x, y) => x + y);
+  
+  expect(mockFn(1, 2)).toBe(3);
+});
+```
+
+### `mockImplementation(fn)`
+
+Mock 함수의 구현을 변경합니다.
+
+```javascript
+test('구현 변경하기', () => {
+  const mockFn = fn();
+  
+  mockFn.mockImplementation((x) => x * 2);
+  
+  expect(mockFn(5)).toBe(10);
+});
+```
+
+### `mockReturnValue(value)`
+
+Mock 함수가 항상 특정 값을 반환하도록 설정합니다.
+
+```javascript
+test('고정 반환값 설정', () => {
+  const mockFn = fn();
+  
+  mockFn.mockReturnValue(42);
+  
+  expect(mockFn()).toBe(42);
+  expect(mockFn()).toBe(42);
+  expect(mockFn()).toBe(42);
+});
+```
+
+### `mockReturnValueOnce(...values)`
+
+Mock 함수가 지정된 값들을 순서대로 한 번씩 반환하도록 설정합니다.
+
+```javascript
+test('일회성 반환값 설정', () => {
+  const mockFn = fn();
+  
+  mockFn.mockReturnValueOnce(1, 2, 3);
+  
+  expect(mockFn()).toBe(1);
+  expect(mockFn()).toBe(2);
+  expect(mockFn()).toBe(3);
+  expect(mockFn()).toBe(undefined); // 큐가 비면 기본값 반환
+});
+
+test('mockReturnValueOnce와 mockReturnValue 조합', () => {
+  const mockFn = fn();
+  
+  mockFn
+    .mockReturnValueOnce(1, 2)
+    .mockReturnValue(99);
+  
+  expect(mockFn()).toBe(1);
+  expect(mockFn()).toBe(2);
+  expect(mockFn()).toBe(99); // 이후 계속 99 반환
+  expect(mockFn()).toBe(99);
+});
+```
+
+### `mockClear()`
+
+Mock 함수의 상태를 초기화합니다.
+
+```javascript
+test('mock 상태 초기화', () => {
+  const mockFn = fn();
+  
+  mockFn.mockReturnValue(42);
+  expect(mockFn()).toBe(42);
+  
+  mockFn.mockClear();
+  expect(mockFn()).toBe(undefined); // 기본값으로 돌아감
+});
+```
+
+### Module Mocking
+
+#### `mock(모듈 절대 경로), mock객체)`
 
 모듈을 모킹합니다. import 하기 **전에** 호출해야 합니다.
 
-**🚨 주의사항**
+> **0.4.0 버전부터 `mock()` 함수가 모듈의 모든 함수를 자동으로 mock function으로 변환합니다.**
+> 
+> **0.4.0 버전부터 `mock()` 함수가 모킹 객체를 리턴합니다.**
 
-1. 반드시 경로는 절대 경로로 입력해주세요.
+### **🚨 주의사항 (매우 중요)**
+
+1. **반드시 경로는 절대 경로로 입력해주세요.**
     - babel이 import문에서 절대 경로로 변환하여 확인을 하기 때문에 반드시 절대 경로로 등록해주세요.
 2. ~~import문을 반드시 mocking 이후에 선언해주세요.~~
     - ~~mocking 전에 import를 하게 되면 mocking되기 전의 모듈을 가져오게 됩니다.~~
 
 > **0.3.0 버전부터 import문을 mock선언 이후에 하지 않아도 됩니다.**
+3. **모킹한 모듈을 제어하고 싶다면 반드시 리턴 받은 객체를 활용하세요.**
+
+**반환값 사용 예시**
+```javascript
+// math.js
+export const add = (a, b) => a + b;
+export const multiply = (a, b) => a * b;
+
+// math.test.js
+import { add, multiply} from './math.js';
+test('mock 객체 반환값 활용', () => {
+  // mock() 함수가 모킹된 객체를 반환
+  // example - { add : 모킹함수, multiply : 모킹함수}
+  const mockedMath = mock('/absolute/path/to/math.js', {
+    add: (a, b) => a + b,
+    multiply: (a, b) => a * b
+  });
+  
+  // ⚠️ 중요: mock function 메서드는 반드시 반환받은 객체에 사용하세요
+  // 올바른 사용 ✅
+  mockedMath.add.mockReturnValue(100);
+  mockedMath.multiply.mockReturnValueOnce(50, 75);
+  // 잘못된 사용 ❌
+  // add.mockReturnValue(100); // 동작하지 않습니다!
+  
+  expect(add(1, 2)).toBe(100);
+  expect(multiply(2, 3)).toBe(50);
+  expect(multiply(2, 3)).toBe(75);
+  
+});
+```
+
+### **왜 반환된 객체를 사용해야 하나요?**
+
+**간략 설명**
+
+wrapper 패턴을 통해 모듈을 변경하기 때문에 mock function에 접근이 불가
+
+**상세 설명**
+
+`mock()` 함수는 모듈의 함수들을 mock function으로 변환하여 mockStore에 저장합니다.
+
+하지만 `import`로 가져온 함수는 wrapper 함수이기 때문에 mock function의 메서드(`mockReturnValue`, `mockImplementation` 등)를 직접 가지고 있지 않습니다.
+
+따라서 mock function의 메서드를 사용하려면 **반드시 `mock()` 함수가 반환한 객체**를 통해 접근해야 합니다.
+```javascript
+// 동작 원리
+const mockedMath = mock('/path/to/math.js', {
+  add: (a, b) => a + b
+});
+
+// mockedMath.add는 실제 mock function (메서드 있음) ✅
+mockedMath.add.mockReturnValue(100);
+
+// import로 가져온 add는 wrapper 함수 (메서드 없음) ❌
+const { add } = await import('./math.js');
+// add.mockReturnValue(100); // TypeError: add.mockReturnValue is not a function
+```
 
 **💡 부분 모킹(Partial Mocking)**
 
@@ -213,6 +376,8 @@ test('부분 모킹 예제', async () => {
   expect(multiply(2, 3)).toBe(100); // 모킹된 함수 사용
 });
 ```
+
+> 모킹을 한 모듈에 mock function을 쓰고 싶으면 
 
 **📦 모듈 시스템 지원**
 
@@ -249,11 +414,31 @@ test('랜덤 함수 모킹', async () => {
   // 2. 모킹된 값 사용
   expect(play()).toBe(5);
 });
+
+// 0.4.0 버전부터 mock functions 사용 가능
+test('mock functions로 동적 제어', async () => {
+  const mocked = mock('/Users/san/Js-Te/test-helper/random.js', {
+    random: () => 0.5
+  });
+  
+  expect(play()).toBe(5);
+  
+  // 반환값 동적 변경
+  mocked.random.mockReturnValue(0.3);
+  expect(play()).toBe(3);
+  
+  // 일회성 반환값 설정
+  mocked.random.mockReturnValueOnce(0.1);
+  expect(play()).toBe(1);
+  expect(play()).toBe(3); // 이전 설정값으로 복귀
+});
 ```
 
 ### `clearAllMocks()`
 
 등록된 모든 mock을 제거합니다.
+
+**참고**: `clearAllMocks()`는 mockStore에서 mock을 제거하지만, 각 mock function의 내부 상태(returnQueue, implementation 등)는 초기화하지 않습니다. Mock function의 상태를 초기화하려면 각 함수의 `mockClear()` 메서드를 사용하세요.
 
 ### `unmock(모듈경로)`
 
@@ -374,20 +559,38 @@ describe('문자열 테스트', () => {
 });
 ```
 
-### 모킹 예제
+### Mock Functions 기본 사용
+```javascript
+import { fn } from '@dannysir/js-te';
 
-#### 전체 모킹
+test('콜백 함수 모킹', () => {
+  const mockCallback = fn((x) => x * 2);
+  
+  expect(mockCallback(21)).toBe(42);
+  
+  // 구현 변경
+  mockCallback.mockImplementation((x) => x + 10);
+  expect(mockCallback(5)).toBe(15);
+});
+```
+
+### 전체 모킹
+#### 모듈 모킹 (전체)
 ```javascript
 // mocking.test.js
 import {random} from '../src/test-helper/game.js'; // 0.2.4 버전부터 import문 상단 배치 가능
 
 test('[mocking] - mocking random function', async () => {
-  mock('/Users/san/Js-Te/test-helper/random.js', {
+  const mocked = mock('/Users/san/Js-Te/test-helper/random.js', {
     random: () => 3,
   });
   // 0.3.0 버전 이전까지는 반드시 mock 이후 동적 import문 작성
   // const {play} = await import('../src/test-helper/game.js');
   expect(play()).toBe(30);
+  
+  // 0.4.0 버전부터: 동적으로 반환값 변경 가능
+  mocked.random.mockReturnValue(5);
+  expect(play()).toBe(50);
 });
 
 // game.js
@@ -401,7 +604,7 @@ export const play = () => {
 export const random = () => Math.random();
 ```
 
-#### 부분 모킹
+#### 모듈 모킹 (부분)
 ```javascript
 // calculator.js
 export const add = (a, b) => a + b;
@@ -411,7 +614,7 @@ export const multiply = (a, b) => a * b;
 // calculator.test.js
 test('[partial mocking] - mock only multiply', async () => {
   // multiply만 모킹, add와 subtract는 원본 사용
-  mock('/Users/san/Js-Te/calculator.js', {
+  const mocked = mock('/Users/san/Js-Te/calculator.js', {
     multiply: (a, b) => 999
   });
   
@@ -419,7 +622,17 @@ test('[partial mocking] - mock only multiply', async () => {
   
   expect(add(2, 3)).toBe(5);        
   expect(subtract(5, 2)).toBe(3);   
-  expect(multiply(2, 3)).toBe(999); 
+  expect(multiply(2, 3)).toBe(999);
+  
+  // 0.4.0 버전부터: mock function 메서드 사용 가능
+  mocked.multiply.mockReturnValue(100);
+  expect(multiply(2, 3)).toBe(100);
+  
+  // 일회성 반환값
+  mocked.multiply.mockReturnValueOnce(50, 75);
+  expect(multiply(2, 3)).toBe(50);
+  expect(multiply(2, 3)).toBe(75);
+  expect(multiply(2, 3)).toBe(100); // 이전 설정값으로 복귀
 });
 ```
 
