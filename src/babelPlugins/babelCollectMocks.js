@@ -1,6 +1,4 @@
-import path from 'path';
-
-import {BABEL} from "../constants/babel.js";
+import {findAbsolutePath} from "./utils/pathHelper.js";
 
 export const createMockCollectorPlugin = (mockedPaths) => {
   return ({types: t}) => {
@@ -18,14 +16,8 @@ export const createMockCollectorPlugin = (mockedPaths) => {
 
           const mockPath = args[0].value;
           const currentFilePath = state.filename || process.cwd();
-          const currentDir = path.dirname(currentFilePath);
 
-          let absolutePath;
-          if (mockPath.startsWith(BABEL.PERIOD)) {
-            absolutePath = path.resolve(currentDir, mockPath);
-          } else {
-            absolutePath = mockPath;
-          }
+          const absolutePath = findAbsolutePath(mockPath, currentFilePath);
 
           mockedPaths.add(absolutePath);
         }
