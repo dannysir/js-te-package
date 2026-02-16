@@ -1,6 +1,6 @@
 import fs from 'fs';
 import {transformSync} from "@babel/core";
-import {babelTransformImport} from "../../babelPlugins/babelTransformImport.js";
+import {babelTransform} from "../../babelPlugins/babelTransform.js";
 import {red} from "../../utils/consoleColor.js";
 import {BABEL} from "../../constants/babel.js";
 
@@ -17,7 +17,7 @@ export const transformFiles = (filePath, mockPath) => {
 
   const transformed = transformSync(originalCode, {
     filename: filePath,
-    plugins: [babelTransformImport(mockPath)],
+    plugins: [babelTransform(mockPath)],
     parserOpts: {
       sourceType: BABEL.MODULE,
       plugins: ['dynamicImport']
