@@ -22,12 +22,20 @@ describe('[function return test] - expect arg', () => {
 });
 
 describe('[mocking] - mocking test', () => {
-  test('[mock module] - mocking random function', async () => {
+  test('[mock module] - mocking random function (absolute path)', async () => {
     mock('/Users/san/js-te-package/test-helper/random.js', {
       random: () => 3,
     });
 
     expect(play()).toBe(30);
+  });
+
+  test('[mock module] - mocking random function (relative path)', async () => {
+    mock('../test-helper/random.js', {
+      random: () => 970105,
+    });
+
+    expect(play()).toBe(9701050);
   });
 
   test('[mock module mockReturnValueOnce] - mocking function test', async () => {
