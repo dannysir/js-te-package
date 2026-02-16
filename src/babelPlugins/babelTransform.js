@@ -1,10 +1,9 @@
-
 import {findAbsolutePath, shouldTransform} from "./utils/pathHelper.js";
 import {getModuleInfo} from "./utils/getModuleInfo.js";
 import {createNamespaceWrapper, createOriginalDeclaration, createWrapperFunction} from "./utils/wrapperCreator.js";
 import {BABEL, MOCK} from "../constants/babel.js";
 
-export const babelTransformImport = (mockedPaths = null) => {
+export const babelTransform = (mockedPaths = null) => {
   return ({types: t}) => {
     return {
       visitor: {
@@ -177,7 +176,25 @@ export const babelTransformImport = (mockedPaths = null) => {
             nodePath.node.declarations = newDeclarations;
             nodePath.node._transformed = true;
           }
-        }
+        },
+
+        CallExpression(nodePath, state) {
+          if (!t.isIdentifier(nodePath.node.callee, { name: 'mock' })) {
+            return;
+          }
+
+          const args = nodePath.node.arguments;
+          if (args.length < 1 || !t.isStringLiteral(args[0])) {
+            return;
+          }
+
+          const mockPath = args[0].value;
+          const currentFilePath = state.filename || process.cwd();
+
+          const absolutePath = findAbsolutePath(mockPath, currentFilePath);
+
+          nodePath.node.arguments[0] = t.stringLiteral(absolutePath);
+        },
       }
     };
   }
