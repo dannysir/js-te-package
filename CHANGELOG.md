@@ -1,5 +1,21 @@
 # CHANGE LOG
 
+## [0.4.1] 2026-02-16
+
+### mock 기능 개선
+
+- `mock(path, moduleObject)`
+  - 문제 : 기존 `path`를 반드시 절대 경로로 등록해야 하는 문제
+  - 해결
+    - `babelTransformImport` 파일을 수정하여 `mock` 경로를 절대 경로로 변환
+    - `babelCollectMock` 에서 절대경로로 등록하도록 수정
+
+### 리펙토링
+
+- `findAbsolutePath` 를 이용하여 중복 로직 제거
+- `babelTransformImport`에서 `mock` 경로 변환도 진행하기에 이름을 `babelTransform`으로 변경
+
+
 ## [0.4.0] 2026-01-01
 
 ### 추가
