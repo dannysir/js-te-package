@@ -1,6 +1,6 @@
 import path from 'path';
+import {pathToFileURL} from 'node:url';
 import {getFilePath} from "./utils/messages.js";
-import {transformFiles} from "./utils/transformFiles.js";
 import {NUM} from "../constants/index.js";
 
 export const runTests = async (jsTe, mockedPaths, testFiles) => {
@@ -9,9 +9,8 @@ export const runTests = async (jsTe, mockedPaths, testFiles) => {
 
   for (const file of testFiles) {
     console.log(getFilePath(file));
-    transformFiles(file, mockedPaths);
 
-    await import(path.resolve(file));
+    await import(pathToFileURL(path.resolve(file)).href);
 
     const {passed, failed} = await jsTe.run();
     totalPassed += passed;
