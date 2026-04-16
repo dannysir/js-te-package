@@ -1,5 +1,5 @@
 import {play} from "../test-helper/game.js";
-import {random} from "../test-helper/random.js";
+import {add, random} from "../test-helper/random.js";
 
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
@@ -36,6 +36,18 @@ describe('[mocking] - mocking test', () => {
     });
 
     expect(play()).toBe(9701050);
+  });
+
+  test('[mock module] - partial mocking', async () => {
+    mock('../test-helper/random.js', {
+      random: () => 3,
+    });
+
+    const a = 1;
+    const b = random();
+    const result = 4;
+
+    expect(add(a, b)).toBe(result);
   });
 
   test('[mock module mockReturnValueOnce] - mocking function test', async () => {
