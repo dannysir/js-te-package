@@ -1,5 +1,36 @@
 # CHANGE LOG
 
+## [0.5.0] 2026-04-16
+
+### 추가
+- 가상 메모리 기반 테스트 실행
+  - `module.registerHooks()` 기반 `load` 훅으로 교체
+  - 테스트 파일·소스 파일을 **디스크에 쓰지 않고** 메모리에서만 Babel 변환하여 Node에 공급
+  - ESM `import`, 동적 `import()`, CJS `require()` 를 단일 훅으로 처리
+- `src/cli/loaderHook.js` 신규 — `registerHooks({ load })` 설치
+- `src/cli/utils/transformSource.js` 신규 — Babel 변환 순수 함수 + `filename:length:hash` 기반 캐시
+
+### 변경
+- `setupFiles()` — mock 경로 사전 수집만 수행하도록 단순화
+  - 모든 소스 파일을 eager 하게 변환·덮어쓰던 기존 로직 제거
+- `runTests()` — 파일별 `transformFiles()` 호출 제거, `pathToFileURL` 로 `import`
+- `bin/cli.js` — `installLoaderHook()` 추가, `finally { restoreFiles() }` 제거
+- `engines.node` → `>=22.15.0` (`module.registerHooks` 도입 버전)
+
+### 삭제
+- `src/cli/utils/transformFiles.js` — 디스크 변환·복구 로직, `originalFiles` Map 모두 불필요
+- `src/cli/utils/findFiles.js` 내 `findAllSourceFiles` — eager 탐색 불필요
+
+### 개선 효과
+- 비정상 종료(SIGKILL, OOM 등) 시 사용자 원본 소스 훼손 가능성 제거
+- 읽기 전용(`chmod 444`) 파일이 있어도 테스트 실행 가능
+- mock 이 없는 프로젝트는 Babel 변환 비용 0
+
+### 문서
+- `docs/가상메모리기반테스트실행.md` 추가 — 설계 배경과 상세 흐름
+- 상세 API 레퍼런스를 README 에서 `docs/API.md` 로 분리
+- README 를 현재형으로 재작성 (과거 버전 취소선 메모 제거)
+
 ## [0.4.1] 2026-02-16
 
 ### mock 기능 개선
