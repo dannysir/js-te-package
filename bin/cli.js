@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
 import {NUM, RESULT_MSG} from "../src/constants/index.js";
-import {restoreFiles} from "../src/cli/utils/transformFiles.js";
 import {getErrorMsgInLogic, getFileCountString, getTestResultMsg} from "../src/cli/utils/messages.js";
 import {setupEnvironment} from "../src/cli/setupEnvironment.js";
 import {setupFiles} from "../src/cli/setupFiles.js";
 import {runTests} from "../src/cli/runTests.js";
+import {installLoaderHook} from "../src/cli/loaderHook.js";
 
 const main = async () => {
   try {
     const jsTe = await setupEnvironment();
     const {mockedPaths, testFiles} = setupFiles();
+
+    installLoaderHook(mockedPaths);
 
     console.log(getFileCountString(testFiles.length));
     const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles);
@@ -20,8 +22,6 @@ const main = async () => {
   } catch (error) {
     console.log(getErrorMsgInLogic(error.message));
     return NUM.ONE;
-  } finally {
-    restoreFiles();
   }
 };
 

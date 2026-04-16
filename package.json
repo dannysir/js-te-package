@@ -36,6 +36,9 @@
   ],
   "author": "dannysir",
   "license": "ISC",
+  "engines": {
+    "node": ">=22.15.0"
+  },
   "dependencies": {
     "@babel/core": "^7.28.5",
     "@babel/generator": "^7.28.5",
