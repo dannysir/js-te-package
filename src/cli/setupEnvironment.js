@@ -1,10 +1,11 @@
 import path from 'path';
 import fs from 'fs';
-import {MODULE_TYPE, PATH} from "../constants/index.js";
+import {MODULE_TYPE} from "../constants/module.js";
+import {PATH} from "../constants/paths.js";
 
-const getUserModuleType = () => {
+export const getUserModuleType = (cwd = process.cwd()) => {
   try {
-    const pkgPath = path.join(process.cwd(), 'package.json');
+    const pkgPath = path.join(cwd, 'package.json');
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
     return pkg.type === MODULE_TYPE.MODULE ? MODULE_TYPE.ESM : MODULE_TYPE.CJS;
   } catch {

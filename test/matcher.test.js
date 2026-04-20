@@ -47,3 +47,119 @@ test('[matcher : toBeTruthy] - return true', () => {
 test('[matcher : toBeFalsy] - return false', () => {
   expect(false).toBeFalsy();
 });
+
+test('[matcher : .not] - toBe', () => {
+  expect(2).not.toBe(1);
+});
+
+test('[matcher : .not] - toEqual', () => {
+  expect([1, 2]).not.toEqual([1, 2, 3]);
+});
+
+test('[matcher : .not] - toBeTruthy', () => {
+  expect(0).not.toBeTruthy();
+});
+
+test('[matcher : .not] - toBeFalsy', () => {
+  expect('non-empty').not.toBeFalsy();
+});
+
+test('[matcher : toThrow] - no expected (any error)', () => {
+  expect(() => { throw new Error('whatever'); }).toThrow();
+});
+
+test('[matcher : toThrow] - RegExp', () => {
+  expect(() => { throw new Error('failed: code 42'); }).toThrow(/code \d+/);
+});
+
+test('[matcher : toThrow] - Error subclass', () => {
+  class MyError extends Error {}
+  expect(() => { throw new MyError('boom'); }).toThrow(MyError);
+});
+
+test('[matcher : toThrow] - predicate', () => {
+  expect(() => { throw new Error('predicate target'); })
+    .toThrow((err) => err.message.startsWith('predicate'));
+});
+
+test('[matcher : toThrow .not] - does not throw', () => {
+  expect(() => 1 + 1).not.toThrow();
+});
+
+test('[matcher : toContain] - array', () => {
+  expect([1, 2, 3]).toContain(2);
+});
+
+test('[matcher : toContain] - string', () => {
+  expect('hello world').toContain('world');
+});
+
+test('[matcher : toContain .not]', () => {
+  expect([1, 2, 3]).not.toContain(99);
+});
+
+test('[matcher : toBeInstanceOf]', () => {
+  class Animal {}
+  const a = new Animal();
+  expect(a).toBeInstanceOf(Animal);
+});
+
+test('[matcher : toBeInstanceOf .not]', () => {
+  expect({}).not.toBeInstanceOf(Array);
+});
+
+test('[matcher : toBeNull]', () => {
+  expect(null).toBeNull();
+});
+
+test('[matcher : toBeNull .not]', () => {
+  expect(0).not.toBeNull();
+});
+
+test('[matcher : toBeUndefined]', () => {
+  let x;
+  expect(x).toBeUndefined();
+});
+
+test('[matcher : toBeDefined]', () => {
+  expect(0).toBeDefined();
+});
+
+test('[matcher : toBeDefined .not]', () => {
+  let x;
+  expect(x).not.toBeDefined();
+});
+
+test('[matcher : toHaveBeenCalled]', () => {
+  const mockFn = fn();
+  mockFn('a');
+  expect(mockFn).toHaveBeenCalled();
+});
+
+test('[matcher : toHaveBeenCalled .not]', () => {
+  const mockFn = fn();
+  expect(mockFn).not.toHaveBeenCalled();
+});
+
+test('[matcher : toHaveBeenCalledWith]', () => {
+  const mockFn = fn();
+  mockFn(1, 2);
+  mockFn('x');
+  expect(mockFn).toHaveBeenCalledWith(1, 2);
+});
+
+test('[matcher : toHaveBeenCalledTimes]', () => {
+  const mockFn = fn();
+  mockFn();
+  mockFn();
+  mockFn();
+  expect(mockFn).toHaveBeenCalledTimes(3);
+});
+
+test('[matcher : mockClear clears calls]', () => {
+  const mockFn = fn();
+  mockFn();
+  mockFn();
+  mockFn.mockClear();
+  expect(mockFn).toHaveBeenCalledTimes(0);
+});

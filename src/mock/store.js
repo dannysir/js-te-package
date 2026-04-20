@@ -1,4 +1,4 @@
-import {changeModuleExports} from "./utils/changeModuleExports.js";
+import {changeModuleExports} from "./changeModuleExports.js";
 
 export const mockStore = new Map();
 

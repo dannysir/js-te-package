@@ -1,7 +1,32 @@
 import {findAbsolutePath, shouldTransform} from "./utils/pathHelper.js";
 import {getModuleInfo} from "./utils/getModuleInfo.js";
-import {createNamespaceWrapper, createOriginalDeclaration, createWrapperFunction} from "./utils/wrapperCreator.js";
+import {buildTransformPair} from "./utils/transformBuilder.js";
 import {BABEL, MOCK} from "../constants/babel.js";
+
+const normalizeImportSpecifiers = (t, specifiers) => specifiers.map(spec => {
+  if (t.isImportDefaultSpecifier(spec)) {
+    return {importedName: 'default', localName: spec.local.name, isNamespace: false};
+  }
+  if (t.isImportNamespaceSpecifier(spec)) {
+    return {importedName: null, localName: spec.local.name, isNamespace: true};
+  }
+  return {importedName: spec.imported.name, localName: spec.local.name, isNamespace: false};
+});
+
+const normalizeRequireDeclarator = (t, declarator) => {
+  if (t.isObjectPattern(declarator.id)) {
+    return declarator.id.properties.map(prop => ({
+      importedName: prop.key.name,
+      localName: prop.value.name,
+      isNamespace: false,
+    }));
+  }
+  return [{
+    importedName: 'default',
+    localName: declarator.id.name,
+    isNamespace: false,
+  }];
+};
 
 export const babelTransform = (mockedPaths = null) => {
   return ({types: t}) => {
@@ -34,57 +59,22 @@ export const babelTransform = (mockedPaths = null) => {
             return;
           }
 
-          const specifiers = nodePath.node.specifiers;
-          const originalVarName = nodePath.scope.generateUidIdentifier('original');
+          const originalVar = nodePath.scope.generateUidIdentifier('original');
+          const bindings = normalizeImportSpecifiers(t, nodePath.node.specifiers);
 
-          /*
-
-          const _original = await import('./random.js');
-          const random = (...args) => {
-            const module = mockStore.has('/path/to/random.js')
-              ? { ..._original, ...mockStore.get('/path/to/random.js') }
-              : _original;
-            return module.random(...args);
-          };
-          */
-
-          const originalDeclaration = createOriginalDeclaration(
+          const {originalDecl, wrapperDecls} = buildTransformPair({
             t,
-            originalVarName,
             source,
-            false
-          );
-
-          const wrapperDeclarations = specifiers.map(spec => {
-            if (t.isImportDefaultSpecifier(spec)) {
-              return createWrapperFunction(
-                t,
-                'default',
-                spec.local.name,
-                absolutePath,
-                originalVarName
-              );
-            } else if (t.isImportNamespaceSpecifier(spec)) {
-              return createNamespaceWrapper(
-                t,
-                spec.local.name,
-                absolutePath,
-                originalVarName
-              );
-            } else {
-              return createWrapperFunction(
-                t,
-                spec.imported.name,
-                spec.local.name,
-                absolutePath,
-                originalVarName
-              );
-            }
+            absolutePath,
+            bindings,
+            originalVar,
+            isRequire: false,
           });
 
-          const wrapperDeclaration = t.variableDeclaration(BABEL.CONST, wrapperDeclarations);
-
-          nodePath.replaceWithMultiple([originalDeclaration, wrapperDeclaration]);
+          nodePath.replaceWithMultiple([
+            originalDecl,
+            t.variableDeclaration(BABEL.CONST, wrapperDecls),
+          ]);
         },
 
         VariableDeclaration(nodePath, state) {
@@ -120,56 +110,18 @@ export const babelTransform = (mockedPaths = null) => {
 
             hasTransformation = true;
             const originalVar = nodePath.scope.generateUidIdentifier('original');
+            const bindings = normalizeRequireDeclarator(t, declarator);
 
-            /*
+            const {originalDecl, wrapperDecls} = buildTransformPair({
+              t,
+              source,
+              absolutePath,
+              bindings,
+              originalVar,
+              isRequire: true,
+            });
 
-            const _original = require('./random');
-            const random = (...args) => {
-              const module = mockStore.has('/path/to/random.js')
-                ? { ..._original, ...mockStore.get('/path/to/random.js') }
-                : _original;
-              return module.random(...args);
-            };
-            */
-
-            newDeclarations.push(
-              t.variableDeclarator(
-                originalVar,
-                t.callExpression(
-                  t.identifier('require'),
-                  [t.stringLiteral(source)]
-                )
-              )
-            );
-
-            if (t.isObjectPattern(declarator.id)) {
-              const properties = declarator.id.properties;
-
-              properties.forEach(prop => {
-                const key = prop.key.name;
-                const localName = prop.value.name;
-
-                newDeclarations.push(
-                  createWrapperFunction(
-                    t,
-                    key,
-                    localName,
-                    absolutePath,
-                    originalVar
-                  )
-                );
-              });
-            } else {
-              newDeclarations.push(
-                createWrapperFunction(
-                  t,
-                  'default',
-                  declarator.id.name,
-                  absolutePath,
-                  originalVar
-                )
-              );
-            }
+            newDeclarations.push(...originalDecl.declarations, ...wrapperDecls);
           }
 
           if (hasTransformation) {
@@ -179,7 +131,7 @@ export const babelTransform = (mockedPaths = null) => {
         },
 
         CallExpression(nodePath, state) {
-          if (!t.isIdentifier(nodePath.node.callee, { name: 'mock' })) {
+          if (!t.isIdentifier(nodePath.node.callee, {name: 'mock'})) {
             return;
           }
 

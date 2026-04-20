@@ -1,7 +1,11 @@
-import {formatFailureMessage, formatSuccessMessage} from "./utils/formatString.js";
+import {RESULT_MSG} from "./view/reportMessages.js";
 import {clearAllMocks} from "./mock/store.js";
-import {NUM, RESULT_MSG} from "./constants/index.js";
-import {getTestResultMsg} from "./cli/utils/messages.js";
+
+const NOOP_REPORTER = {
+  onTestPass: () => {},
+  onTestFail: () => {},
+  onSuiteDone: () => {},
+};
 
 class TestManager {
   #tests = [];
@@ -59,25 +63,25 @@ class TestManager {
     this.#beforeEachArr = [];
   }
 
-  async run() {
-    let passed = NUM.ZERO;
-    let failed = NUM.ZERO;
+  async run(reporter = NOOP_REPORTER) {
+    let passed = 0;
+    let failed = 0;
 
-    for (const test of testManager.getTests()) {
+    for (const test of this.getTests()) {
       try {
         await test.fn();
-        console.log(formatSuccessMessage(test));
+        reporter.onTestPass(test);
         passed++;
         clearAllMocks();
       } catch (error) {
-        console.log(formatFailureMessage(test, error));
+        reporter.onTestFail(test, error);
         failed++;
       }
     }
 
-    console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed));
+    reporter.onSuiteDone(passed, failed);
 
-    testManager.clearTests();
+    this.clearTests();
 
     return {passed, failed};
   }

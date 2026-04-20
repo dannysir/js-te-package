@@ -1,18 +1,16 @@
 import path from 'path';
 import {pathToFileURL} from 'node:url';
-import {getFilePath} from "./utils/messages.js";
-import {NUM} from "../constants/index.js";
 
-export const runTests = async (jsTe, mockedPaths, testFiles) => {
-  let totalPassed = NUM.ZERO;
-  let totalFailed = NUM.ZERO;
+export const runTests = async (jsTe, mockedPaths, testFiles, reporter) => {
+  let totalPassed = 0;
+  let totalFailed = 0;
 
   for (const file of testFiles) {
-    console.log(getFilePath(file));
+    reporter.onFileStart(file);
 
     await import(pathToFileURL(path.resolve(file)).href);
 
-    const {passed, failed} = await jsTe.run();
+    const {passed, failed} = await jsTe.run(reporter);
     totalPassed += passed;
     totalFailed += failed;
   }

@@ -1,7 +1,7 @@
 import {testManager} from "./src/testManager.js";
 import {clearAllMocks, isMocked, mock, unmock, mockStore} from './src/mock/store.js';
-import {expect} from "./src/expect.js";
-import {makeMockFnc} from "./src/mock/utils/changeModuleExports.js";
+import {expect} from "./src/expect/index.js";
+import {makeMockFnc} from "./src/mock/makeMockFnc.js";
 
 /**
  * 테스트 케이스를 정의합니다.
@@ -71,7 +71,7 @@ export const beforeEach = (fn) => testManager.beforeEach(fn);
  * const { passed, failed } = await run();
  * console.log(`${passed} passed, ${failed} failed`);
  */
-export const run = () => testManager.run();
+export const run = (reporter) => testManager.run(reporter);
 
 /**
  * 값을 검증하는 matcher 함수들을 반환합니다.

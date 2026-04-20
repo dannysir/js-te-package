@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
-
-import {PATH} from "../../constants/index.js";
+import {PATH} from "../../constants/paths.js";
 
 /**
  * 테스트 파일을 찾는 로직입니다.
@@ -24,7 +22,7 @@ export const findTestFiles = (dir) => {
       const stat = fs.statSync(fullPath);
 
       if (stat.isDirectory()) {
-        walk(fullPath, isTestDir);
+        walk(fullPath);
       } else if (item.endsWith(PATH.TEST_FILE) || isTestDir) {
         if (item.endsWith(PATH.JAVASCRIPT_FILE)) {
           files.push(fullPath);

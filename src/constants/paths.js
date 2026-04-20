@@ -1,0 +1,9 @@
+export const PATH = {
+  NODE_MODULES: 'node_modules',
+  TEST_DIRECTORY: 'test',
+  TEST_FILE: '.test.js',
+  JAVASCRIPT_FILE: '.js',
+  BIN: 'bin',
+  DIST: 'dist',
+  DANNYSIR_JS_TE: '@dannysir/js-te',
+};
