@@ -1,7 +1,5 @@
-import {formatFailureMessage, formatSuccessMessage} from "./utils/formatString.js";
+import {formatFailureMessage, formatSuccessMessage, getTestResultMsg, RESULT_MSG} from "./view/testMessages.js";
 import {clearAllMocks} from "./mock/store.js";
-import {NUM, RESULT_MSG} from "./constants/index.js";
-import {getTestResultMsg} from "./cli/utils/messages.js";
 
 class TestManager {
   #tests = [];
@@ -60,8 +58,8 @@ class TestManager {
   }
 
   async run() {
-    let passed = NUM.ZERO;
-    let failed = NUM.ZERO;
+    let passed = 0;
+    let failed = 0;
 
     for (const test of this.getTests()) {
       try {

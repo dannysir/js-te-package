@@ -2,7 +2,7 @@ import {registerHooks} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {transformSource} from './utils/transformSource.js';
-import {PATH} from '../constants/index.js';
+import {PATH} from '../constants/paths.js';
 
 const NODE_MODULES_SEGMENT = `${path.sep}${PATH.NODE_MODULES}${path.sep}`;
 const FILE_PROTOCOL = 'file://';

@@ -1,11 +1,10 @@
 import path from 'path';
 import {pathToFileURL} from 'node:url';
-import {getFilePath} from "./utils/messages.js";
-import {NUM} from "../constants/index.js";
+import {getFilePath} from "../view/testMessages.js";
 
 export const runTests = async (jsTe, mockedPaths, testFiles) => {
-  let totalPassed = NUM.ZERO;
-  let totalFailed = NUM.ZERO;
+  let totalPassed = 0;
+  let totalFailed = 0;
 
   for (const file of testFiles) {
     console.log(getFilePath(file));

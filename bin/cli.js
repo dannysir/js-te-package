@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import {NUM, RESULT_MSG} from "../src/constants/index.js";
-import {getErrorMsgInLogic, getFileCountString, getTestResultMsg} from "../src/cli/utils/messages.js";
+import {getErrorMsgInLogic, getFileCountString, getTestResultMsg, RESULT_MSG} from "../src/view/testMessages.js";
 import {setupEnvironment} from "../src/cli/setupEnvironment.js";
 import {setupFiles} from "../src/cli/setupFiles.js";
 import {runTests} from "../src/cli/runTests.js";
@@ -18,10 +17,10 @@ const main = async () => {
     const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles);
     console.log(getTestResultMsg(RESULT_MSG.TOTAL, totalPassed, totalFailed));
 
-    return totalFailed > NUM.ZERO ? NUM.ONE : NUM.ZERO;
+    return totalFailed > 0 ? 1 : 0;
   } catch (error) {
     console.log(getErrorMsgInLogic(error.message));
-    return NUM.ONE;
+    return 1;
   }
 };
 

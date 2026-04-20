@@ -1,4 +1,4 @@
-import {formatErrorMsg, formatThrowErrorMsg} from "./utils/formatString.js";
+import {formatErrorMsg, formatThrowErrorMsg} from "./view/errorMessages.js";
 
 const runArgFnc = (actual) => {
   if (typeof actual === 'function') {

@@ -5,7 +5,7 @@
 세션 단위로 Phase 하나씩 진행. 세션 시작 시 이 문서와 체크박스를 확인하고, 세션 종료 시 해당 Phase 내의 체크박스를 갱신한다.
 
 - [x] **Phase 1** — 소규모 수정·정리 (C1, C4, C6)
-- [ ] **Phase 2** — 조직·구조 정돈 (D1, D2, D3, C3)
+- [x] **Phase 2** — 조직·구조 정돈 (D1, D2, D3, C3)
 - [ ] **Phase 3** — 핵심 아키텍처 (A1, A2, C5)
 - [ ] **Phase 4** — 기능 확장 (B2, B3, B4)
 - [ ] **Phase 5** — 테스트 보강 (E1, E2, E3)
@@ -84,13 +84,13 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 
 ## Phase 2 — 조직·구조 정돈
 
-- [ ] D1 완료
-- [ ] D2 완료
-- [ ] D3 완료
-- [ ] C3 완료
-- [ ] `npm test` 통과
-- [ ] `npm run build` 성공
-- [ ] `package.json` `exports` 필드 재검토
+- [x] D1 완료
+- [x] D2 완료
+- [x] D3 완료
+- [x] C3 완료
+- [x] `npm test` 통과
+- [x] `npm run build` 성공
+- [x] `package.json` `exports` 필드 재검토
 - [ ] 커밋
 
 ### D1. 메시지 포맷 중복 통합
@@ -134,9 +134,8 @@ Phase 5: 테스트 보강         (E1, E2, E3)
         ...
     mock/
       store.js
-      makeMockFnc.js         # C3로 분리
+      makeMockFnc.js         # C3로 분리 (mockFunctions 내부 흡수)
       changeModuleExports.js # C3 후 순수 변환 함수만
-      mockFunctions.js
     babelPlugins/
       babelTransform.js
       babelCollectMocks.js
@@ -170,9 +169,9 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 ### C3. `changeModuleExports.js` 파일 분리
 - **대상**: [src/mock/utils/changeModuleExports.js](src/mock/utils/changeModuleExports.js)
 - **변경**:
-  - `makeMockFnc` → `src/mock/makeMockFnc.js`
+  - `makeMockFnc` → `src/mock/makeMockFnc.js` (`mockFunctions` 헬퍼도 이 파일 내부로 흡수)
   - `changeModuleExports` → `src/mock/changeModuleExports.js` (순수 변환 함수만)
-  - `src/mock/utils/mockFunctions.js` → `src/mock/mockFunctions.js` (하위 `utils/` 층 제거, D3와 일치)
+  - `src/mock/utils/mockFunctions.js` 제거 (내용은 `makeMockFnc.js`에 병합)
   - [index.js](index.js), [store.js](src/mock/store.js) import 경로 갱신.
 - **검증**: `npm test`.
 
@@ -323,7 +322,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 - `src/cli/utils/messages.js` → `src/view/testMessages.js`로 흡수 (CLI 전용 것은 reporter로 이동)
 - `src/constants/index.js` → `src/constants/paths.js`, `src/constants/module.js`
 - `src/mock/utils/changeModuleExports.js` → `src/mock/makeMockFnc.js` + `src/mock/changeModuleExports.js`
-- `src/mock/utils/mockFunctions.js` → `src/mock/mockFunctions.js`
+- `src/mock/utils/mockFunctions.js` → `src/mock/makeMockFnc.js` 내부로 흡수
 - `src/matchers.js`, `src/expect.js` → `src/expect/` 디렉터리로 재구성
 
 ### 신규

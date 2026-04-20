@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
-import {MODULE_TYPE, PATH} from "../constants/index.js";
+import {MODULE_TYPE} from "../constants/module.js";
+import {PATH} from "../constants/paths.js";
 
 const getUserModuleType = () => {
   try {
