@@ -20,6 +20,10 @@
   - `RegExp` — matches against the error message
   - `Error` subclass — `instanceof` check
   - predicate function — receives the error object for custom inspection
+- `toEqual` / `toHaveBeenCalledWith` now use a recursive deep equal instead of `JSON.stringify`
+  - Objects with the same keys in different order are now equal (`{a:1,b:2}` ≡ `{b:2,a:1}`)
+  - Circular references no longer crash the comparison
+- Error messages now go through `safeStringify` — circular references render as `[Circular]`
 
 ### Improved (Internal)
 - Added unit tests for the babel plugin, CLI, `loaderHook`, and reporter

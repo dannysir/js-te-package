@@ -18,6 +18,10 @@
   - `RegExp` — 에러 메시지 정규식 매칭
   - `Error` 서브클래스 — `instanceof` 검사
   - predicate 함수 — 에러 객체를 직접 검사
+- `toEqual` / `toHaveBeenCalledWith` 가 `JSON.stringify` 대신 재귀 deep equal 사용
+  - 키 순서가 달라도 동등한 객체로 인식 (`{a:1,b:2}` ≡ `{b:2,a:1}`)
+  - 순환 참조 객체 비교 시 크래시 없이 안전하게 처리
+- 에러 메시지 생성에 `safeStringify` 적용 — 순환 참조도 `[Circular]` 로 표시
 
 ### 개선 (내부)
 - babel plugin · CLI · `loaderHook` · reporter 단위 테스트 추가
