@@ -1,25 +1,47 @@
-import {formatErrorMsg, formatThrowErrorMsg} from "../../view/errorMessages.js";
+import {formatThrowErrorMsg} from "../../view/errorMessages.js";
+
+const isErrorClass = (value) => (
+  typeof value === 'function' && (value === Error || value.prototype instanceof Error)
+);
+
+const matchesExpected = (thrown, expected) => {
+  if (expected === undefined) return true;
+  if (typeof expected === 'string') {
+    return String(thrown?.message ?? thrown).includes(expected);
+  }
+  if (expected instanceof RegExp) {
+    return expected.test(String(thrown?.message ?? thrown));
+  }
+  if (isErrorClass(expected)) {
+    return thrown instanceof expected;
+  }
+  if (typeof expected === 'function') {
+    return expected(thrown) === true;
+  }
+  return false;
+};
 
 export const toThrow = (actual, expected) => {
-  let thrown = null;
+  let thrown;
+  let didThrow = false;
   try {
     if (typeof actual === 'function') {
       actual();
     }
   } catch (e) {
     thrown = e;
+    didThrow = true;
   }
 
-  if (!thrown) {
+  if (!didThrow) {
     return {
       pass: false,
-      message: () => formatThrowErrorMsg(expected),
+      message: () => formatThrowErrorMsg(expected, undefined),
     };
   }
 
-  const matches = thrown.message.includes(expected);
   return {
-    pass: matches,
-    message: () => formatErrorMsg(expected, thrown.message),
+    pass: matchesExpected(thrown, expected),
+    message: () => formatThrowErrorMsg(expected, thrown),
   };
 };
