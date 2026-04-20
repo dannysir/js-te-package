@@ -163,3 +163,32 @@ test('[matcher : mockClear clears calls]', () => {
   mockFn.mockClear();
   expect(mockFn).toHaveBeenCalledTimes(0);
 });
+
+test('[matcher : toEqual] - 키 순서 무관하게 동등', () => {
+  expect({a: 1, b: 2}).toEqual({b: 2, a: 1});
+});
+
+test('[matcher : toEqual] - 순환 참조도 크래시 없이 처리', () => {
+  const a = {name: 'x'};
+  a.self = a;
+  const b = {name: 'x'};
+  b.self = b;
+  expect(a).toEqual(b);
+});
+
+test('[matcher : toHaveBeenCalledWith] - 키 순서 무관', () => {
+  const mockFn = fn();
+  mockFn({a: 1, b: 2});
+  expect(mockFn).toHaveBeenCalledWith({b: 2, a: 1});
+});
+
+test('[matcher : toHaveBeenCalledWith] - 순환 참조 인자 안전', () => {
+  const mockFn = fn();
+  const cyclic = {tag: 'c'};
+  cyclic.self = cyclic;
+  mockFn(cyclic);
+
+  const expected = {tag: 'c'};
+  expected.self = expected;
+  expect(mockFn).toHaveBeenCalledWith(expected);
+});
