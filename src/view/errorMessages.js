@@ -1,5 +1,7 @@
+import {safeStringify} from "./safeStringify.js";
+
 export const formatErrorMsg = (expect, actual) => {
-  return `Expected ${JSON.stringify(expect)} but got ${JSON.stringify(actual)}`;
+  return `Expected ${safeStringify(expect)} but got ${safeStringify(actual)}`;
 };
 
 const describeThrowExpected = (expected) => {
@@ -33,7 +35,7 @@ export const formatThrowErrorMsg = (expected, thrown) => {
 };
 
 export const formatContainErrorMsg = (expected, actual) => {
-  return `Expected ${JSON.stringify(actual)} to contain ${JSON.stringify(expected)}`;
+  return `Expected ${safeStringify(actual)} to contain ${safeStringify(expected)}`;
 };
 
 export const formatInstanceOfErrorMsg = (Ctor, actual) => {
@@ -49,7 +51,7 @@ export const formatCalledErrorMsg = (callCount) => {
 };
 
 export const formatCalledWithErrorMsg = (expectedArgs, calls) => {
-  return `Expected mock to have been called with ${JSON.stringify(expectedArgs)}, but received calls: ${JSON.stringify(calls)}`;
+  return `Expected mock to have been called with ${safeStringify(expectedArgs)}, but received calls: ${safeStringify(calls)}`;
 };
 
 export const formatCalledTimesErrorMsg = (expected, actual) => {

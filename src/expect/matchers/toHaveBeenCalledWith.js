@@ -1,10 +1,10 @@
 import {formatCalledWithErrorMsg} from "../../view/errorMessages.js";
+import {deepEqual} from "./utils/deepEqual.js";
 
 export const toHaveBeenCalledWith = (actual, ...expectedArgs) => {
   const calls = actual?.mock?.calls ?? [];
-  const expectedKey = JSON.stringify(expectedArgs);
   return {
-    pass: calls.some(callArgs => JSON.stringify(callArgs) === expectedKey),
+    pass: calls.some((callArgs) => deepEqual(callArgs, expectedArgs)),
     message: () => formatCalledWithErrorMsg(expectedArgs, calls),
   };
 };
