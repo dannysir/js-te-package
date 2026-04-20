@@ -31,3 +31,27 @@ export const formatThrowErrorMsg = (expected, thrown) => {
     : String(thrown);
   return `${head}, but got ${actual}`;
 };
+
+export const formatContainErrorMsg = (expected, actual) => {
+  return `Expected ${JSON.stringify(actual)} to contain ${JSON.stringify(expected)}`;
+};
+
+export const formatInstanceOfErrorMsg = (Ctor, actual) => {
+  const name = Ctor?.name || 'Constructor';
+  const actualName = actual === null ? 'null'
+    : actual === undefined ? 'undefined'
+    : actual?.constructor?.name ?? typeof actual;
+  return `Expected value to be instance of ${name} but got ${actualName}`;
+};
+
+export const formatCalledErrorMsg = (callCount) => {
+  return `Expected mock to have been called, but it was called ${callCount} times`;
+};
+
+export const formatCalledWithErrorMsg = (expectedArgs, calls) => {
+  return `Expected mock to have been called with ${JSON.stringify(expectedArgs)}, but received calls: ${JSON.stringify(calls)}`;
+};
+
+export const formatCalledTimesErrorMsg = (expected, actual) => {
+  return `Expected mock to have been called ${expected} times, but it was called ${actual} times`;
+};
