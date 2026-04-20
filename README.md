@@ -4,17 +4,16 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.5.0](./CHANGELOG.md)
+## [📎 Latest Update — 0.6.0](./CHANGELOG.md)
 
-### Virtual Memory-based Test Execution
+### New matchers and richer mock assertions
 
-Uses `module.registerHooks()` to Babel-transform test and source files **entirely in memory** — no disk writes.
+- New matchers: `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`
+- `.not` chaining negates any matcher
+- `toThrow()` now accepts no argument / `RegExp` / `Error` subclass / predicate
+- `fn().mock.calls` exposes the recorded call arguments
 
-- Eliminates source file corruption on abnormal process termination
-- Works with read-only files (`chmod 444`)
-- Zero transform cost for projects without mocks
-
-See [Virtual Memory-based Test Execution](./docs/가상메모리기반테스트실행.md) for design details.
+See [Virtual Memory-based Test Execution](./docs/internal/가상메모리기반테스트실행.md) for design details (Korean).
 
 ---
 
@@ -72,8 +71,8 @@ npm test
 ## Features
 
 - **Test writing** — `test()`, `describe()`, `beforeEach()`, `test.each()`
-- **Matchers** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`
-- **Mock Functions** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`
+- **Matchers** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`, `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`, `.not` chaining
+- **Mock Functions** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`, `mock.calls`
 - **Module Mocking** — `mock(path, mockObj)` (relative & absolute paths), `clearAllMocks`, `unmock`, `isMocked`
 - **Module systems** — ESM (`import`) and CommonJS (`require`)
 - **CLI** — single `js-te` command
@@ -117,7 +116,7 @@ test('mock random function', () => {
 });
 ```
 
-> ⚠️ Mock function methods (`mockReturnValue`, etc.) are only accessible through the object returned by `mock()`. See [why](./docs/API.md#왜-반환-객체를-사용해야-하나요) in the API docs.
+> ⚠️ Mock function methods (`mockReturnValue`, etc.) are only accessible through the object returned by `mock()`. See [why](./docs/reference/API.md#why-must-i-use-the-returned-object) in the API docs.
 
 ---
 
@@ -143,8 +142,8 @@ project/
 
 ## Documentation
 
-- [API Reference](./docs/API.md) — full usage for `test`, `expect`, `mock`, `fn`, `beforeEach`, `test.each`
-- [Virtual Memory-based Test Execution](./docs/가상메모리기반테스트실행.md) — 0.5.0 internals
+- [API Reference](./docs/reference/API.md) — full usage for `test`, `expect`, `mock`, `fn`, `beforeEach`, `test.each`
+- [Virtual Memory-based Test Execution](./docs/internal/가상메모리기반테스트실행.md) — 0.5.0 internals (Korean)
 - [CHANGELOG](./CHANGELOG.md) — version history
 
 ## Links

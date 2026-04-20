@@ -10,14 +10,20 @@
 - [Matcher](#matcher)
   - [`expect(value).toBe(expected)`](#expectvaluetobeexpected)
   - [`expect(value).toEqual(expected)`](#expectvaluetoequalexpected)
-  - [`expect(fn).toThrow(message?)`](#expectfntothrowmessage)
+  - [`expect(fn).toThrow(matcher?)`](#expectfntothrowmatcher)
   - [`expect(value).toBeTruthy() / toBeFalsy()`](#expectvaluetobetruthy--tobefalsy)
+  - [`expect(value).toContain(item)`](#expectvaluetocontainitem)
+  - [`expect(value).toBeInstanceOf(Class)`](#expectvaluetobeinstanceofclass)
+  - [`expect(value).toBeNull() / toBeUndefined() / toBeDefined()`](#expectvaluetobenull--tobeundefined--tobedefined)
+  - [`expect(mockFn).toHaveBeenCalled() / toHaveBeenCalledWith(...args) / toHaveBeenCalledTimes(n)`](#expectmockfntohavebeencalled--tohavebeencalledwithargs--tohavebeencalledtimesn)
+  - [`.not` 체이닝](#not-체이닝)
 - [Mock Function](#mock-function)
   - [`fn(implementation?)`](#fnimplementation)
   - [`mockImplementation(fn)`](#mockimplementationfn)
   - [`mockReturnValue(value)`](#mockreturnvaluevalue)
   - [`mockReturnValueOnce(...values)`](#mockreturnvalueoncevalues)
   - [`mockClear()`](#mockclear)
+  - [`mock.calls`](#mockcalls)
 - [Module Mocking](#module-mocking)
   - [`mock(path, mockObj)`](#mockpath-mockobj)
   - [부분 모킹 (Partial Mocking)](#부분-모킹-partial-mocking)
@@ -155,14 +161,34 @@ expect({ name: '철수' }).toEqual({ name: '철수' });
 expect([1, 2, 3]).toEqual([1, 2, 3]);
 ```
 
-### `expect(fn).toThrow(message?)`
+### `expect(fn).toThrow(matcher?)`
 
-함수가 에러를 던지는지 확인합니다. `message` 를 전달하면 에러 메시지에 해당 문자열이 포함되는지 검사합니다.
+함수가 에러를 던지는지 확인합니다. 인자 형태에 따라 검사 방식이 달라집니다.
+
+| 인자 | 의미 |
+| --- | --- |
+| 없음 | throw 발생 여부만 확인 |
+| `string` | 에러 메시지에 해당 문자열이 **포함**되는지 |
+| `RegExp` | 에러 메시지가 정규식과 매칭되는지 |
+| `Error` 서브클래스 | `instanceof` 검사 |
+| `(err) => boolean` | predicate 함수가 `true` 를 반환하는지 |
 
 ```js
-expect(() => {
-  throw new Error('에러 발생');
-}).toThrow('에러');
+// throw 여부만
+expect(() => { throw new Error('boom'); }).toThrow();
+
+// 문자열 포함
+expect(() => { throw new Error('에러 발생'); }).toThrow('에러');
+
+// 정규식
+expect(() => { throw new Error('code: 42'); }).toThrow(/code: \d+/);
+
+// Error 서브클래스
+class CustomError extends Error {}
+expect(() => { throw new CustomError(); }).toThrow(CustomError);
+
+// predicate
+expect(() => { throw new Error('boom'); }).toThrow((err) => err.message.length > 3);
 ```
 
 ### `expect(value).toBeTruthy() / toBeFalsy()`
@@ -172,6 +198,65 @@ expect(() => {
 ```js
 expect(true).toBeTruthy();
 expect(0).toBeFalsy();
+```
+
+### `expect(value).toContain(item)`
+
+배열에 특정 원소가 포함되어 있는지, 또는 문자열에 부분 문자열이 포함되어 있는지 검사합니다.
+
+```js
+expect([1, 2, 3]).toContain(2);
+expect('hello world').toContain('world');
+```
+
+### `expect(value).toBeInstanceOf(Class)`
+
+값이 주어진 클래스의 인스턴스인지 `instanceof` 로 검사합니다.
+
+```js
+class Animal {}
+class Dog extends Animal {}
+
+expect(new Dog()).toBeInstanceOf(Dog);
+expect(new Dog()).toBeInstanceOf(Animal);
+expect([]).toBeInstanceOf(Array);
+```
+
+### `expect(value).toBeNull() / toBeUndefined() / toBeDefined()`
+
+`null` · `undefined` 여부를 정확히 검사합니다.
+
+```js
+expect(null).toBeNull();
+expect(undefined).toBeUndefined();
+expect(0).toBeDefined();         // undefined 가 아님
+expect(null).toBeDefined();      // null 도 정의된 값으로 간주
+```
+
+### `expect(mockFn).toHaveBeenCalled() / toHaveBeenCalledWith(...args) / toHaveBeenCalledTimes(n)`
+
+`fn()` 으로 만든 mock 함수의 호출 이력을 검증합니다. 내부적으로 `mockFn.mock.calls` 배열을 사용합니다.
+
+```js
+const mockFn = fn();
+mockFn(1, 2);
+mockFn('hello');
+
+expect(mockFn).toHaveBeenCalled();              // 1회 이상 호출되었는지
+expect(mockFn).toHaveBeenCalledTimes(2);        // 정확히 2회 호출되었는지
+expect(mockFn).toHaveBeenCalledWith(1, 2);      // (1, 2) 인자로 호출된 적이 있는지
+expect(mockFn).toHaveBeenCalledWith('hello');
+```
+
+### `.not` 체이닝
+
+모든 매처는 `.not` 으로 결과를 반전할 수 있습니다.
+
+```js
+expect(5).not.toBe(6);
+expect([1, 2, 3]).not.toContain(99);
+expect(mockFn).not.toHaveBeenCalled();
+expect(() => 'ok').not.toThrow();
 ```
 
 ---
@@ -279,6 +364,22 @@ test('mock 상태 초기화', () => {
 });
 ```
 
+### `mock.calls`
+
+mock 함수가 호출될 때마다 인자 배열이 누적됩니다. `toHaveBeenCalledWith` · `toHaveBeenCalledTimes` 매처가 내부적으로 사용하지만, 직접 접근하여 임의 검증도 가능합니다.
+
+```js
+const mockFn = fn();
+mockFn(1, 2);
+mockFn('a', 'b', 'c');
+
+mockFn.mock.calls;        // [[1, 2], ['a', 'b', 'c']]
+mockFn.mock.calls.length; // 2
+mockFn.mock.calls[0];     // [1, 2]
+```
+
+`mockClear()` 호출 시 `mock.calls` 도 초기화됩니다.
+
 ---
 
 ## Module Mocking
@@ -366,7 +467,7 @@ import { add } from './math.js';
 // add.mockReturnValue(100); // TypeError: add.mockReturnValue is not a function
 ```
 
-wrapper 패턴에 대한 자세한 설명은 [가상메모리기반테스트실행.md § 4](./가상메모리기반테스트실행.md#4-babel-변환-상세-wrapper-패턴) 를 참고하세요.
+wrapper 패턴에 대한 자세한 설명은 [가상메모리기반테스트실행.md § 4](../internal/가상메모리기반테스트실행.md#4-babel-변환-상세-wrapper-패턴) 를 참고하세요.
 
 ### ESM / CommonJS 지원
 
@@ -428,4 +529,4 @@ test('모킹 동작', () => {
 3. 이후 모든 `import` / `require` 가 훅을 거치며, 사전 수집된 경로에 해당하는 파일만 Babel 로 변환하여 **메모리에서만** Node 에 반환
 4. 변환된 코드는 `mock()` 호출 시점의 `mockStore` 를 런타임마다 조회하는 wrapper 패턴으로 만들어져, `mock()` 호출 순서·`import` 순서와 무관하게 올바른 값을 반환
 
-사용자의 원본 파일은 **한 바이트도 수정되지 않습니다.** 자세한 설계 내용은 [가상메모리기반테스트실행.md](./가상메모리기반테스트실행.md) 참고.
+사용자의 원본 파일은 **한 바이트도 수정되지 않습니다.** 자세한 설계 내용은 [가상메모리기반테스트실행.md](../internal/가상메모리기반테스트실행.md) 참고.

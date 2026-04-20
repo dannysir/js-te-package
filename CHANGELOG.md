@@ -1,240 +1,246 @@
-# CHANGE LOG
+# CHANGELOG
+
+> Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
+
+## [0.6.0] 2026-04-20
+
+### Added (Matcher)
+- `toContain(item)` — checks array element / substring inclusion
+- `toBeInstanceOf(Class)` — `instanceof`-based type check
+- `toBeNull()` / `toBeUndefined()` / `toBeDefined()` — dedicated null/undefined matchers
+- `toHaveBeenCalled()` / `toHaveBeenCalledWith(...args)` / `toHaveBeenCalledTimes(n)` — mock call assertions
+- `.not` chaining — every matcher can be negated (e.g. `expect(x).not.toBe(y)`)
+
+### Added (Mock)
+- `fn().mock.calls` — exposes the accumulated argument arrays from each mock invocation
+
+### Changed (Matcher)
+- `toThrow()` argument expansion
+  - no argument — only verifies that a throw happened
+  - `RegExp` — matches against the error message
+  - `Error` subclass — `instanceof` check
+  - predicate function — receives the error object for custom inspection
+
+### Improved (Internal)
+- Added unit tests for the babel plugin, CLI, `loaderHook`, and reporter
+- Improved testability of `loaderHook` / `setupEnvironment` (refactor Phases 1–5)
+- Strengthened mock / lifecycle edge-case tests
+
+### Docs
+- Reorganized `docs/` into `docs/reference/` (user-facing) and `docs/internal/` (personal notes)
+- Split CHANGELOG and API docs into English and Korean versions (`*.md` = English, `*.ko.md` = Korean)
 
 ## [0.5.0] 2026-04-16
 
-### 추가
-- 가상 메모리 기반 테스트 실행
-  - `module.registerHooks()` 기반 `load` 훅으로 교체
-  - 테스트 파일·소스 파일을 **디스크에 쓰지 않고** 메모리에서만 Babel 변환하여 Node에 공급
-  - ESM `import`, 동적 `import()`, CJS `require()` 를 단일 훅으로 처리
-- `src/cli/loaderHook.js` 신규 — `registerHooks({ load })` 설치
-- `src/cli/utils/transformSource.js` 신규 — Babel 변환 순수 함수 + `filename:length:hash` 기반 캐시
+### Added
+- Virtual memory-based test execution
+  - Replaced disk-based Babel transform with `module.registerHooks()` `load` hook
+  - Test and source files are Babel-transformed **in memory only** and fed to Node — no disk writes
+  - A single hook handles ESM `import`, dynamic `import()`, and CJS `require()`
+- New `src/cli/loaderHook.js` — installs `registerHooks({ load })`
+- New `src/cli/utils/transformSource.js` — pure Babel transform function with `filename:length:hash` cache
 
-### 변경
-- `setupFiles()` — mock 경로 사전 수집만 수행하도록 단순화
-  - 모든 소스 파일을 eager 하게 변환·덮어쓰던 기존 로직 제거
-- `runTests()` — 파일별 `transformFiles()` 호출 제거, `pathToFileURL` 로 `import`
-- `bin/cli.js` — `installLoaderHook()` 추가, `finally { restoreFiles() }` 제거
-- `engines.node` → `>=22.15.0` (`module.registerHooks` 도입 버전)
+### Changed
+- `setupFiles()` — simplified to only pre-collect mock paths
+  - Removed the previous logic that eagerly transformed and overwrote every source file
+- `runTests()` — removed per-file `transformFiles()` calls; uses `pathToFileURL` for `import`
+- `bin/cli.js` — added `installLoaderHook()`; removed `finally { restoreFiles() }`
+- `engines.node` → `>=22.15.0` (version that introduced `module.registerHooks`)
 
-### 삭제
-- `src/cli/utils/transformFiles.js` — 디스크 변환·복구 로직, `originalFiles` Map 모두 불필요
-- `src/cli/utils/findFiles.js` 내 `findAllSourceFiles` — eager 탐색 불필요
+### Removed
+- `src/cli/utils/transformFiles.js` — disk transform/restore logic and the `originalFiles` Map are no longer needed
+- `findAllSourceFiles` from `src/cli/utils/findFiles.js` — eager scan no longer required
 
-### 개선 효과
-- 비정상 종료(SIGKILL, OOM 등) 시 사용자 원본 소스 훼손 가능성 제거
-- 읽기 전용(`chmod 444`) 파일이 있어도 테스트 실행 가능
-- mock 이 없는 프로젝트는 Babel 변환 비용 0
+### Improvements
+- Eliminated the risk of corrupting user source files on abnormal termination (SIGKILL, OOM, …)
+- Tests can run even when source files are read-only (`chmod 444`)
+- Projects without mocks pay zero Babel transform cost
 
-### 문서
-- `docs/가상메모리기반테스트실행.md` 추가 — 설계 배경과 상세 흐름
-- 상세 API 레퍼런스를 README 에서 `docs/API.md` 로 분리
-- README 를 현재형으로 재작성 (과거 버전 취소선 메모 제거)
+### Docs
+- Added `docs/가상메모리기반테스트실행.md` — design background and detailed flow
+- Moved the detailed API reference from README to `docs/API.md`
+- Rewrote README in present tense (removed strikethrough notes about past versions)
 
 ## [0.4.1] 2026-02-16
 
-### mock 기능 개선
-
+### Mock improvements
 - `mock(path, moduleObject)`
-  - 문제 : 기존 `path`를 반드시 절대 경로로 등록해야 하는 문제
-  - 해결
-    - `babelTransformImport` 파일을 수정하여 `mock` 경로를 절대 경로로 변환
-    - `babelCollectMock` 에서 절대경로로 등록하도록 수정
+  - Issue: previously required `path` to be registered as an absolute path
+  - Fix:
+    - Updated `babelTransformImport` to convert mock paths to absolute paths
+    - Made `babelCollectMock` register paths as absolute
 
-### 리펙토링
-
-- `findAbsolutePath` 를 이용하여 중복 로직 제거
-- `babelTransformImport`에서 `mock` 경로 변환도 진행하기에 이름을 `babelTransform`으로 변경
-
+### Refactor
+- Removed duplicated logic by reusing `findAbsolutePath`
+- Renamed `babelTransformImport` to `babelTransform` since it now also handles mock path conversion
 
 ## [0.4.0] 2026-01-01
 
-### 추가
-
-- Mock Functions 기능 추가
-  - `fn()` - 모킹 가능한 함수 생성
-  - `mockImplementation()` - mock 함수의 구현 로직 변경
-  - `mockReturnValue()` - mock 함수가 항상 특정 값을 반환하도록 설정
-  - `mockReturnValueOnce()` - mock 함수가 한 번만 특정 값을 반환하도록 설정
-  - `mockClear()` - mock 함수의 상태 초기화
-- Module Mocking 개선
-  - `mock()` 함수가 모듈의 모든 함수를 자동으로 mock function으로 변환
-  - 변환된 mock functions에 대해 `mockImplementation()`, `mockReturnValue()` 등의 메서드 사용 가능
+### Added
+- Mock Functions
+  - `fn()` — creates a mockable function
+  - `mockImplementation()` — changes the mock function's implementation
+  - `mockReturnValue()` — makes the mock always return a specific value
+  - `mockReturnValueOnce()` — makes the mock return a specific value just once
+  - `mockClear()` — resets the mock's internal state
+- Module mocking improvements
+  - `mock()` automatically converts every function in a module into a mock function
+  - The converted mock functions support `mockImplementation()`, `mockReturnValue()`, etc.
 
 ## [0.3.3] 2025-12-26
 
-### 리펙토링
-**해당 리펙토링은 0.4.0 버전을 위한 최종 리펙토링입니다.**
-- 파일 위치 수정
-  - utils에 일괄적으로 있던 유틸 관련 메서드를 cli에 관련된 요소는 src/cli/utils로 이동
-  - 각각의 기능에 해당하는 유틸 파일을 관리하기 쉽운 구조로 변경
+### Refactor
+**This refactor is the final cleanup before 0.4.0.**
+- File reorganization
+  - Moved CLI-related utilities from the shared `utils` directory into `src/cli/utils`
+  - Restructured per-feature utility files for easier maintenance
 - `formatString.js`
-  - 파일 내에 있던 `placeHolder`를 테스트 클래스 내부로 옮겨 불필요한 모듈 제거
-  - 파일 내에 있던 `getMatcherForReplace` 메서드를 클래스 내부의 private 함수로 변경
-  - 파일 내 네이밍 규칙을 일관되게 변경
+  - Moved the file-level `placeHolder` into the test class to drop an unnecessary module
+  - Made `getMatcherForReplace` a private method on the class
+  - Standardized naming conventions inside the file
 
 ## [0.3.2] 2025-12-10
 
-### 리펙토링
-- cli.js
-  - `main()`에서 관리하던 전체 흐름을 `setupEnvironment.js`, `setupFiles.js`, `runTests.js`로 분리
-  - `main()`에서는 흐름만 관리하도록 수정
-- babel 플러그인
-  - 플러그인 내부에 중복된 Wrapper 패턴 생성 로직 분리
-  - 플러그인 내부에서는 AST를 이용한 로직 생성만 집중하도록 만듬
-- JSDoc 추가
-  - babel과 관련된 로직 및 사용자가 사용하는 로직에 JSDoc 추가
-  - JSDoc을 통해 매개변수와 리턴 타입에 대해 명시하고 함수의 역할 및 사용 예시를 추가
-- 그 외 리펙토링 사항
-  - 코드 스타일 통일
-    - 일부 function 코드를 arrow function 코드로 수정
-  - 미흡한 상수화 보완
+### Refactor
+- `cli.js`
+  - Split the monolithic `main()` into `setupEnvironment.js`, `setupFiles.js`, and `runTests.js`
+  - `main()` now only orchestrates the flow
+- Babel plugins
+  - Extracted shared wrapper-pattern generation logic out of the plugins
+  - Each plugin now focuses solely on AST transformations
+- Added JSDoc
+  - Documented Babel-related logic and user-facing APIs
+  - Specified parameter/return types and added usage examples
+- Misc
+  - Unified code style (function → arrow function in some places)
+  - Filled in missing constants
 
-### 문서 오류 수정
-
-- README.md 내 오타 수정
-  - 부분 모킹 import문 오타 수정
-  - 상단 최근 업데이트 내역 갱신
+### Doc fixes
+- README typos
+  - Fixed the partial-mocking import example
+  - Refreshed the recent updates section at the top
 
 ## [0.3.1] 2025-12-08
 
-### 오류 수정 
-
-- `package.json` 내에 파일 누락된 파일 목록 추가
-  - `babelCollectMocks.js` 플러그인 누락으로 인한 오류 수정
+### Bug fix
+- Added missing files to `package.json` `files` field
+  - Restored the `babelCollectMocks.js` plugin that had been left out
 
 ## [0.3.0] 2025-12-08
 
-### 추가
-
-- `mock` 이후 import를 해야하는 문제 해결
-  - 문제 : 기존의 경우 모킹 기능 이용시 반드시 동적 import문을 mock 다음에 작성해야 했음
-  - 해결
-    - 기존 `mockStore`를 직접 비교하여 import하는 방식에서 wrapper 패턴을 이용하도록 적용
-    - 모듈을 새로운 함수로 만들어 함수를 실행할 때마다 `mockStore`와 비교하여 값을 리턴하도록 수정
-- 모듈 변환 최적화
-  - 문제 : 앞선 변경으로 인해 모든 파일의 모듈들이 사용될 때마다 `mockStore`와 비교하는 로직이 실행됨
-  - 해결 
-    - `cli`로직에 mock을 미리 검사하여 mock 경로를 미리 저장하는 로직을 추가
-    - 미리 확인한 mock 경로를 이용해 import문이 만약 저장된 경로일 때만 babel 변환
+### Added
+- Removed the requirement to `import` after `mock()`
+  - Issue: previously, mocked modules had to be imported dynamically *after* the `mock()` call
+  - Fix:
+    - Replaced direct `mockStore` lookups at import time with a wrapper-pattern
+    - Each module function becomes a wrapper that consults `mockStore` at call time
+- Module transform optimization
+  - Issue: the change above meant every imported module's functions consulted `mockStore` on every call
+  - Fix:
+    - The CLI now pre-scans `mock()` calls and collects the mocked paths
+    - Babel transform only runs on imports whose path matches a pre-collected mock path
 
 ## [0.2.3] 2025-12-04
 
-### 문서 수정
-- README.md 내에 type 설정 관련 설명 수정
-    - 0.2.1 버전부터 ESM 방식과 Common JS 방식 모두 허용
-    - 개발 블로그 링크 추가
+### Doc fixes
+- Updated the `type` setting explanation in README
+  - From 0.2.1, both ESM and CommonJS are supported
+  - Added the dev blog link
 
-### 설정 수정
-- package.json
-    - 레포지토리 및 이슈 링크 추가
+### Config fixes
+- `package.json`
+  - Added repository and issue tracker links
 
-### `rollup.config.js` output 파일명 수정
-- 기존 `.cjs.js`와 같은 이름에서 `.cjs`로 수정
-- `esm.js`에서 `.mjs`로 수정
+### `rollup.config.js` output filenames
+- Renamed `.cjs.js` → `.cjs`
+- Renamed `esm.js` → `.mjs`
 
 ## [0.2.2] 2025-12-04
 
-### 문서 수정
-- README 오타 수정
-    - 부분 모킹 적용 버전을 0.1.3(오타) -> 0.2.1
+### Doc fixes
+- README typo
+  - Partial-mocking introduction version: 0.1.3 (typo) → 0.2.1
 
 ## [0.2.1] 2025-12-02
 
-### 오류 수정
-- cli 에러
-    - 문제1 : index.js는 export하지 않고 빌드를하여 제공하기 때문에 index 파일을 찾지 못하는 오류 수정
-    - 문제2 : rollup에서 빌드를 하는 과정에 testManager가 각각 2개가 생기기 때문에 사용자 시스템에 따라 내부적으로 ejs 방식으로 동작하기 때문에 cjs 메서드가 정상 동작하지 않음
-    - 해결 방법 : cli 파일에 사용자 시스템에 맞는 index를 호출하는 기능 추가
+### Bug fixes
+- CLI errors
+  - Issue 1: `index.js` is built rather than directly exported, so the index file could not be located
+  - Issue 2: Rollup produced two `testManager`s, and depending on the user's environment the package was loaded as ESM internally — breaking the CJS methods
+  - Fix: the CLI now picks the correct index for the user's module system
 
 ## [0.2.0] 2025-12-02
 
-### 추가
-
-- CommonJS 지원
-    - require() 구문을 사용하는 프로젝트에서도 사용 가능
-    - ESM(import)과 CommonJS(require) 모두 지원
-    - Rollup을 통한 dual package 배포 (ESM + CJS)
-- 부분 모킹(Partial Mocking) 지원
-    - 모듈의 일부 함수만 모킹하고 나머지는 원본 유지 가능
-    - 스프레드 연산자를 활용한 모킹 방식 개선
-    - ESM과 CommonJS 모두에서 부분 모킹 동작
+### Added
+- CommonJS support
+  - Works in projects that use `require()`
+  - Supports both ESM (`import`) and CommonJS (`require`)
+  - Dual-package distribution (ESM + CJS) via Rollup
+- Partial mocking
+  - Allows mocking only some functions of a module while keeping the rest as the original
+  - Improved mocking via the spread operator
+  - Partial mocking works in both ESM and CommonJS
 
 ## [0.1.2] 2025-11-27
 
-### 추가
-- 레포지토리 변경으로 인해 깃허브 경로 수정
-- cli.js
-    - transformFiles : babel을 통한 코드 변경 로직 분리
-    - findFiles : 사용자의 테스트 파일과 파일을 찾는 로직 분리
-- index.js
-    - run 함수의 경우 사용자가 사용할 필요가 없기 때문에 index.js에서 분리
-    - expect로직과 matcher 로직을 분리
-- tests.js 파일명 수정
-    - 클래스를 직접 export하는 방식에서 선언된 변수를 export하는 방식으로 변경
+### Added
+- Updated GitHub URLs after the repository move
+- `cli.js`
+  - `transformFiles`: extracted the Babel transform logic
+  - `findFiles`: extracted file discovery logic for tests and sources
+- `index.js`
+  - Removed `run` from the public surface (users do not need it)
+  - Split `expect` and matcher logic
+- Renamed `tests.js`
+  - Switched from exporting the class directly to exporting an instance variable
 
 ## [0.1.1] 2025-11-24
 
-### 추가
-- 문법 오류 발생시 babel로 변환한 파일이 다시 restore 되지않는 문제 해결
-    - `babel 변환 -> 원상 복구` 로직이 문법 오류 발생시 진행되지 않는 오류 해결
+### Added
+- Fixed Babel-transformed files not being restored when a syntax error occurred
+  - The `transform → restore` cycle was skipped on syntax errors
 
-## [0.1.0]  2025-11-20
+## [0.1.0] 2025-11-20
 
-### 추가
-- test.each() 기능 추가
-    - 배열 형태의 테스트 케이스를 반복 실행
-    - 플레이스홀더 지원 (%s, %o)
-    - 동일한 테스트 로직을 여러 데이터셋으로 검증 가능
+### Added
+- `test.each()`
+  - Repeats the same test for each row in an array of cases
+  - Supports placeholders (`%s`, `%o`)
+  - Lets you exercise the same test logic against multiple datasets
+- `beforeEach()`
+  - Runs initialization code before each test
+  - Outer `beforeEach` automatically runs in nested `describe` blocks
+  - Guarantees test isolation
+- Babel absolute-path conversion
+  - Normalizes user-provided paths (relative or absolute) to absolute paths
+  - Ensures consistent mocking behavior
 
-
-- beforeEach()
-    - 각 테스트 실행 전 초기화 코드 실행
-    - 중첩된 describe 블록에서 상위 beforeEach 자동 실행
-    - 테스트 간 독립성 보장
-
-
-- Babel 절대 경로 변환
-    - 사용자 입력 경로(상대/절대)를 절대 경로로 통일
-    - 일관된 모킹 동작 보장
-
-### 변경사항
-- 내부 테스트 관리 구조 개선
+### Changed
+- Improved internal test management structure
 
 ## [0.0.2] 2025-11-17
 
-### 추가
-- scoped 패키지로 변경하여 발생한 버그 수정
-    - babelTransformImport 파일 내에 `js-te` 경로를 `@dannysir/js-te` 경로로 변경
+### Added
+- Fixed a bug introduced when the package became scoped
+  - Updated the `js-te` path inside `babelTransformImport` to `@dannysir/js-te`
 
 ## [0.0.1] 2025-11-17
 
-### 추가
-- 최초 배포
-- 테스트 작성 기능 (`test`, `describe`, `expect`)
-- Matcher 함수들
-    - `toBe()` - 값 비교
-    - `toEqual()` - 객체/배열 비교
-    - `toThrow()` - 에러 검증
-    - `toBeTruthy()` / `toBeFalsy()` - 참/거짓 확인
-- 모킹 시스템
-    - `mock()` - 모듈 모킹
-    - `clearAllMocks()` - 전체 mock 제거
-    - `unmock()` - 특정 mock 제거
-    - `isMocked()` - mock 상태 확인
-- Babel 플러그인 dynamic import를 이용한 import 변환으로 모킹 구현
-- 자동 테스트 파일 찾기 (`.test.js` 파일, `test/` 폴더)
-- CLI 도구 (`js-te` 명령어)
-- 중첩 describe 블록 지원
-- 컬러 콘솔 출력
-
----
-
-## 앞으로 추가할 기능
-
-- mocking 기능 개선
-    - 문제점 : mocking한 모듈을 반드시 `mock` 함수 이후에 import 해야함
-    - 원인 : import를 상단에서 진행할 경우 mocking전 원본 모듈을 가져오게 됨
-- ESM / Common JS
-    - 문제점 : 현재 라이브러리가 ESM 방식이기 때문에 사용자도 ESM 방식으로 사용해야함
-    - 개선 방법 : rollup과 같은 번들러를 사용해 ESM 방식의 파일과 Common JS 방식의 파일 2 종류를 생성하여 배포
+### Added
+- Initial release
+- Test authoring (`test`, `describe`, `expect`)
+- Matchers
+  - `toBe()` — value equality
+  - `toEqual()` — object/array equality
+  - `toThrow()` — error assertions
+  - `toBeTruthy()` / `toBeFalsy()` — truthiness checks
+- Mocking system
+  - `mock()` — module mocking
+  - `clearAllMocks()` — clear every mock
+  - `unmock()` — clear a single mock
+  - `isMocked()` — check whether a mock is registered
+- Babel plugin that uses dynamic `import` to implement mocking
+- Automatic test file discovery (`*.test.js` files, `test/` folder)
+- CLI tool (`js-te` command)
+- Nested `describe` blocks
+- Colorized console output
