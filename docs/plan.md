@@ -184,7 +184,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 - [x] C5 완료
 - [x] 기존 테스트 전부 통과
 - [x] 공개 API 시그니처 유지 확인
-- [ ] 커밋
+- [x] 커밋
 
 ### A1. expect ↔ matcher 자동 등록 구조
 - **현황**: [src/expect.js](src/expect.js)가 각 매처를 수동 래핑. 새 매처 추가 시 [matchers.js](src/matchers.js) + [expect.js](src/expect.js) 두 곳 수정.
