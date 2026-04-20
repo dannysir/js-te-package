@@ -57,7 +57,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 - [x] C4 완료
 - [x] C6 완료
 - [x] `npm test` 통과
-- [ ] 커밋
+- [x] 커밋
 
 ### C1. `run()` 내부의 전역 `testManager` 참조 교체
 - **대상**: [src/testManager.js:66](src/testManager.js), [src/testManager.js:80](src/testManager.js)
