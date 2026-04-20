@@ -24,7 +24,7 @@ export const findTestFiles = (dir) => {
       const stat = fs.statSync(fullPath);
 
       if (stat.isDirectory()) {
-        walk(fullPath, isTestDir);
+        walk(fullPath);
       } else if (item.endsWith(PATH.TEST_FILE) || isTestDir) {
         if (item.endsWith(PATH.JAVASCRIPT_FILE)) {
           files.push(fullPath);

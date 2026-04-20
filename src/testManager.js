@@ -63,7 +63,7 @@ class TestManager {
     let passed = NUM.ZERO;
     let failed = NUM.ZERO;
 
-    for (const test of testManager.getTests()) {
+    for (const test of this.getTests()) {
       try {
         await test.fn();
         console.log(formatSuccessMessage(test));
@@ -77,7 +77,7 @@ class TestManager {
 
     console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed));
 
-    testManager.clearTests();
+    this.clearTests();
 
     return {passed, failed};
   }

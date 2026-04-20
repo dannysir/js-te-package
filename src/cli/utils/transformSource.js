@@ -1,13 +1,10 @@
 import {transformSync} from '@babel/core';
+import {createHash} from 'node:crypto';
 import {babelTransform} from '../../babelPlugins/babelTransform.js';
 
 const cache = new Map();
 
-const hashCode = (str) => {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
-  return h;
-};
+const getSourceHash = (code) => createHash('sha1').update(code).digest('hex');
 
 /**
  * 주어진 소스 코드에 babel 변환을 적용해 변환된 코드를 반환합니다.
@@ -20,9 +17,9 @@ const hashCode = (str) => {
 export const transformSource = (code, filename, mockedPaths) => {
   if (mockedPaths.size === 0) return code;
 
-  const cacheKey = `${filename}:${code.length}:${hashCode(code)}`;
-  const cached = cache.get(cacheKey);
-  if (cached) return cached;
+  const sourceHash = getSourceHash(code);
+  const cached = cache.get(filename);
+  if (cached && cached.sourceHash === sourceHash) return cached.transformed;
 
   const {code: transformed} = transformSync(code, {
     filename,
@@ -33,6 +30,6 @@ export const transformSource = (code, filename, mockedPaths) => {
     },
   });
 
-  cache.set(cacheKey, transformed);
+  cache.set(filename, {sourceHash, transformed});
   return transformed;
 };
