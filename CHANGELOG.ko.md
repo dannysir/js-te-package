@@ -3,7 +3,7 @@
 ## [0.6.0] 2026-04-20
 
 ### 추가 (Matcher)
-- `toContain(item)` — 배열 원소·문자열 부분 문자열 포함 여부 검사
+- `toContain(item)` — 배열 원소 또는 문자열의 부분 문자열 포함 여부 검사
 - `toBeInstanceOf(Class)` — `instanceof` 기반 인스턴스 타입 검사
 - `toBeNull()` / `toBeUndefined()` / `toBeDefined()` — null·undefined 전용 매처
 - `toHaveBeenCalled()` / `toHaveBeenCalledWith(...args)` / `toHaveBeenCalledTimes(n)` — mock 함수 호출 검증

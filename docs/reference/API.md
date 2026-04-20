@@ -156,11 +156,19 @@ expect('hello').toBe('hello');
 
 ### `expect(value).toEqual(expected)`
 
-Recursively compares the contents of objects and arrays.
+Recursively compares the contents of objects and arrays. The comparison is **key-order independent** and **safe against circular references**.
 
 ```js
 expect({ name: 'Alice' }).toEqual({ name: 'Alice' });
 expect([1, 2, 3]).toEqual([1, 2, 3]);
+
+// equal regardless of key order
+expect({ a: 1, b: 2 }).toEqual({ b: 2, a: 1 });
+
+// circular references are handled without crashing
+const a = { name: 'x' }; a.self = a;
+const b = { name: 'x' }; b.self = b;
+expect(a).toEqual(b);
 ```
 
 ### `expect(fn).toThrow(matcher?)`
@@ -249,6 +257,8 @@ expect(mockFn).toHaveBeenCalledTimes(2);        // called exactly twice
 expect(mockFn).toHaveBeenCalledWith(1, 2);      // called with (1, 2) at some point
 expect(mockFn).toHaveBeenCalledWith('hello');
 ```
+
+`toHaveBeenCalledWith` uses the same deep equal as `toEqual` to compare arguments, so it is **key-order independent** and **safe against circular references**.
 
 ### `.not` chaining
 
