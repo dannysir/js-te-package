@@ -6,7 +6,7 @@
 
 - [x] **Phase 1** — 소규모 수정·정리 (C1, C4, C6)
 - [x] **Phase 2** — 조직·구조 정돈 (D1, D2, D3, C3)
-- [ ] **Phase 3** — 핵심 아키텍처 (A1, A2, C5)
+- [x] **Phase 3** — 핵심 아키텍처 (A1, A2, C5)
 - [ ] **Phase 4** — 기능 확장 (B2, B3, B4)
 - [ ] **Phase 5** — 테스트 보강 (E1, E2, E3)
 
@@ -91,7 +91,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 - [x] `npm test` 통과
 - [x] `npm run build` 성공
 - [x] `package.json` `exports` 필드 재검토
-- [ ] 커밋
+- [x] 커밋
 
 ### D1. 메시지 포맷 중복 통합
 - **현황**:
@@ -101,7 +101,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 - **변경**:
   - `src/view/` 디렉터리를 새로 만들고 다음으로 재편.
     - `src/view/colors.js` ← 기존 [src/utils/consoleColor.js](src/utils/consoleColor.js) + [src/constants/view.js](src/constants/view.js)
-    - `src/view/testMessages.js` ← 테스트 성공·실패·결과 메시지 (A2의 default reporter가 사용)
+    - `src/view/reportMessages.js` ← 테스트 성공·실패·결과 메시지 (A2의 default reporter가 사용)
     - `src/view/errorMessages.js` ← matcher가 throw할 때 쓰는 에러 메시지 (`formatErrorMsg`, `formatThrowErrorMsg`)
   - 모든 import 경로 갱신.
 - **검증**: `npm test` 및 `npm run build`의 rollup 산출물 정상.
@@ -158,7 +158,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
         silentReporter.js
     view/                    # D1
       colors.js
-      testMessages.js
+      reportMessages.js
       errorMessages.js
     constants/
       paths.js
@@ -179,11 +179,11 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 
 ## Phase 3 — 핵심 아키텍처
 
-- [ ] A1 완료
-- [ ] A2 완료
-- [ ] C5 완료
-- [ ] 기존 테스트 전부 통과
-- [ ] 공개 API 시그니처 유지 확인
+- [x] A1 완료
+- [x] A2 완료
+- [x] C5 완료
+- [x] 기존 테스트 전부 통과
+- [x] 공개 API 시그니처 유지 확인
 - [ ] 커밋
 
 ### A1. expect ↔ matcher 자동 등록 구조
@@ -225,7 +225,7 @@ Phase 5: 테스트 보강         (E1, E2, E3)
     ```
     { onTestPass(test), onTestFail(test, error), onSuiteDone(passed, failed) }
     ```
-  - `src/cli/reporters/defaultReporter.js`: 현재 출력과 동일한 포맷 (D1의 `view/testMessages.js` 사용).
+  - `src/cli/reporters/defaultReporter.js`: 현재 출력과 동일한 포맷 (D1의 `view/reportMessages.js` 사용).
   - `src/cli/reporters/silentReporter.js`: 아무 것도 출력하지 않는 기본 내장형 (E 단계 테스트에서 사용).
   - `TestManager.run(reporter = defaultReporter)`로 변경.
   - [bin/cli.js](bin/cli.js)에서 default reporter 주입.
@@ -318,8 +318,8 @@ Phase 5: 테스트 보강         (E1, E2, E3)
 ### 삭제 / 이동
 - `src/utils/consoleColor.js` → `src/view/colors.js`
 - `src/constants/view.js` → `src/view/colors.js`로 흡수
-- `src/utils/formatString.js` → `src/view/testMessages.js` + `src/view/errorMessages.js`
-- `src/cli/utils/messages.js` → `src/view/testMessages.js`로 흡수 (CLI 전용 것은 reporter로 이동)
+- `src/utils/formatString.js` → `src/view/reportMessages.js` + `src/view/errorMessages.js`
+- `src/cli/utils/messages.js` → `src/view/reportMessages.js`로 흡수 (CLI 전용 것은 reporter로 이동)
 - `src/constants/index.js` → `src/constants/paths.js`, `src/constants/module.js`
 - `src/mock/utils/changeModuleExports.js` → `src/mock/makeMockFnc.js` + `src/mock/changeModuleExports.js`
 - `src/mock/utils/mockFunctions.js` → `src/mock/makeMockFnc.js` 내부로 흡수
