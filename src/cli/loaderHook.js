@@ -7,7 +7,7 @@ import {PATH} from '../constants/paths.js';
 const NODE_MODULES_SEGMENT = `${path.sep}${PATH.NODE_MODULES}${path.sep}`;
 const FILE_PROTOCOL = 'file://';
 
-const shouldTransform = (url, mockedPaths) => {
+export const shouldTransform = (url, mockedPaths) => {
   if (mockedPaths.size === 0) return false;
   if (!url.startsWith(FILE_PROTOCOL)) return false;
 
