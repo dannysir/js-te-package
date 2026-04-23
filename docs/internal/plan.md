@@ -2,7 +2,7 @@
 
 ## 진행 현황
 
-세션 단위로 Phase 하나씩 진행. 세션 시작 시 이 문서와 체크박스를 확인하고, 세션 종료 시 해당 Phase 내 체크박스를 갱신한다.
+세션 단위로 Phase 하나씩 진행. 세션 시작 시 이 문서와 체크박스를 확인하고, 세션 종료 시 해당 Phase 내 체크박스를 갱신한 뒤 사용자 허락을 받아 커밋한다.
 
 - [x] **Phase 1** — CLI 인자 파서 도입
 - [ ] **Phase 2** — 파일 필터
@@ -52,7 +52,6 @@ js-te --help                       # 도움말
 - [x] `bin/cli.js`에서 파싱 결과 수신 → `{ filePatterns, testNamePattern, help }`
 - [x] `--help` 플래그 시 도움말 출력 후 `exit 0`
 - [ ] 단위 테스트 동반 작성 (Phase 5에서 항목 체크)
-- [ ] 세션 종료 시 커밋
 
 ### 구현 메모
 
@@ -71,7 +70,6 @@ js-te --help                       # 도움말
 - [ ] [src/cli/setupFiles.js](../../src/cli/setupFiles.js)가 `filePatterns` 인자 받도록 시그니처 변경
 - [ ] [bin/cli.js](../../bin/cli.js)에서 필터 주입
 - [ ] 단위 테스트 동반 작성 (Phase 5)
-- [ ] 세션 종료 시 커밋
 
 ### 구현 메모
 
@@ -90,7 +88,6 @@ js-te --help                       # 도움말
 - [ ] 내부에서 풀네임(`path + " > " + description` 또는 `description`) 조립 후 `includes(testNamePattern)` 필터
 - [ ] [src/cli/runTests.js](../../src/cli/runTests.js)가 옵션 전달
 - [ ] 단위/통합 테스트 동반 작성 (Phase 5)
-- [ ] 세션 종료 시 커밋
 
 ### 구현 메모
 
@@ -105,7 +102,6 @@ js-te --help                       # 도움말
 - [ ] `bin/cli.js`: `totalPassed + totalFailed === 0`일 때 exit 1
 - [ ] `src/view/reportMessages.js`: "0 tests matched your pattern" 계열 경고 포맷터 추가
 - [ ] `--help` 출력 문자열 최종 확정 (Phase 1에서 초안 → 여기서 다듬기)
-- [ ] 세션 종료 시 커밋
 
 ### 구현 메모
 
@@ -124,7 +120,6 @@ js-te --help                       # 도움말
 - [ ] `test/cli/filterTestFiles.test.js` — 부분 문자열 매칭·OR·0건
 - [ ] `test/cli/testNameFilter.test.js` — 풀네임 매칭·describe 중첩·0건
 - [ ] 기존 `test/basic.test.js` 등 전체 `npm test` 통과 (회귀 없음)
-- [ ] 세션 종료 시 커밋
 
 ### 구현 메모
 
@@ -141,7 +136,6 @@ js-te --help                       # 도움말
 - [ ] `README.md` Quick Start 근처에 짧은 CLI 예시 3~5줄 + `CLI.md` 링크
 - [ ] `CHANGELOG.ko.md` `## [0.7.0]` 신규 섹션, `### 추가 (CLI)` 분류로 항목 기재
 - [ ] `docs/internal/backlog.md` 해당 섹션 체크박스 갱신
-- [ ] 세션 종료 시 커밋
 
 ---
 
