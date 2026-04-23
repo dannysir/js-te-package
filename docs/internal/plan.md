@@ -4,7 +4,7 @@
 
 세션 단위로 Phase 하나씩 진행. 세션 시작 시 이 문서와 체크박스를 확인하고, 세션 종료 시 해당 Phase 내 체크박스를 갱신한다.
 
-- [ ] **Phase 1** — CLI 인자 파서 도입
+- [x] **Phase 1** — CLI 인자 파서 도입
 - [ ] **Phase 2** — 파일 필터
 - [ ] **Phase 3** — testManager 이름 필터
 - [ ] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
@@ -48,9 +48,9 @@ js-te --help                       # 도움말
 
 ## Phase 1 — CLI 인자 파서
 
-- [ ] `src/cli/parseCliArgs.js` 신규
-- [ ] `bin/cli.js`에서 파싱 결과 수신 → `{ filePatterns, testNamePattern, help }`
-- [ ] `--help` 플래그 시 도움말 출력 후 `exit 0`
+- [x] `src/cli/parseCliArgs.js` 신규
+- [x] `bin/cli.js`에서 파싱 결과 수신 → `{ filePatterns, testNamePattern, help }`
+- [x] `--help` 플래그 시 도움말 출력 후 `exit 0`
 - [ ] 단위 테스트 동반 작성 (Phase 5에서 항목 체크)
 - [ ] 세션 종료 시 커밋
 
