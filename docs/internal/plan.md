@@ -5,7 +5,7 @@
 세션 단위로 Phase 하나씩 진행. 세션 시작 시 이 문서와 체크박스를 확인하고, 세션 종료 시 해당 Phase 내 체크박스를 갱신한 뒤 사용자 허락을 받아 커밋한다.
 
 - [x] **Phase 1** — CLI 인자 파서 도입
-- [ ] **Phase 2** — 파일 필터
+- [x] **Phase 2** — 파일 필터
 - [ ] **Phase 3** — testManager 이름 필터
 - [ ] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
 - [ ] **Phase 5** — 단위/통합 테스트
@@ -66,9 +66,9 @@ js-te --help                       # 도움말
 
 ## Phase 2 — 파일 필터
 
-- [ ] `src/cli/utils/filterTestFiles.js` 신규
-- [ ] [src/cli/setupFiles.js](../../src/cli/setupFiles.js)가 `filePatterns` 인자 받도록 시그니처 변경
-- [ ] [bin/cli.js](../../bin/cli.js)에서 필터 주입
+- [x] `src/cli/utils/filterTestFiles.js` 신규
+- [x] [src/cli/setupFiles.js](../../src/cli/setupFiles.js)가 `filePatterns` 인자 받도록 시그니처 변경
+- [x] [bin/cli.js](../../bin/cli.js)에서 필터 주입
 - [ ] 단위 테스트 동반 작성 (Phase 5)
 
 ### 구현 메모

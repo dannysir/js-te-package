@@ -24,7 +24,7 @@ const main = async () => {
   const reporter = defaultReporter;
   try {
     const jsTe = await setupEnvironment();
-    const {mockedPaths, testFiles} = setupFiles();
+    const {mockedPaths, testFiles} = setupFiles({filePatterns: cliOptions.filePatterns});
 
     installLoaderHook(mockedPaths);
 
