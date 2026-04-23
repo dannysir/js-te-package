@@ -6,7 +6,7 @@
 
 - [x] **Phase 1** — CLI 인자 파서 도입
 - [x] **Phase 2** — 파일 필터
-- [ ] **Phase 3** — testManager 이름 필터
+- [x] **Phase 3** — testManager 이름 필터
 - [ ] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
 - [ ] **Phase 5** — 단위/통합 테스트
 - [ ] **Phase 6** — 문서 (CLI 레퍼런스 · README · CHANGELOG)
@@ -84,9 +84,11 @@ js-te --help                       # 도움말
 
 ## Phase 3 — testManager 이름 필터
 
-- [ ] [src/testManager.js](../../src/testManager.js)의 `run()`이 옵션 객체 수용 — 예: `run(reporter, { testNamePattern } = {})`
-- [ ] 내부에서 풀네임(`path + " > " + description` 또는 `description`) 조립 후 `includes(testNamePattern)` 필터
-- [ ] [src/cli/runTests.js](../../src/cli/runTests.js)가 옵션 전달
+- [x] [src/testManager.js](../../src/testManager.js)의 `run()`이 `testNamePattern`을 positional로 수용 — `run(reporter, testNamePattern, file)` (옵션 객체 대신 positional — 단일 옵션이면 감싸지 않는 프로젝트 스타일)
+- [x] 내부에서 풀네임(`path + " > " + description` 또는 `description`) 조립 후 `includes(testNamePattern)` 필터
+- [x] [src/cli/runTests.js](../../src/cli/runTests.js)가 옵션 전달
+- [x] [index.js](../../index.js) `run` 래퍼가 `testNamePattern`·`file` 전달 (계획 외 발견 — dist 번들이 이 경로로 공개 API 노출)
+- [x] 매칭 0건 파일은 헤더·suite 출력 생략 (계획 외 발견 — `testManager.run(reporter, pattern, file)`에서 파일 레벨 리포팅 내장화. `getMatchingTests`/`clearTests`는 testManager 내부 메서드로만 유지, 공개 API 표면은 `run` 하나)
 - [ ] 단위/통합 테스트 동반 작성 (Phase 5)
 
 ### 구현 메모

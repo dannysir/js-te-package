@@ -71,7 +71,7 @@ export const beforeEach = (fn) => testManager.beforeEach(fn);
  * const { passed, failed } = await run();
  * console.log(`${passed} passed, ${failed} failed`);
  */
-export const run = (reporter) => testManager.run(reporter);
+export const run = (reporter, testNamePattern, file) => testManager.run(reporter, testNamePattern, file);
 
 /**
  * 값을 검증하는 matcher 함수들을 반환합니다.
