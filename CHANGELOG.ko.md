@@ -1,5 +1,21 @@
 # CHANGE LOG
 
+## [0.7.0] 2026-04-24
+
+### 추가 (CLI)
+- Positional 파일 패턴 — `js-te user` 로 전체 경로에 대한 대소문자 구분 부분 문자열 매칭으로 테스트 파일을 필터링 (여러 개면 OR)
+- `-t, --testNamePattern <pattern>` — 풀네임(`describe > ... > test 설명`)에 대한 대소문자 구분 부분 문자열 매칭
+- `-h, --help` — 사용법·옵션·예제·종료 코드 출력
+- 파일 필터와 이름 필터 조합 가능 (`js-te auth -t "token"`)
+
+### 변경 (CLI)
+- 매칭 0건일 때 exit 1 로 변경(기존 exit 0) — Vitest 기본 동작과 동일. CI 에서 필터 오타로 "조용한 성공" 이 발생해 리그레션을 놓치는 사고 방지
+- 실행 요약에 필터링 상태 표기 (적용된 패턴, 전체 대비 매칭된 파일 수)
+
+### 문서
+- [docs/reference/CLI.md](./docs/reference/CLI.md) / [CLI.ko.md](./docs/reference/CLI.ko.md) 신규 — CLI 전체 레퍼런스
+- README "빠른 시작" 에 부분 실행 예제 추가
+
 ## [0.6.0] 2026-04-20
 
 ### 추가 (Matcher)

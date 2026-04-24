@@ -9,7 +9,7 @@
 - [x] **Phase 3** — testManager 이름 필터
 - [x] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
 - [x] **Phase 5** — 단위/통합 테스트
-- [ ] **Phase 6** — 문서 (CLI 레퍼런스 · README · CHANGELOG)
+- [x] **Phase 6** — 문서 (CLI 레퍼런스 · README · CHANGELOG)
 
 ## 배경
 
@@ -133,11 +133,12 @@ js-te --help                       # 도움말
 
 ## Phase 6 — 문서
 
-- [ ] `docs/reference/CLI.md` 신규 — 사용 예, 옵션 표, 매칭 규칙, 종료 코드, 예시 시나리오
-- [ ] `docs/reference/CLI.ko.md` 신규 — 한글 버전
-- [ ] `README.md` Quick Start 근처에 짧은 CLI 예시 3~5줄 + `CLI.md` 링크
-- [ ] `CHANGELOG.ko.md` `## [0.7.0]` 신규 섹션, `### 추가 (CLI)` 분류로 항목 기재
-- [ ] `docs/internal/backlog.md` 해당 섹션 체크박스 갱신
+- [x] `docs/reference/CLI.md` 신규 — 사용 예, 옵션 표, 매칭 규칙, 종료 코드, 예시 시나리오
+- [x] `docs/reference/CLI.ko.md` 신규 — 한글 버전
+- [x] `README.md` / `README.ko.md` Quick Start 근처에 짧은 CLI 예시 + `CLI.md` 링크 + `--help` 스크린샷 placeholder
+- [x] `CHANGELOG.md` / `CHANGELOG.ko.md` `## [0.7.0]` 신규 섹션 (`### 추가 (CLI)` 분류)
+- [x] `package.json` version 0.7.0 bump
+- [x] `docs/internal/backlog.md` — 확인 결과 CLI 부분 실행 관련 항목이 이미 plan.md 로 이관되어 수정 불필요
 
 ---
 

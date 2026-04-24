@@ -4,16 +4,16 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.6.0](./CHANGELOG.md)
+## [📎 Latest Update — 0.7.0](./CHANGELOG.md)
 
-### New matchers and richer mock assertions
+### Partial test runs from the CLI
 
-- New matchers: `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`
-- `.not` chaining negates any matcher
-- `toThrow()` now accepts no argument / `RegExp` / `Error` subclass / predicate
-- `fn().mock.calls` exposes the recorded call arguments
+- Positional file patterns — `js-te user` runs only test files whose path contains `"user"` (multiple patterns are OR-ed)
+- `-t, --testNamePattern <pattern>` — filter by full test name (`describe > ... > test description`)
+- `-h, --help` — prints usage, options, examples, and exit codes
+- Zero-match now exits with code `1` to surface silent CI regressions (matches Vitest's default)
 
-See [Virtual Memory-based Test Execution](./docs/internal/가상메모리기반테스트실행.md) for design details (Korean).
+See the [CLI reference](./docs/reference/CLI.md) for details.
 
 ---
 
@@ -64,6 +64,25 @@ npm test
 
 <p align='center'>
   <img width="585" height="902" alt="js-te output example" src="https://github.com/user-attachments/assets/3d087a61-cc44-4f5b-8a2f-efd5f15c12b7" />
+</p>
+
+### Running a subset
+
+```bash
+js-te                 # all tests
+js-te user            # files whose path includes "user"
+js-te -t "login"      # tests whose full name includes "login"
+js-te auth -t "token" # combine both
+js-te --help          # help
+```
+
+See the [CLI reference](./docs/reference/CLI.md) for full options, matching rules, and exit codes.
+
+### `--help` output
+
+<p align='center'>
+  <!-- TODO: replace src with screenshot URL after capture -->
+  <img width="585" alt="js-te --help output" src="" />
 </p>
 
 ---
@@ -143,7 +162,8 @@ project/
 ## Documentation
 
 - [API Reference](./docs/reference/API.md) — full usage for `test`, `expect`, `mock`, `fn`, `beforeEach`, `test.each`
-- [Virtual Memory-based Test Execution](./docs/internal/가상메모리기반테스트실행.md) — 0.5.0 internals (Korean)
+- [CLI Reference](./docs/reference/CLI.md) — command-line options, matching rules, and exit codes
+- [Loader hook-based in-memory transform](./docs/internal/로더훅기반인메모리변환.md) — 0.5.0 internals (Korean)
 - [CHANGELOG](./CHANGELOG.md) — version history
 
 ## Links

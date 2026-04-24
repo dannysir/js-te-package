@@ -477,7 +477,7 @@ import { add } from './math.js';
 // add.mockReturnValue(100); // TypeError: add.mockReturnValue is not a function
 ```
 
-wrapper 패턴에 대한 자세한 설명은 [가상메모리기반테스트실행.md § 4](../internal/가상메모리기반테스트실행.md#4-babel-변환-상세-wrapper-패턴) 를 참고하세요.
+wrapper 패턴에 대한 자세한 설명은 [로더훅기반인메모리변환.md § 4](../internal/로더훅기반인메모리변환.md#4-babel-변환-상세-wrapper-패턴) 를 참고하세요.
 
 ### ESM / CommonJS 지원
 
@@ -539,4 +539,4 @@ test('모킹 동작', () => {
 3. 이후 모든 `import` / `require` 가 훅을 거치며, 사전 수집된 경로에 해당하는 파일만 Babel 로 변환하여 **메모리에서만** Node 에 반환
 4. 변환된 코드는 `mock()` 호출 시점의 `mockStore` 를 런타임마다 조회하는 wrapper 패턴으로 만들어져, `mock()` 호출 순서·`import` 순서와 무관하게 올바른 값을 반환
 
-사용자의 원본 파일은 **한 바이트도 수정되지 않습니다.** 자세한 설계 내용은 [가상메모리기반테스트실행.md](../internal/가상메모리기반테스트실행.md) 참고.
+사용자의 원본 파일은 **한 바이트도 수정되지 않습니다.** 자세한 설계 내용은 [로더훅기반인메모리변환.md](../internal/로더훅기반인메모리변환.md) 참고.

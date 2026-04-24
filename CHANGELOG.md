@@ -2,6 +2,22 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.7.0] 2026-04-24
+
+### Added (CLI)
+- Positional file patterns — `js-te user` filters test files by case-sensitive substring on the full path (multiple patterns are OR-ed)
+- `-t, --testNamePattern <pattern>` — filter by case-sensitive substring on the full test name (`describe > ... > test description`)
+- `-h, --help` — prints usage, options, examples, and exit codes
+- File and name filters can be combined (`js-te auth -t "token"`)
+
+### Changed (CLI)
+- Exit code is now `1` when no tests match the filter (previously would exit `0`), matching Vitest's default to surface silent CI regressions
+- Run summary now labels the filtering state (patterns applied, files considered vs. matched)
+
+### Docs
+- New [docs/reference/CLI.md](./docs/reference/CLI.md) / [CLI.ko.md](./docs/reference/CLI.ko.md) — full CLI reference
+- README "Quick Start" now shows subset-run examples
+
 ## [0.6.0] 2026-04-20
 
 ### Added (Matcher)
