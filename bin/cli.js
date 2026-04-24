@@ -30,9 +30,12 @@ const main = async () => {
 
     reporter.onRunStart(totalFileCount, testFiles.length, cliOptions.testNamePattern);
     const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern);
+
+    const zeroMatched = totalPassed + totalFailed === 0;
+    if (zeroMatched) reporter.onNoTestsFound(cliOptions.filePatterns, cliOptions.testNamePattern);
     reporter.onRunDone(totalPassed, totalFailed);
 
-    return totalFailed > 0 ? 1 : 0;
+    return (totalFailed > 0 || zeroMatched) ? 1 : 0;
   } catch (error) {
     reporter.onRunError(error);
     return 1;

@@ -7,7 +7,7 @@
 - [x] **Phase 1** — CLI 인자 파서 도입
 - [x] **Phase 2** — 파일 필터
 - [x] **Phase 3** — testManager 이름 필터
-- [ ] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
+- [x] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
 - [ ] **Phase 5** — 단위/통합 테스트
 - [ ] **Phase 6** — 문서 (CLI 레퍼런스 · README · CHANGELOG)
 
@@ -101,9 +101,9 @@ js-te --help                       # 도움말
 
 ## Phase 4 — 0건 정책 · `--help` · 경고
 
-- [ ] `bin/cli.js`: `totalPassed + totalFailed === 0`일 때 exit 1
-- [ ] `src/view/reportMessages.js`: "0 tests matched your pattern" 계열 경고 포맷터 추가
-- [ ] `--help` 출력 문자열 최종 확정 (Phase 1에서 초안 → 여기서 다듬기)
+- [x] `bin/cli.js`: `totalPassed + totalFailed === 0`일 때 exit 1
+- [x] `src/view/reportMessages.js`: "0 tests matched your pattern" 계열 경고 포맷터 추가
+- [x] `--help` 출력 문자열 최종 확정 (Phase 1에서 초안 → 여기서 다듬기)
 
 ### 구현 메모
 

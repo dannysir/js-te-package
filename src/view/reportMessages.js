@@ -43,6 +43,14 @@ export const getFilterSummaryMsg = (testNamePattern) => {
   return `\nFilter applied: -t "${testNamePattern}"`;
 };
 
+export const getNoTestsFoundMsg = (filePatterns, testNamePattern) => {
+  const parts = [];
+  if (filePatterns?.length) parts.push(`file pattern(s) [${filePatterns.join(', ')}]`);
+  if (testNamePattern !== undefined) parts.push(`name pattern "${testNamePattern}"`);
+  const suffix = parts.length ? ` matching ${parts.join(' and ')}` : '';
+  return yellow(`\n⚠ No tests found${suffix}`);
+};
+
 export const getFilePath = (path) => {
   return `\n${yellow(path)}\n`;
 };
