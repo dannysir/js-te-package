@@ -24,11 +24,11 @@ const main = async () => {
   const reporter = defaultReporter;
   try {
     const jsTe = await setupEnvironment();
-    const {mockedPaths, testFiles} = setupFiles({filePatterns: cliOptions.filePatterns});
+    const {mockedPaths, testFiles, totalFileCount} = setupFiles({filePatterns: cliOptions.filePatterns});
 
     installLoaderHook(mockedPaths);
 
-    reporter.onRunStart(testFiles.length);
+    reporter.onRunStart(totalFileCount, testFiles.length, cliOptions.testNamePattern);
     const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern);
     reporter.onRunDone(totalPassed, totalFailed);
 

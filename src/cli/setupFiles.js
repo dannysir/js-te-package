@@ -7,5 +7,5 @@ export const setupFiles = ({filePatterns = []} = {}) => {
   const testFiles = filterTestFiles(allTestFiles, filePatterns);
   const mockedPaths = collectMockedPaths(testFiles);
 
-  return {mockedPaths, testFiles};
+  return {mockedPaths, testFiles, totalFileCount: allTestFiles.length};
 };

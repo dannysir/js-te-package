@@ -34,8 +34,13 @@ export const getTestResultMsg = (title, success, fail) => {
   return msg;
 };
 
-export const getFileCountString = (n) => {
-  return `\nFound ${green(n)} test file(s)`;
+export const getFileCountString = (totalCount, matchedCount = totalCount) => {
+  if (matchedCount === totalCount) return `\nFound ${green(totalCount)} test file(s)`;
+  return `\nFound ${green(totalCount)} test file(s), ${green(matchedCount)} matched filter`;
+};
+
+export const getFilterSummaryMsg = (testNamePattern) => {
+  return `\nFilter applied: -t "${testNamePattern}"`;
 };
 
 export const getFilePath = (path) => {

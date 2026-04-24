@@ -4,13 +4,17 @@ import {
   getErrorMsgInLogic,
   getFileCountString,
   getFilePath,
+  getFilterSummaryMsg,
   getTestResultMsg,
   RESULT_MSG,
 } from "../../view/reportMessages.js";
 
 export const defaultReporter = {
-  onRunStart: (fileCount) => {
-    console.log(getFileCountString(fileCount));
+  onRunStart: (totalCount, matchedCount, testNamePattern) => {
+    console.log(getFileCountString(totalCount, matchedCount));
+    if (testNamePattern !== undefined) {
+      console.log(getFilterSummaryMsg(testNamePattern));
+    }
   },
   onFileStart: (filePath) => {
     console.log(getFilePath(filePath));
