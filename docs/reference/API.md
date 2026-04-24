@@ -479,7 +479,7 @@ import { add } from './math.js';
 // add.mockReturnValue(100); // TypeError: add.mockReturnValue is not a function
 ```
 
-For the full design of the wrapper pattern see [가상메모리기반테스트실행.md § 4](../internal/가상메모리기반테스트실행.md#4-babel-변환-상세-wrapper-패턴) (Korean).
+For the full design of the wrapper pattern see [로더훅기반인메모리변환.md § 4](../internal/로더훅기반인메모리변환.md#4-babel-변환-상세-wrapper-패턴) (Korean).
 
 ### ESM / CommonJS support
 
@@ -541,4 +541,4 @@ Since 0.5.0 js-te runs through a **`load` hook** registered with Node's `module.
 3. Every subsequent `import` / `require` flows through the hook. Only files matching a pre-collected mock path get Babel-transformed, **in memory only**, before being handed back to Node.
 4. The transformed code uses the wrapper pattern: each call consults `mockStore` at call time, so the result is correct regardless of the order between `mock()` and `import`.
 
-The user's source files are **never modified on disk**. See [가상메모리기반테스트실행.md](../internal/가상메모리기반테스트실행.md) (Korean) for the full design.
+The user's source files are **never modified on disk**. See [로더훅기반인메모리변환.md](../internal/로더훅기반인메모리변환.md) (Korean) for the full design.

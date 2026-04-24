@@ -63,11 +63,25 @@ class TestManager {
     this.#beforeEachArr = [];
   }
 
-  async run(reporter = NOOP_REPORTER) {
+  getMatchingTests(testNamePattern) {
+    if (testNamePattern === undefined) return this.getTests();
+    return this.getTests().filter(test => this.#getFullName(test).includes(testNamePattern));
+  }
+
+  async run(reporter = NOOP_REPORTER, testNamePattern, file) {
+    const tests = this.getMatchingTests(testNamePattern);
+
+    if (tests.length === 0) {
+      this.clearTests();
+      return {passed: 0, failed: 0};
+    }
+
+    if (file !== undefined) reporter.onFileStart(file);
+
     let passed = 0;
     let failed = 0;
 
-    for (const test of this.getTests()) {
+    for (const test of tests) {
       try {
         await test.fn();
         reporter.onTestPass(test);
@@ -84,6 +98,12 @@ class TestManager {
     this.clearTests();
 
     return {passed, failed};
+  }
+
+  #getFullName(test) {
+    return test.path === ''
+      ? test.description
+      : test.path + RESULT_MSG.DIRECTORY_DELIMITER + test.description;
   }
 
   #getMatcherForReplace = () => {
