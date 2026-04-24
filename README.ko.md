@@ -81,8 +81,7 @@ js-te --help          # 도움말
 ### `--help` 출력
 
 <p align='center'>
-  <!-- TODO: 스크린샷 캡처 후 src 에 URL 을 채워 넣기 -->
-  <img width="585" alt="js-te --help 출력" src="" />
+  <img width="728" height="388" alt="스크린샷 2026-04-24 오후 5 06 47" src="https://github.com/user-attachments/assets/82bb1b83-030b-4f69-91c2-f3a88a81663a" />
 </p>
 
 ---
