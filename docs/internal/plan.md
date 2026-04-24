@@ -8,7 +8,7 @@
 - [x] **Phase 2** — 파일 필터
 - [x] **Phase 3** — testManager 이름 필터
 - [x] **Phase 4** — 0건 정책 · `--help` · 경고 메시지
-- [ ] **Phase 5** — 단위/통합 테스트
+- [x] **Phase 5** — 단위/통합 테스트
 - [ ] **Phase 6** — 문서 (CLI 레퍼런스 · README · CHANGELOG)
 
 ## 배경
@@ -51,7 +51,7 @@ js-te --help                       # 도움말
 - [x] `src/cli/parseCliArgs.js` 신규
 - [x] `bin/cli.js`에서 파싱 결과 수신 → `{ filePatterns, testNamePattern, help }`
 - [x] `--help` 플래그 시 도움말 출력 후 `exit 0`
-- [ ] 단위 테스트 동반 작성 (Phase 5에서 항목 체크)
+- [x] 단위 테스트 동반 작성 (Phase 5에서 항목 체크)
 
 ### 구현 메모
 
@@ -69,7 +69,7 @@ js-te --help                       # 도움말
 - [x] `src/cli/utils/filterTestFiles.js` 신규
 - [x] [src/cli/setupFiles.js](../../src/cli/setupFiles.js)가 `filePatterns` 인자 받도록 시그니처 변경
 - [x] [bin/cli.js](../../bin/cli.js)에서 필터 주입
-- [ ] 단위 테스트 동반 작성 (Phase 5)
+- [x] 단위 테스트 동반 작성 (Phase 5)
 
 ### 구현 메모
 
@@ -89,7 +89,7 @@ js-te --help                       # 도움말
 - [x] [src/cli/runTests.js](../../src/cli/runTests.js)가 옵션 전달
 - [x] [index.js](../../index.js) `run` 래퍼가 `testNamePattern`·`file` 전달 (계획 외 발견 — dist 번들이 이 경로로 공개 API 노출)
 - [x] 매칭 0건 파일은 헤더·suite 출력 생략 (계획 외 발견 — `testManager.run(reporter, pattern, file)`에서 파일 레벨 리포팅 내장화. `getMatchingTests`/`clearTests`는 testManager 내부 메서드로만 유지, 공개 API 표면은 `run` 하나)
-- [ ] 단위/통합 테스트 동반 작성 (Phase 5)
+- [x] 단위/통합 테스트 동반 작성 (Phase 5)
 
 ### 구현 메모
 
@@ -118,15 +118,15 @@ js-te --help                       # 도움말
 
 ## Phase 5 — 단위/통합 테스트
 
-- [ ] `test/cli/parseCliArgs.test.js` — positional·옵션·alias·에러 케이스
-- [ ] `test/cli/filterTestFiles.test.js` — 부분 문자열 매칭·OR·0건
-- [ ] `test/cli/testNameFilter.test.js` — 풀네임 매칭·describe 중첩·0건
-- [ ] 기존 `test/basic.test.js` 등 전체 `npm test` 통과 (회귀 없음)
+- [x] `test/cli/parseCliArgs.test.js` — positional·옵션·alias·에러 케이스
+- [x] `test/cli/filterTestFiles.test.js` — 부분 문자열 매칭·OR·0건
+- [x] `test/cli/testNameFilter.test.js` — 풀네임 매칭·describe 중첩·0건
+- [x] 기존 `test/basic.test.js` 등 전체 `npm test` 통과 (회귀 없음)
 
 ### 구현 메모
 
 - 기존 `test/cli/` 하위 테스트([test/cli/findFiles.test.js](../../test/cli/findFiles.test.js) 등) 패턴 따라가기.
-- `testNameFilter.test.js`는 `testManager`에 직접 describe/test를 쌓고 `run(silentReporter, {testNamePattern})` 호출해 남은 테스트 수를 검증.
+- `testNameFilter.test.js`는 전역 `describe/test` 로 고유 marker prefix(`__TNF_*__`) 로 fixture 를 스테이징하고 `run(silentReporter, pattern)` 호출 결과 `{passed, failed}` 를 검증. `testManager` 를 직접 import 하면 loader hook 이 `src/mock/store.js` 를 이중 변환하며 `mockStore` 중복 선언 충돌이 발생(잠복 버그)하므로 전역 API 만 사용.
 - fixture 디렉토리가 필요하면 기존 `test/cli/findFiles.test.js`가 쓰는 방식 참고.
 
 ---
