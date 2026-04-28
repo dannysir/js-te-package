@@ -1,5 +1,14 @@
 # CHANGE LOG
 
+## [0.7.1] 2026-04-28
+
+### 수정
+- `mockStore` 를 모듈별 `Map` + Babel 식별자 주입 방식에서 `globalThis.__jsTeMockStore__` 싱글톤으로 변경. 사용자 코드와의 식별자 충돌, 패키지가 두 번 이상 resolve 될 때(다중 realm / 중첩 `node_modules`) 발생하던 상태 분열 문제 해결.
+
+### 문서 (내부)
+- [docs/internal/로더훅기반인메모리변환.md](docs/internal/로더훅기반인메모리변환.md) 를 globalThis 기반 mockStore 동작으로 갱신.
+- 머지 완료된 `docs/internal/plan.md` 제거 (feature-partial-run brunch 산출물).
+
 ## [0.7.0] 2026-04-24
 
 ### 추가 (CLI)

@@ -4,7 +4,7 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.7.0](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.7.1](./CHANGELOG.ko.md)
 
 ### CLI 부분 실행
 

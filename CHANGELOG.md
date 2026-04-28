@@ -2,6 +2,15 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.7.1] 2026-04-28
+
+### Fixed
+- `mockStore` is now a `globalThis.__jsTeMockStore__` singleton instead of a per-module `Map` injected as a Babel identifier. Resolves identifier collisions with user code and split-state issues when the package is resolved more than once (multi-realm / nested `node_modules`).
+
+### Docs (internal)
+- Updated [docs/internal/로더훅기반인메모리변환.md](docs/internal/로더훅기반인메모리변환.md) to reflect the `globalThis` based mockStore mechanism.
+- Removed merged `docs/internal/plan.md` (feature-partial-run branch artifact).
+
 ## [0.7.0] 2026-04-24
 
 ### Added (CLI)
