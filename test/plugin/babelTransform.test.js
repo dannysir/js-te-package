@@ -12,17 +12,12 @@ const transform = (code, mockedPaths = null, filename = CALLER) => transformSync
   },
 }).code;
 
-test('[babelTransform] Program 방문자: 파일 상단에 mockStore 바인딩 삽입', () => {
-  const out = transform('const x = 1;');
-  expect(out).toContain('const mockStore = global.mockStore');
-});
-
 test('[babelTransform] ESM default import → wrapper 생성 + _original await import', () => {
   const out = transform(`import foo from './random.js';`);
   expect(out).toContain('await import("./random.js")');
   expect(out).toContain('const foo = (...args) =>');
-  expect(out).toContain('mockStore.has');
-  expect(out).toContain('mockStore.get');
+  expect(out).toContain('globalThis.__jsTeMockStore__.has');
+  expect(out).toContain('globalThis.__jsTeMockStore__.get');
 });
 
 test('[babelTransform] ESM named import → wrapper 생성', () => {
@@ -33,7 +28,7 @@ test('[babelTransform] ESM named import → wrapper 생성', () => {
 
 test('[babelTransform] ESM namespace import → 객체 전개 wrapper', () => {
   const out = transform(`import * as utils from './random.js';`);
-  expect(out).toContain('const utils = mockStore.has');
+  expect(out).toContain('const utils = globalThis.__jsTeMockStore__.has');
 });
 
 test('[babelTransform] CJS require Identifier 패턴', () => {
@@ -78,5 +73,5 @@ test('[babelTransform] MOCK.STORE_PATH 임포트는 변환 대상에서 제외',
   const src = `import {mockStore} from '@dannysir/js-te/src/mock/store.js';`;
   const out = transform(src);
   expect(out).toContain(`from '@dannysir/js-te/src/mock/store.js'`);
-  expect(out).not.toContain('mockStore.has("@dannysir');
+  expect(out).not.toContain('globalThis.__jsTeMockStore__.has("@dannysir');
 });

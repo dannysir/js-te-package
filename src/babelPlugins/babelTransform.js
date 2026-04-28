@@ -32,19 +32,6 @@ export const babelTransform = (mockedPaths = null) => {
   return ({types: t}) => {
     return {
       visitor: {
-        Program(path) {
-          const mockStoreDeclaration = t.VariableDeclaration('const', [
-            t.VariableDeclarator(
-              t.Identifier(MOCK.STORE_NAME),
-              t.MemberExpression(
-                t.Identifier('global'),
-                t.Identifier(MOCK.STORE_NAME)
-              )
-            )
-          ]);
-          path.node.body.unshift(mockStoreDeclaration);
-        },
-
         ImportDeclaration(nodePath, state) {
           const source = nodePath.node.source.value;
 

@@ -1,5 +1,5 @@
 export const MOCK = {
-  STORE_NAME: 'mockStore',
+  STORE_GLOBAL: '__jsTeMockStore__',
   STORE_PATH: '@dannysir/js-te/src/mock/store.js'
 };
 
