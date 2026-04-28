@@ -12,8 +12,8 @@ import {BABEL, MOCK} from "../../constants/babel.js";
  * @example
  * // 반환 결과 (코드로 표현하면):
  * const random = (...args) => {
- *   const module = mockStore.has('/path/to/random.js')
- *     ? { ..._original, ...mockStore.get('/path/to/random.js') }
+ *   const module = globalThis.__jsTeMockStore__.has('/path/to/random.js')
+ *     ? { ..._original, ...globalThis.__jsTeMockStore__.get('/path/to/random.js') }
  *     : _original;
  *   return module.random(...args);
  * };
@@ -51,8 +51,8 @@ export const createWrapperFunction = (t, importedName, localName, absolutePath, 
  *
  * @example
  * // 반환 결과 (코드로 표현하면):
- * const utils = mockStore.has('/path/to/utils.js')
- *   ? { ..._original, ...mockStore.get('/path/to/utils.js') }
+ * const utils = globalThis.__jsTeMockStore__.has('/path/to/utils.js')
+ *   ? { ..._original, ...globalThis.__jsTeMockStore__.get('/path/to/utils.js') }
  *   : _original;
  */
 export const createNamespaceWrapper = (t, localName, absolutePath, originalVarName) => {
@@ -96,21 +96,27 @@ export const createOriginalDeclaration = (t, originalVarName, source, isRequire 
  *
  * @example
  * // 반환 결과 (코드로 표현하면):
- * mockStore.has('/path/to/random.js')
- *   ? { ..._original, ...mockStore.get('/path/to/random.js') }
+ * globalThis.__jsTeMockStore__.has('/path/to/random.js')
+ *   ? { ..._original, ...globalThis.__jsTeMockStore__.get('/path/to/random.js') }
  *   : _original
  */
 const createConditionalModule = (t, absolutePath, originalVarName) => {
   return t.conditionalExpression(
     t.callExpression(
-      t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.HAS)),
+      t.memberExpression(
+        t.memberExpression(t.identifier('globalThis'), t.identifier(MOCK.STORE_GLOBAL)),
+        t.identifier(BABEL.HAS)
+      ),
       [t.stringLiteral(absolutePath)]
     ),
     t.objectExpression([
       t.spreadElement(originalVarName),
       t.spreadElement(
         t.callExpression(
-          t.memberExpression(t.identifier(MOCK.STORE_NAME), t.identifier(BABEL.GET)),
+          t.memberExpression(
+            t.memberExpression(t.identifier('globalThis'), t.identifier(MOCK.STORE_GLOBAL)),
+            t.identifier(BABEL.GET)
+          ),
           [t.stringLiteral(absolutePath)]
         )
       )

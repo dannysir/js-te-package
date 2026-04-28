@@ -22,8 +22,3 @@ test('[transformSource] 같은 filename이라도 code가 다르면 결과 달라
   const out2 = transformSource(`const y = 2;`, filename, paths);
   expect(out1).not.toBe(out2);
 });
-
-test('[transformSource] 변환된 코드는 mockStore 바인딩을 포함 (Program visitor 통과 확인)', () => {
-  const out = transformSource(`const x = 1;`, '/tmp/program.js', new Set(['/tmp/dummy.js']));
-  expect(out).toContain('const mockStore = global.mockStore');
-});

@@ -1,6 +1,6 @@
 import {changeModuleExports} from "./changeModuleExports.js";
 
-export const mockStore = new Map();
+export const mockStore = (globalThis.__jsTeMockStore__ ??= new Map());
 
 export const clearAllMocks = () => {
   mockStore.clear();
