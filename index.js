@@ -64,12 +64,9 @@ export const describe = (suiteName, fn) => testManager.describe(suiteName, fn);
 export const beforeEach = (fn) => testManager.beforeEach(fn);
 
 /**
- * 등록된 모든 테스트를 실행합니다.
- * @returns {Promise<{passed: number, failed: number}>} 테스트 결과
- *
- * @example
- * const { passed, failed } = await run();
- * console.log(`${passed} passed, ${failed} failed`);
+ * @internal
+ * CLI 러너 전용. 사용자에게 글로벌로 노출되지 않으며 직접 호출은 권장하지 않습니다.
+ * 사용자가 test fn 안에서 호출하면 외부 러너의 run 과 재귀 충돌해 결과가 오염됩니다.
  */
 export const run = (reporter, testNamePattern, file) => testManager.run(reporter, testNamePattern, file);
 

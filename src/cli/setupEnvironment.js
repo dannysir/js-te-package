@@ -3,6 +3,19 @@ import fs from 'fs';
 import {MODULE_TYPE} from "../constants/module.js";
 import {PATH} from "../constants/paths.js";
 
+const GLOBAL_EXPORTS = [
+  'test',
+  'describe',
+  'beforeEach',
+  'expect',
+  'mock',
+  'unmock',
+  'isMocked',
+  'clearAllMocks',
+  'mockStore',
+  'fn',
+];
+
 export const getUserModuleType = (cwd = process.cwd()) => {
   try {
     const pkgPath = path.join(cwd, 'package.json');
@@ -25,8 +38,8 @@ export const setupEnvironment = async () => {
     jsTe = require(PATH.DANNYSIR_JS_TE);
   }
 
-  Object.keys(jsTe).forEach(key => {
-    global[key] = jsTe[key];
+  GLOBAL_EXPORTS.forEach(key => {
+    if (jsTe[key] !== undefined) global[key] = jsTe[key];
   });
 
   return jsTe
