@@ -7,6 +7,16 @@ const NOOP_REPORTER = {
   onSuiteDone: () => {},
 };
 
+const getFullName = (test) =>
+  test.path === ''
+    ? test.description
+    : test.path + RESULT_MSG.DIRECTORY_DELIMITER + test.description;
+
+export const filterTestsByName = (tests, pattern) => {
+  if (pattern === undefined) return tests;
+  return tests.filter(test => getFullName(test).includes(pattern));
+};
+
 class TestManager {
   #tests = [];
   #testDepth = [];
@@ -64,8 +74,7 @@ class TestManager {
   }
 
   getMatchingTests(testNamePattern) {
-    if (testNamePattern === undefined) return this.getTests();
-    return this.getTests().filter(test => this.#getFullName(test).includes(testNamePattern));
+    return filterTestsByName(this.getTests(), testNamePattern);
   }
 
   async run(reporter = NOOP_REPORTER, testNamePattern, file) {
@@ -98,12 +107,6 @@ class TestManager {
     this.clearTests();
 
     return {passed, failed};
-  }
-
-  #getFullName(test) {
-    return test.path === ''
-      ? test.description
-      : test.path + RESULT_MSG.DIRECTORY_DELIMITER + test.description;
   }
 
   #getMatcherForReplace = () => {
