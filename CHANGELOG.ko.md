@@ -1,5 +1,14 @@
 # CHANGE LOG
 
+## [0.7.2] 2026-05-02
+
+### 변경
+- 글로벌 자동 등록을 명시적 화이트리스트(`test`, `describe`, `beforeEach`, `expect`, `mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`, `fn`)로 교체. `run` 은 더 이상 `global` 에 노출되지 않는다. 사용자가 test 본문 안에서 `run()` 을 호출해 외부 러너에 재진입해 결과가 오염되던 위험 제거. `run` 자체는 패키지 entry 에서 계속 export 되며 CLI 내부 전용으로 `@internal` 표기.
+
+### 개선 (내부)
+- `src/testManager.js` 의 `filterTestsByName` 을 module-scope pure 함수로 추출. 공유 러너 큐에 의존하지 않는 순수 단위 테스트가 가능해짐.
+- `mockStore` `globalThis` 싱글톤 회귀 통합 테스트 추가 — `@dannysir/js-te/src/mock/store.js` 서브패스로 import 한 mockStore 와 wrapper 가 같은 저장소를 공유하는지, 사용자 모듈의 지역 `const mockStore` 식별자가 wrapper 동작에 새지 않는지 실행 단위로 고정.
+
 ## [0.7.1] 2026-04-28
 
 ### 수정

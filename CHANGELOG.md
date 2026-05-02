@@ -2,6 +2,15 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.7.2] 2026-05-02
+
+### Changed
+- Global registration is now an explicit whitelist (`test`, `describe`, `beforeEach`, `expect`, `mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`, `fn`). `run` is no longer attached to `global`, removing a recursion hazard where a user calling `run()` inside a test body would re-enter the outer runner. `run` is still exported from the package entry (CLI internal, marked `@internal`).
+
+### Improved (Internal)
+- Extracted `filterTestsByName` as a module-scope pure function in `src/testManager.js`, enabling pure unit tests of the name filter without relying on the shared runner queue.
+- Added an integration regression test for the `mockStore` `globalThis` singleton — verifies that `mockStore` imported via the `@dannysir/js-te/src/mock/store.js` subpath shares the same store as the wrapper, and that a userspace `const mockStore` identifier collision does not leak into the wrapper.
+
 ## [0.7.1] 2026-04-28
 
 ### Fixed
