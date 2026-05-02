@@ -4,7 +4,7 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.7.1](./CHANGELOG.md)
+## [📎 Latest Update — 0.7.2](./CHANGELOG.md)
 
 ### Partial test runs from the CLI
 
