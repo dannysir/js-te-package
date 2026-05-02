@@ -29,3 +29,10 @@ export function foo() {}
 - **환경**: 다양한 Node.js 환경과 프로젝트 구조에서 동작
 
 새 기능 설계 시 "다양한 사용자 환경에서도 동작하는가?" 를 가장 먼저 고려한다.
+
+## 브랜치명 원칙
+
+브랜치명은 `<작업분류>/<설명>` 형식으로 작성한다.
+
+- 설명은 영문 소문자 단어를 하이픈(`-`)으로 연결한 짧은 문구
+- 예: `refactor/testmanager-instance-isolation`, `fix/mock-store-injection-collision`
