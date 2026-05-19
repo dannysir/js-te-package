@@ -10,6 +10,12 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./browser": {
+      "node": null,
+      "browser": "./dist/browser.mjs",
+      "import": "./dist/browser.mjs",
+      "default": "./dist/browser.mjs"
+    },
     "./src/mock/store.js": "./src/mock/store.js"
   },
   "bin": {
