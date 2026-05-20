@@ -11,7 +11,7 @@
       "require": "./dist/index.cjs"
     },
     "./browser": {
-      "node": null,
+      "node": "./dist/browser-node-stub.mjs",
       "browser": "./dist/browser.mjs",
       "import": "./dist/browser.mjs",
       "default": "./dist/browser.mjs"
