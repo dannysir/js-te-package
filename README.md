@@ -4,16 +4,15 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.7.2](./CHANGELOG.md)
+## [📎 Latest Update — 0.7.3](./CHANGELOG.md)
 
-### Partial test runs from the CLI
+### Browser entry & TypeScript declarations
 
-- Positional file patterns — `js-te user` runs only test files whose path contains `"user"` (multiple patterns are OR-ed)
-- `-t, --testNamePattern <pattern>` — filter by full test name (`describe > ... > test description`)
-- `-h, --help` — prints usage, options, examples, and exit codes
-- Zero-match now exits with code `1` to surface silent CI regressions (matches Vitest's default)
+- **Browser entry** — `@dannysir/js-te/browser` re-exports the core API (`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`) for browsers and Web Workers, where the Node CLI runner can't run
+- Importing `/browser` from a Node runtime throws immediately with a clear error, steering you to the main entry or the `js-te` CLI
+- **TypeScript** — `.d.ts` declarations now ship for both the main and `/browser` entries, so the package is fully typed out of the box
 
-See the [CLI reference](./docs/reference/CLI.md) for details.
+See [Browser usage](#browser-usage) for details.
 
 ---
 
@@ -95,6 +94,8 @@ See the [CLI reference](./docs/reference/CLI.md) for full options, matching rule
 - **Module Mocking** — `mock(path, mockObj)` (relative & absolute paths), `clearAllMocks`, `unmock`, `isMocked`
 - **Module systems** — ESM (`import`) and CommonJS (`require`)
 - **CLI** — single `js-te` command
+- **Browser entry** — `@dannysir/js-te/browser` exposes the core API for browsers and Web Workers
+- **TypeScript** — bundled `.d.ts` declarations for the main and `/browser` entries
 
 ## Examples
 
@@ -136,6 +137,39 @@ test('mock random function', () => {
 ```
 
 > ⚠️ Mock function methods (`mockReturnValue`, etc.) are only accessible through the object returned by `mock()`. See [why](./docs/reference/API.md#why-must-i-use-the-returned-object) in the API docs.
+
+---
+
+## Browser usage
+
+`@dannysir/js-te/browser` is a browser/Web Worker-safe entry that re-exports the pure test core. Reach for it when you run js-te test code directly in the browser (interactive demos, playgrounds) — the default `@dannysir/js-te` entry depends on the Node CLI runner and can't run there.
+
+```js
+import { describe, test, expect, fn, beforeEach, testManager } from '@dannysir/js-te/browser';
+
+describe('math', () => {
+  test('addition', () => {
+    expect(1 + 2).toBe(3);
+  });
+});
+
+await testManager.run();
+```
+
+**Exported:** `test` (with `test.each`), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+
+**Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`) — these are Node-only and intentionally left out.
+
+> `testManager` is a module-level singleton. If you collect tests more than once on the same page, call `testManager.clearTests()` between runs.
+
+**Node guard** — importing this entry from a Node runtime throws immediately, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI):
+
+```
+@dannysir/js-te/browser cannot be used in a Node.js runtime.
+It is designed for browsers and Web Workers only.
+```
+
+**TypeScript** — type declarations ship with the package (`types/browser.d.ts`), so the entry is fully typed with no extra setup.
 
 ---
 

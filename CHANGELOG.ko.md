@@ -1,5 +1,16 @@
 # CHANGE LOG
 
+## [0.7.3] 2026-05-20
+
+### 추가
+- **브라우저 entry** — `@dannysir/js-te/browser` 가 코어 테스트 API(`test`(`test.each` 포함), `describe`, `beforeEach`, `expect`, `fn`, `testManager`)를 re-export 하여 Node CLI 러너가 동작하지 않는 브라우저·Web Worker 에서도 사용 가능. 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`) 는 Node 전용이라 의도적으로 제외.
+- `@dannysir/js-te/browser` 를 Node 런타임에서 import 하면 즉시 명확한 에러를 던져 메인 entry 나 `js-te` CLI 로 안내.
+- **TypeScript 타입 선언** — 메인(`types/index.d.ts`) 과 `/browser`(`types/browser.d.ts`) 양쪽 entry 용 `.d.ts` 를 직접 작성해 동봉하고 `package.json#exports` 에 연결. 별도 설정 없이 완전한 타입 지원.
+
+### 문서
+- README(영/한)에 "브라우저 사용" 섹션 추가 — 신규 entry, export/제외 API, Node 가드 설명.
+- [API.md](./docs/reference/API.md) / [API.ko.md](./docs/reference/API.ko.md) 에 "Browser entry" 섹션 신규.
+
 ## [0.7.2] 2026-05-02
 
 ### 변경

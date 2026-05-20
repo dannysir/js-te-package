@@ -34,6 +34,7 @@ A complete reference for every public API of `@dannysir/js-te`.
   - [`clearAllMocks()`](#clearallmocks)
   - [`unmock(path)`](#unmockpath)
   - [`isMocked(path)`](#ismockedpath)
+- [Browser entry](#browser-entry)
 - [How execution works](#how-execution-works)
 
 ---
@@ -529,6 +530,34 @@ Removes a single mock by path.
 ### `isMocked(path)`
 
 Returns whether a path currently has a registered mock.
+
+---
+
+## Browser entry
+
+`@dannysir/js-te/browser` is a browser/Web Worker-safe entry that re-exports the pure test core. Use it when running test code directly in the browser (interactive demos, playgrounds), where the Node CLI runner can't run.
+
+```js
+import { describe, test, expect, fn, beforeEach, testManager } from '@dannysir/js-te/browser';
+
+describe('math', () => {
+  test('addition', () => {
+    expect(1 + 2).toBe(3);
+  });
+});
+
+await testManager.run();
+```
+
+**Exported:** `test` (with `test.each`), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+
+**Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`). These depend on Node and are intentionally left out — the browser and Node entries differ on purpose.
+
+`testManager` is a module-level singleton. If you collect tests more than once on the same page, call `testManager.clearTests()` between runs.
+
+**Node guard** — importing this entry from a Node runtime throws immediately, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI).
+
+**TypeScript** — declarations ship with the package (`types/browser.d.ts`), so the entry is fully typed with no extra setup.
 
 ---
 

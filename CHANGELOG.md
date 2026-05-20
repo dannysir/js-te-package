@@ -2,6 +2,17 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.7.3] 2026-05-20
+
+### Added
+- **Browser entry** — `@dannysir/js-te/browser` re-exports the core test API (`test` with `test.each`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`) for use in browsers and Web Workers, where the Node CLI runner can't run. Module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`) are Node-only and intentionally excluded.
+- Importing `@dannysir/js-te/browser` from a Node runtime now throws immediately with a clear error, steering callers to the main entry or the `js-te` CLI.
+- **TypeScript declarations** — hand-written `.d.ts` files now ship for both the main (`types/index.d.ts`) and `/browser` (`types/browser.d.ts`) entries, wired through `package.json#exports`, so the package is fully typed out of the box.
+
+### Docs
+- README (en/ko) gains a "Browser usage" section documenting the new entry, its exported/excluded API, and the Node guard.
+- New "Browser entry" section in [API.md](./docs/reference/API.md) / [API.ko.md](./docs/reference/API.ko.md).
+
 ## [0.7.2] 2026-05-02
 
 ### Changed

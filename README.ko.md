@@ -4,16 +4,15 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.7.2](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.7.3](./CHANGELOG.ko.md)
 
-### CLI 부분 실행
+### 브라우저 entry & TypeScript 타입 선언
 
-- Positional 파일 패턴 — `js-te user` 로 경로에 `"user"` 가 포함된 테스트 파일만 실행 (여러 개면 OR)
-- `-t, --testNamePattern <pattern>` — 풀네임(`describe > ... > test 설명`) 기준 필터
-- `-h, --help` — 사용법·옵션·예제·종료 코드 출력
-- 매칭 0건일 때 exit 1 (Vitest 기본 동작과 동일, CI 에서의 조용한 성공 방지)
+- **브라우저 entry** — `@dannysir/js-te/browser` 가 코어 API(`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`)를 re-export 하여 Node CLI 러너가 동작하지 않는 브라우저·Web Worker 에서도 사용 가능
+- Node 런타임에서 `/browser` 를 import 하면 명확한 에러를 던져 메인 entry 나 `js-te` CLI 로 안내
+- **TypeScript** — 메인 entry 와 `/browser` entry 양쪽에 `.d.ts` 타입 선언을 함께 배포하여 별도 설정 없이 타입 지원
 
-자세한 내용은 [CLI 레퍼런스](./docs/reference/CLI.ko.md) 를 참고하세요.
+자세한 내용은 [브라우저 사용](#브라우저-사용) 을 참고하세요.
 
 ---
 
@@ -94,6 +93,8 @@ js-te --help          # 도움말
 - **Module Mocking** — `mock(path, mockObj)` (상대/절대 경로 모두 지원), `clearAllMocks`, `unmock`, `isMocked`
 - **모듈 시스템** — ESM(`import`) · CommonJS(`require`) 동시 지원
 - **CLI** — `js-te` 명령 한 줄
+- **브라우저 entry** — `@dannysir/js-te/browser` 로 브라우저·Web Worker 에서 코어 API 사용
+- **TypeScript** — 메인 entry 와 `/browser` entry 용 `.d.ts` 타입 선언 동봉
 
 ## 간단 사용 예
 
@@ -135,6 +136,39 @@ test('랜덤 함수 모킹', () => {
 ```
 
 > ⚠️ `mock()` 이 반환한 객체로만 mock function 메서드(`mockReturnValue` 등)에 접근할 수 있습니다. 자세한 이유는 [API 문서](./docs/reference/API.ko.md#왜-반환-객체를-사용해야-하나요)를 참고하세요.
+
+---
+
+## 브라우저 사용
+
+`@dannysir/js-te/browser` 는 브라우저·Web Worker 에서 안전하게 쓸 수 있는 entry 로, 순수 테스트 코어만 re-export 합니다. 브라우저에서 js-te 테스트 코드를 직접 실행할 때(인터랙티브 시연, 플레이그라운드 등) 사용하세요 — 기본 `@dannysir/js-te` entry 는 Node CLI 러너에 의존하므로 브라우저에서 동작하지 않습니다.
+
+```js
+import { describe, test, expect, fn, beforeEach, testManager } from '@dannysir/js-te/browser';
+
+describe('math', () => {
+  test('addition', () => {
+    expect(1 + 2).toBe(3);
+  });
+});
+
+await testManager.run();
+```
+
+**export 되는 것:** `test`(`test.each` 포함), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+
+**export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`) — Node 전용이라 의도적으로 제외합니다.
+
+> `testManager` 는 모듈 레벨 싱글톤입니다. 같은 페이지에서 테스트를 여러 번 collect 한다면 실행 사이에 `testManager.clearTests()` 를 호출하세요.
+
+**Node 가드** — 이 entry 를 Node 런타임에서 import 하면 즉시 에러를 던지며, 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다:
+
+```
+@dannysir/js-te/browser cannot be used in a Node.js runtime.
+It is designed for browsers and Web Workers only.
+```
+
+**TypeScript** — 타입 선언이 패키지에 동봉되어(`types/browser.d.ts`) 별도 설정 없이 완전한 타입 지원을 받습니다.
 
 ---
 

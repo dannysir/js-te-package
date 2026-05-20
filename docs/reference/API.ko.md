@@ -32,6 +32,7 @@
   - [`clearAllMocks()`](#clearallmocks)
   - [`unmock(path)`](#unmockpath)
   - [`isMocked(path)`](#ismockedpath)
+- [Browser entry](#browser-entry)
 - [실행 원리 요약](#실행-원리-요약)
 
 ---
@@ -527,6 +528,34 @@ test('모킹 동작', () => {
 ### `isMocked(path)`
 
 특정 경로에 mock 이 등록되어 있는지 확인합니다.
+
+---
+
+## Browser entry
+
+`@dannysir/js-te/browser` 는 브라우저·Web Worker 에서 안전하게 쓸 수 있는 entry 로, 순수 테스트 코어만 re-export 합니다. Node CLI 러너가 동작하지 않는 브라우저에서 테스트 코드를 직접 실행할 때(인터랙티브 시연, 플레이그라운드 등) 사용합니다.
+
+```js
+import { describe, test, expect, fn, beforeEach, testManager } from '@dannysir/js-te/browser';
+
+describe('math', () => {
+  test('addition', () => {
+    expect(1 + 2).toBe(3);
+  });
+});
+
+await testManager.run();
+```
+
+**export 되는 것:** `test`(`test.each` 포함), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+
+**export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`). Node 에 의존하므로 의도적으로 제외합니다 — 브라우저 entry 와 Node entry 의 표면 차이는 의도된 설계입니다.
+
+`testManager` 는 모듈 레벨 싱글톤입니다. 같은 페이지에서 테스트를 여러 번 collect 한다면 실행 사이에 `testManager.clearTests()` 를 호출하세요.
+
+**Node 가드** — 이 entry 를 Node 런타임에서 import 하면 즉시 에러를 던지며, 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다.
+
+**TypeScript** — 타입 선언이 패키지에 동봉되어(`types/browser.d.ts`) 별도 설정 없이 완전한 타입 지원을 받습니다.
 
 ---
 
