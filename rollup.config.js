@@ -43,4 +43,30 @@ export default [
       commonjs()
     ]
   },
+  {
+    input: 'browser.js',
+    output: {
+      file: 'dist/browser.mjs',
+      format: 'esm',
+      sourcemap: true
+    },
+    external: [],
+    plugins: [
+      nodeResolve(),
+      commonjs()
+    ]
+  },
+  {
+    input: 'browser-node-stub.js',
+    output: {
+      file: 'dist/browser-node-stub.mjs',
+      format: 'esm',
+      sourcemap: true
+    },
+    external: [],
+    plugins: [
+      nodeResolve(),
+      commonjs()
+    ]
+  },
 ];

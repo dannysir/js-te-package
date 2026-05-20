@@ -4,11 +4,20 @@
   "description": "JavaScript test library",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
+  "types": "./types/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./browser": {
+      "types": "./types/browser.d.ts",
+      "node": "./dist/browser-node-stub.mjs",
+      "browser": "./dist/browser.mjs",
+      "import": "./dist/browser.mjs",
+      "default": "./dist/browser.mjs"
     },
     "./src/mock/store.js": "./src/mock/store.js"
   },
@@ -25,6 +34,7 @@
     "bin/",
     "dist/",
     "src/",
+    "types/",
     "index.js"
   ],
   "keywords": [
