@@ -4,9 +4,13 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.7.3](./CHANGELOG.md)
+## [📎 Latest Update — 0.7.4](./CHANGELOG.md)
 
-### Browser entry & TypeScript declarations
+### Project homepage (0.7.4)
+
+- `package.json` now declares a `homepage` field, so the npm package page links to the [project site](https://dannysir-labs.vercel.app/en/libraries/js-te). Metadata-only — no API or runtime changes.
+
+### Browser entry & TypeScript declarations (0.7.3)
 
 - **Browser entry** — `@dannysir/js-te/browser` re-exports the core API (`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`) for browsers and Web Workers, where the Node CLI runner can't run
 - Importing `/browser` from a Node runtime throws immediately with a clear error, steering you to the main entry or the `js-te` CLI

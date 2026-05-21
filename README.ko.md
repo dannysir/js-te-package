@@ -4,9 +4,13 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.7.3](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.7.4](./CHANGELOG.ko.md)
 
-### 브라우저 entry & TypeScript 타입 선언
+### 프로젝트 홈페이지 (0.7.4)
+
+- `package.json` 에 `homepage` 필드 추가 — npm 패키지 페이지에서 [프로젝트 사이트](https://dannysir-labs.vercel.app/en/libraries/js-te)로 연결. 메타데이터 변경만 있고 API·런타임 동작 변화 없음.
+
+### 브라우저 entry & TypeScript 타입 선언 (0.7.3)
 
 - **브라우저 entry** — `@dannysir/js-te/browser` 가 코어 API(`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`)를 re-export 하여 Node CLI 러너가 동작하지 않는 브라우저·Web Worker 에서도 사용 가능
 - Node 런타임에서 `/browser` 를 import 하면 명확한 에러를 던져 메인 entry 나 `js-te` CLI 로 안내

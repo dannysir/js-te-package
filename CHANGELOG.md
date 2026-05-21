@@ -2,6 +2,11 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.7.4] 2026-05-21
+
+### Changed
+- Added a `homepage` field to `package.json` pointing to the dannysir-labs demo/docs site (`https://dannysir-labs.vercel.app/en/libraries/js-te`), so the npm package page links to the project homepage. Metadata-only; no API or runtime changes.
+
 ## [0.7.3] 2026-05-20
 
 ### Added

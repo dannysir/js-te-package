@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## [0.7.4] 2026-05-21
+
+### 변경
+- `package.json` 에 `homepage` 필드 추가 — npm 패키지 페이지에서 dannysir-labs 시연/문서 사이트(`https://dannysir-labs.vercel.app/en/libraries/js-te`)로 연결. 메타데이터 변경만 있고 API·런타임 동작 변화 없음.
+
 ## [0.7.3] 2026-05-20
 
 ### 추가
