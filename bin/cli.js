@@ -29,7 +29,7 @@ const main = async () => {
     installLoaderHook(mockedPaths);
 
     reporter.onRunStart(totalFileCount, testFiles.length, cliOptions.testNamePattern);
-    const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern);
+    const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern, cliOptions.testLocation);
 
     const zeroMatched = totalPassed + totalFailed === 0;
     if (zeroMatched) reporter.onNoTestsFound(cliOptions.filePatterns, cliOptions.testNamePattern);

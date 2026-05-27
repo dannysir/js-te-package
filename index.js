@@ -68,7 +68,7 @@ export const beforeEach = (fn) => testManager.beforeEach(fn);
  * CLI 러너 전용. 사용자에게 글로벌로 노출되지 않으며 직접 호출은 권장하지 않습니다.
  * 사용자가 test fn 안에서 호출하면 외부 러너의 run 과 재귀 충돌해 결과가 오염됩니다.
  */
-export const run = (reporter, testNamePattern, file) => testManager.run(reporter, testNamePattern, file);
+export const run = (reporter, testNamePattern, file, testLocation) => testManager.run(reporter, testNamePattern, file, testLocation);
 
 /**
  * 값을 검증하는 matcher 함수들을 반환합니다.

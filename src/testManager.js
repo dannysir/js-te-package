@@ -1,3 +1,4 @@
+import {fileURLToPath} from "node:url";
 import {RESULT_MSG} from "./view/reportMessages.js";
 import {clearAllMocks} from "./mock/store.js";
 
@@ -5,6 +6,36 @@ const NOOP_REPORTER = {
   onTestPass: () => {},
   onTestFail: () => {},
   onSuiteDone: () => {},
+};
+
+const SELF_FILE = fileURLToPath(import.meta.url);
+
+const parseStackFrame = (frame) => {
+  const trimmed = frame.trim();
+  const inParen = trimmed.match(/\(([^()]+)\)$/);
+  const location = inParen ? inParen[1] : trimmed.replace(/^at\s+/, '');
+
+  const match = location.match(/^(.*):(\d+):(\d+)$/);
+  if (!match) return undefined;
+
+  const rawFile = match[1];
+  if (rawFile.startsWith('node:')) return undefined;
+
+  const file = rawFile.startsWith('file://') ? fileURLToPath(rawFile) : rawFile;
+  return {file, line: Number(match[2])};
+};
+
+const captureCallSite = () => {
+  const stack = new Error().stack;
+  if (!stack) return undefined;
+
+  for (const frame of stack.split('\n').slice(1)) {
+    const parsed = parseStackFrame(frame);
+    if (parsed === undefined) continue;
+    if (parsed.file === SELF_FILE) continue;
+    return parsed;
+  }
+  return undefined;
 };
 
 const getFullName = (test) =>
@@ -15,6 +46,15 @@ const getFullName = (test) =>
 export const filterTestsByName = (tests, pattern) => {
   if (pattern === undefined) return tests;
   return tests.filter(test => getFullName(test).includes(pattern));
+};
+
+export const filterTestsByLocation = (tests, location) => {
+  if (location === undefined) return tests;
+  return tests.filter(test =>
+    test.location !== undefined &&
+    test.location.file === location.file &&
+    test.location.line === location.line
+  );
 };
 
 class TestManager {
@@ -46,6 +86,7 @@ class TestManager {
         await fn();
       },
       path: this.#testDepth.join(RESULT_MSG.DIRECTORY_DELIMITER),
+      location: captureCallSite(),
     }
     this.#tests.push(testObj);
   }
@@ -73,12 +114,13 @@ class TestManager {
     this.#beforeEachArr = [];
   }
 
-  getMatchingTests(testNamePattern) {
-    return filterTestsByName(this.getTests(), testNamePattern);
+  getMatchingTests(testNamePattern, testLocation) {
+    const byName = filterTestsByName(this.getTests(), testNamePattern);
+    return filterTestsByLocation(byName, testLocation);
   }
 
-  async run(reporter = NOOP_REPORTER, testNamePattern, file) {
-    const tests = this.getMatchingTests(testNamePattern);
+  async run(reporter = NOOP_REPORTER, testNamePattern, file, testLocation) {
+    const tests = this.getMatchingTests(testNamePattern, testLocation);
 
     if (tests.length === 0) {
       this.clearTests();

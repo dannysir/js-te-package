@@ -1,8 +1,9 @@
-import {parseCliArgs, printHelp} from '../../src/cli/parseCliArgs.js';
+import path from 'node:path';
+import {parseCliArgs, parseTestLocation, printHelp} from '../../src/cli/parseCliArgs.js';
 
 test('[parseCliArgs] 인자 없음 → 기본값', () => {
   const result = parseCliArgs([]);
-  expect(result).toEqual({filePatterns: [], testNamePattern: undefined, help: false});
+  expect(result).toEqual({filePatterns: [], testNamePattern: undefined, testLocation: undefined, help: false});
 });
 
 test('[parseCliArgs] positional 1개 → filePatterns 배열', () => {
@@ -54,6 +55,33 @@ test('[parseCliArgs] 알 수 없는 옵션 → throw', () => {
   expect(() => parseCliArgs(['--bogus'])).toThrow('Invalid CLI arguments');
 });
 
+test('[parseCliArgs] --testLocation → 절대경로 + 라인으로 파싱', () => {
+  const result = parseCliArgs(['--testLocation', 'test/user.test.js:42']);
+  expect(result.testLocation).toEqual({file: path.resolve(process.cwd(), 'test/user.test.js'), line: 42});
+});
+
+test('[parseTestLocation] 정상 분리', () => {
+  const result = parseTestLocation('test/user.test.js:42');
+  expect(result).toEqual({file: path.resolve(process.cwd(), 'test/user.test.js'), line: 42});
+});
+
+test('[parseTestLocation] 상대경로를 cwd 기준 절대경로로 변환', () => {
+  const result = parseTestLocation('./a/b.test.js:7');
+  expect(result.file).toBe(path.resolve(process.cwd(), './a/b.test.js'));
+});
+
+test('[parseTestLocation] 콜론 없음 → throw', () => {
+  expect(() => parseTestLocation('test/user.test.js')).toThrow('testLocation must be');
+});
+
+test('[parseTestLocation] 라인이 숫자가 아님 → throw', () => {
+  expect(() => parseTestLocation('test/user.test.js:abc')).toThrow('testLocation must be');
+});
+
+test('[parseTestLocation] 라인이 0 이하 → throw', () => {
+  expect(() => parseTestLocation('test/user.test.js:0')).toThrow('testLocation must be');
+});
+
 test('[printHelp] Usage 포함 텍스트를 stdout으로 방출', () => {
   const spy = fn();
   const original = process.stdout.write;
@@ -65,6 +93,7 @@ test('[printHelp] Usage 포함 텍스트를 stdout으로 방출', () => {
     expect(text).toContain('Usage:');
     expect(text).toContain('js-te');
     expect(text).toContain('--testNamePattern');
+    expect(text).toContain('--testLocation');
     expect(text).toContain('--help');
   } finally {
     process.stdout.write = original;
