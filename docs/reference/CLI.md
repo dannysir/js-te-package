@@ -23,12 +23,13 @@ Reference for the `js-te` command-line interface — options, positional argumen
 
 By default `js-te` discovers and runs every test file in the project (see [test file discovery](../../README.md#test-file-discovery)). The CLI accepts filters that narrow the run to a subset, intended for local iteration and editor/IDE integration.
 
-Two orthogonal filters exist:
+Three filters exist:
 
 - **File filter** — chosen by positional arguments (substring match on the file path).
 - **Name filter** — chosen by `-t / --testNamePattern` (substring match on the full test name).
+- **Location filter** — chosen by `--testLocation` (exact `<path>:<line>` of a single test), intended for editor "run this test" gutter actions.
 
-Both filters are optional. When both are provided they are AND-combined.
+All filters are optional. When several are provided they are AND-combined.
 
 ## Usage
 
@@ -41,6 +42,7 @@ js-te [options] [file patterns...]
 | Option                            | Alias | Type   | Description                                                   |
 | --------------------------------- | ----- | ------ | ------------------------------------------------------------- |
 | `--testNamePattern <pattern>`     | `-t`  | string | Only run tests whose full name includes `<pattern>`.          |
+| `--testLocation <path:line>`      |       | string | Only run the test whose `test(...)` call is on `<line>` of `<path>`. |
 | `--help`                          | `-h`  | flag   | Print usage, options, examples, and exit codes; then exit 0.  |
 
 Unknown options cause `js-te` to exit with code `1` and print `Invalid CLI arguments: ...`.
@@ -80,6 +82,16 @@ standalone test with no describe
 
 With `-t "token"`, only the middle test above would run.
 
+### Location
+
+- `--testLocation <path>:<line>` runs the single test whose `test(...)` call site sits on `<line>` of `<path>`.
+- `<path>` may be relative (resolved against the current working directory) or absolute; `<line>` must be a positive integer. A malformed value exits with code `1` and `Invalid CLI arguments: ...`.
+- The line must match the line where `test(...)` is called — not a line inside the test body. Pointing at any other line matches zero tests.
+- Only the file at `<path>` is imported and run; other discovered files are skipped.
+- `test.each(...)` cases all share the line of the `test.each` call, so a location filter cannot single out one generated case.
+
+This filter is the reliable way to run **one** test even when several tests share the same name, which a name pattern cannot disambiguate.
+
 ### Combining filters
 
 File and name filters are independent. When both are set, a test runs only if its **file** passes the file filter **and** its **full name** passes the name filter.
@@ -116,6 +128,9 @@ js-te --testNamePattern "login flow > returns"
 
 # Both filters combined
 js-te auth -t "token"       # file path contains "auth" AND full name contains "token"
+
+# Location filter — single test by file and line
+js-te --testLocation test/user.test.js:42
 
 # Help
 js-te --help

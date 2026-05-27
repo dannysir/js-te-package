@@ -76,6 +76,7 @@ js-te                 # all tests
 js-te user            # files whose path includes "user"
 js-te -t "login"      # tests whose full name includes "login"
 js-te auth -t "token" # combine both
+js-te --testLocation test/user.test.js:42  # single test by file and line
 js-te --help          # help
 ```
 
