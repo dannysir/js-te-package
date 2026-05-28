@@ -13,6 +13,7 @@ export type {
   MockState,
   TestManager,
   TestCase,
+  TestLocation,
   Reporter,
   RunResult,
 } from './index';

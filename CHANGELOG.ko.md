@@ -1,5 +1,16 @@
 # CHANGE LOG
 
+## [0.8.0] 2026-05-28
+
+### 추가
+- **위치 필터** — `--testLocation <경로>:<라인>` 으로 `<경로>` 의 `<라인>` 줄에 있는 `test(...)` 테스트 하나만 실행. `--testNamePattern` 으로는 구분할 수 없는 **동명 테스트**가 여러 개일 때도 그중 하나만 확실히 실행할 수 있으며, 에디터의 "이 테스트 실행" 거터 동작을 위한 것. 각 테스트는 등록 시점에 콜 스택을 파싱해 정의 위치를 기록.
+- Babel 인메모리 변환에 `retainLines` 적용 — 변환된 테스트 파일이 원본 소스 라인 번호와 어긋나지 않도록 유지해, `mock()` 을 쓰는 파일에서도 위치 매칭이 정확하게 동작.
+- **JSON 리포터** — `--reporter json` 으로 실행이 끝난 뒤 stdout 으로 JSON 객체를 한 번 출력. 스키마는 `{totals, files:[{path, passed, failed, tests:[{path, description, status, location, error?}]}]}` 형태. IDE 확장이나 CI 스크립트가 결과를 머신 파싱할 수 있게 함. `default` 리포터는 그대로 유지되며 여전히 기본값.
+
+### 문서
+- CLI 레퍼런스(영/한)와 README 빠른 시작에 `--testLocation` 옵션·매칭 규칙·`test.each` 공유 라인 한계 추가.
+- CLI 레퍼런스(영/한)에 "리포터" 섹션 추가 — `--reporter` 옵션·기본 제공 리포터·JSON 스키마·`noTestsFound` / `error` 특수 케이스 문서화.
+
 ## [0.7.4] 2026-05-21
 
 ### 변경

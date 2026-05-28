@@ -23,6 +23,7 @@ export const transformSource = (code, filename, mockedPaths) => {
 
   const {code: transformed} = transformSync(code, {
     filename,
+    retainLines: true,
     plugins: [babelTransform(mockedPaths)],
     parserOpts: {
       sourceType: 'unambiguous',
