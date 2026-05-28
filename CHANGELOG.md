@@ -2,7 +2,7 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
-## [Unreleased]
+## [0.8.0] 2026-05-28
 
 ### Added
 - **Location filter** — `--testLocation <path>:<line>` runs the single test whose `test(...)` call is on `<line>` of `<path>`. This is the reliable way to run one test even when several share the same name (which `--testNamePattern` cannot disambiguate), and is intended for editor "run this test" gutter actions. Each test now records its definition site by parsing the call stack at registration time.
