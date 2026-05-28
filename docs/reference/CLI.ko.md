@@ -12,6 +12,7 @@
   - [파일 패턴](#파일-패턴)
   - [이름 패턴](#이름-패턴)
   - [필터 조합](#필터-조합)
+- [리포터](#리포터)
 - [종료 코드](#종료-코드)
 - [예제](#예제)
 - [0건 매칭 동작](#0건-매칭-동작)
@@ -43,6 +44,7 @@ js-te [options] [file patterns...]
 | ------------------------------- | ----- | ------ | --------------------------------------------------------------------------- |
 | `--testNamePattern <pattern>`   | `-t`  | string | 풀네임에 `<pattern>` 이 포함된 테스트만 실행합니다.                         |
 | `--testLocation <path:line>`    |       | string | `<path>` 의 `<line>` 줄에 있는 `test(...)` 테스트 하나만 실행합니다.        |
+| `--reporter <name>`             |       | string | 출력 형식. `default` (사람이 읽는 형식, 기본값) 또는 `json`.                |
 | `--help`                        | `-h`  | flag   | 사용법·옵션·예제·종료 코드를 출력하고 0으로 종료합니다.                     |
 
 알 수 없는 옵션이 주어지면 `js-te` 는 `Invalid CLI arguments: ...` 메시지와 함께 exit 1 로 종료합니다.
@@ -102,6 +104,58 @@ js-te auth -t "토큰"
 #   풀네임에 "토큰" 이 포함된 테스트만 실행
 ```
 
+## 리포터
+
+`--reporter <name>` 으로 결과 출력 방식을 고릅니다. 기본 제공되는 리포터는 두 가지입니다.
+
+- `default` — 색상이 적용된, 사람이 읽기 좋은 stdout 출력. 미지정 시 기본값이며 기존 CLI 동작과 동일합니다.
+- `json` — 실행이 끝난 뒤 stdout 으로 JSON 객체 하나를 출력합니다. IDE 확장이나 CI 스크립트가 결과를 프로그램적으로 파싱해 활용할 때 사용합니다. 알 수 없는 리포터 이름을 주면 `Invalid CLI arguments: ...` 와 함께 exit 1 로 종료합니다.
+
+### JSON 스키마
+
+`json` 리포터는 실행이 끝난 직후 stdout 으로 JSON 객체를 **딱 한 줄, 한 번** 출력합니다.
+
+```json
+{
+  "totals": {"passed": 10, "failed": 1},
+  "files": [
+    {
+      "path": "/abs/path/foo.test.js",
+      "passed": 3,
+      "failed": 1,
+      "tests": [
+        {
+          "path": "group > sub",
+          "description": "ok case",
+          "status": "passed",
+          "location": {"file": "/abs/path/foo.test.js", "line": 42}
+        },
+        {
+          "path": "",
+          "description": "bad case",
+          "status": "failed",
+          "location": {"file": "/abs/path/foo.test.js", "line": 50},
+          "error": {"message": "expected 1 to equal 2"}
+        }
+      ]
+    }
+  ]
+}
+```
+
+필드 메모:
+
+- `files[].path` 는 테스트 파일의 절대 경로입니다.
+- `tests[].path` 는 감싸는 `describe` 체인을 `" > "` 로 이어 붙인 문자열이며, 최상위 테스트면 `""` 입니다. `tests[].description` 은 `test(...)` 에 직접 넘긴 설명입니다. 두 필드를 합치면 풀네임이 됩니다.
+- `tests[].status` 는 `"passed"` 또는 `"failed"`.
+- `tests[].location` 은 `test(...)` 가 호출된 파일과 라인입니다. 스택 파싱이 실패해 호출 위치를 잡지 못한 경우엔 필드 자체가 생략됩니다.
+- `tests[].error` 는 실패한 테스트에만 포함되며, 현재 `message` 만 노출합니다. 스택 트레이스는 의도적으로 포함하지 않습니다.
+
+특수 케이스:
+
+- 필터에 매칭된 테스트가 없으면 payload 는 `{"totals": {"passed": 0, "failed": 0}, "files": [], "noTestsFound": true}` 이며 exit 1 로 종료합니다.
+- 테스트 실행 자체가 실패하면 (예: 셋업 단계 에러) payload 는 `{"totals": {"passed": 0, "failed": 0}, "files": [], "error": {"message": "..."}}` 이며 exit 1 로 종료합니다.
+
 ## 종료 코드
 
 | 코드 | 의미                                                             |
@@ -131,6 +185,9 @@ js-te auth -t "토큰"        # 파일 경로에 "auth" 포함 AND 풀네임에 
 
 # 위치 필터 — 파일과 라인으로 단일 테스트 지정
 js-te --testLocation test/user.test.js:42
+
+# JSON 리포터 — stdout 으로 머신 파싱 가능한 결과 출력
+js-te --reporter json
 
 # 도움말
 js-te --help
