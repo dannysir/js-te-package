@@ -91,17 +91,27 @@ export const clearAllMocks: () => void;
 /** 모듈 목업 저장소 */
 export const mockStore: Map<string, Record<string, MockFn>>;
 
+export interface TestLocation {
+  file: string;
+  line: number;
+}
+
 export interface TestCase {
   description: string;
   fn: () => Promise<void>;
   path: string;
+  location?: TestLocation;
 }
 
 export interface Reporter {
+  onRunStart?(totalCount: number, matchedCount: number, testNamePattern?: string): void;
+  onFileStart?(file: string): void;
   onTestPass(test: TestCase): void;
   onTestFail(test: TestCase, error: unknown): void;
   onSuiteDone(passed: number, failed: number): void;
-  onFileStart?(file: string): void;
+  onNoTestsFound?(filePatterns: string[], testNamePattern?: string): void;
+  onRunDone?(totalPassed: number, totalFailed: number): void;
+  onRunError?(error: unknown): void;
 }
 
 export interface RunResult {
@@ -116,8 +126,8 @@ export interface TestManager {
   beforeEach(fn: TestFn): void;
   getTests(): TestCase[];
   clearTests(): void;
-  getMatchingTests(testNamePattern?: string): TestCase[];
-  run(reporter?: Reporter, testNamePattern?: string, file?: string): Promise<RunResult>;
+  getMatchingTests(testNamePattern?: string, testLocation?: TestLocation): TestCase[];
+  run(reporter?: Reporter, testNamePattern?: string, file?: string, testLocation?: TestLocation): Promise<RunResult>;
 }
 
 /**
@@ -127,5 +137,6 @@ export interface TestManager {
 export const run: (
   reporter?: Reporter,
   testNamePattern?: string,
-  file?: string
+  file?: string,
+  testLocation?: TestLocation
 ) => Promise<RunResult>;

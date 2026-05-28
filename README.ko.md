@@ -77,6 +77,7 @@ js-te user            # 경로에 "user" 가 포함된 파일
 js-te -t "로그인"     # 풀네임에 "로그인" 이 포함된 테스트
 js-te auth -t "토큰"  # 두 필터 조합
 js-te --testLocation test/user.test.js:42  # 파일과 라인으로 단일 테스트 실행
+js-te --reporter json # IDE/CI 용 JSON 출력
 js-te --help          # 도움말
 ```
 
