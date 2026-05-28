@@ -6,6 +6,12 @@ import {setupFiles} from "../src/cli/setupFiles.js";
 import {runTests} from "../src/cli/runTests.js";
 import {installLoaderHook} from "../src/cli/loaderHook.js";
 import {defaultReporter} from "../src/cli/reporters/defaultReporter.js";
+import {createJsonReporter} from "../src/cli/reporters/jsonReporter.js";
+
+const pickReporter = (name) => {
+  if (name === 'json') return createJsonReporter();
+  return defaultReporter;
+};
 
 let cliOptions;
 try {
@@ -21,7 +27,7 @@ if (cliOptions.help) {
 }
 
 const main = async () => {
-  const reporter = defaultReporter;
+  const reporter = pickReporter(cliOptions.reporter);
   try {
     const jsTe = await setupEnvironment();
     const {mockedPaths, testFiles, totalFileCount} = setupFiles({filePatterns: cliOptions.filePatterns});

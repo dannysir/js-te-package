@@ -3,7 +3,7 @@ import {parseCliArgs, parseTestLocation, printHelp} from '../../src/cli/parseCli
 
 test('[parseCliArgs] 인자 없음 → 기본값', () => {
   const result = parseCliArgs([]);
-  expect(result).toEqual({filePatterns: [], testNamePattern: undefined, testLocation: undefined, help: false});
+  expect(result).toEqual({filePatterns: [], testNamePattern: undefined, testLocation: undefined, reporter: 'default', help: false});
 });
 
 test('[parseCliArgs] positional 1개 → filePatterns 배열', () => {
@@ -82,6 +82,26 @@ test('[parseTestLocation] 라인이 0 이하 → throw', () => {
   expect(() => parseTestLocation('test/user.test.js:0')).toThrow('testLocation must be');
 });
 
+test('[parseCliArgs] --reporter 미지정 → "default"', () => {
+  const result = parseCliArgs([]);
+  expect(result.reporter).toBe('default');
+});
+
+test('[parseCliArgs] --reporter json', () => {
+  const result = parseCliArgs(['--reporter', 'json']);
+  expect(result.reporter).toBe('json');
+});
+
+test('[parseCliArgs] --reporter default 명시', () => {
+  const result = parseCliArgs(['--reporter', 'default']);
+  expect(result.reporter).toBe('default');
+});
+
+test('[parseCliArgs] --reporter 알 수 없는 값 → throw', () => {
+  expect(() => parseCliArgs(['--reporter', 'bogus'])).toThrow('Invalid CLI arguments');
+  expect(() => parseCliArgs(['--reporter', 'bogus'])).toThrow('unknown reporter');
+});
+
 test('[printHelp] Usage 포함 텍스트를 stdout으로 방출', () => {
   const spy = fn();
   const original = process.stdout.write;
@@ -94,6 +114,7 @@ test('[printHelp] Usage 포함 텍스트를 stdout으로 방출', () => {
     expect(text).toContain('js-te');
     expect(text).toContain('--testNamePattern');
     expect(text).toContain('--testLocation');
+    expect(text).toContain('--reporter');
     expect(text).toContain('--help');
   } finally {
     process.stdout.write = original;
