@@ -1,6 +1,8 @@
 import {
   formatFailureMessage,
+  formatSkippedMessage,
   formatSuccessMessage,
+  formatTodoMessage,
   getErrorMsgInLogic,
   getFileCountString,
   getFilePath,
@@ -26,14 +28,20 @@ export const defaultReporter = {
   onTestFail: (test, error) => {
     console.log(formatFailureMessage(test, error));
   },
-  onSuiteDone: (passed, failed) => {
-    console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed));
+  onTestSkip: (test) => {
+    console.log(formatSkippedMessage(test));
+  },
+  onTestTodo: (test) => {
+    console.log(formatTodoMessage(test));
+  },
+  onSuiteDone: (passed, failed, skipped, todo) => {
+    console.log(getTestResultMsg(RESULT_MSG.TESTS, passed, failed, skipped, todo));
   },
   onNoTestsFound: (filePatterns, testNamePattern) => {
     console.log(getNoTestsFoundMsg(filePatterns, testNamePattern));
   },
-  onRunDone: (totalPassed, totalFailed) => {
-    console.log(getTestResultMsg(RESULT_MSG.TOTAL, totalPassed, totalFailed));
+  onRunDone: (totalPassed, totalFailed, totalSkipped, totalTodo) => {
+    console.log(getTestResultMsg(RESULT_MSG.TOTAL, totalPassed, totalFailed, totalSkipped, totalTodo));
   },
   onRunError: (error) => {
     console.log(getErrorMsgInLogic(error.message));

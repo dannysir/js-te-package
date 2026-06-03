@@ -5,6 +5,8 @@ import {clearAllMocks} from "./mock/store.js";
 const NOOP_REPORTER = {
   onTestPass: () => {},
   onTestFail: () => {},
+  onTestSkip: () => {},
+  onTestTodo: () => {},
   onSuiteDone: () => {},
 };
 
@@ -61,34 +63,41 @@ class TestManager {
   #tests = [];
   #testDepth = [];
   #beforeEachArr = [];
+  #groupModeStack = [];
   #placeHolder = {
     's': (value) => value,
     'o': (value) => JSON.stringify(value),
   };
 
   describe(str, fn) {
-    this.#testDepth.push(str);
-    const prevLength = this.#beforeEachArr.length;
-    fn();
-    this.#beforeEachArr.length = prevLength;
-    this.#testDepth.pop();
+    this.#describeWithMode(str, fn, null);
+  }
+
+  describeOnly(str, fn) {
+    this.#describeWithMode(str, fn, 'only');
+  }
+
+  describeSkip(str, fn) {
+    this.#describeWithMode(str, fn, 'skip');
   }
 
   test(description, fn) {
-    const beforeEachHooks = [...this.#beforeEachArr];
+    this.#registerTest(description, fn, undefined);
+  }
 
-    const testObj = {
-      description,
-      fn: async () => {
-        for (const hook of beforeEachHooks) {
-          await hook();
-        }
-        await fn();
-      },
-      path: this.#testDepth.join(RESULT_MSG.DIRECTORY_DELIMITER),
-      location: captureCallSite(),
+  testOnly(description, fn) {
+    this.#registerTest(description, fn, 'only');
+  }
+
+  testSkip(description, fn) {
+    this.#registerTest(description, fn, 'skip');
+  }
+
+  testTodo(description, fn) {
+    if (fn !== undefined) {
+      throw new Error('test.todo() must not receive a test function');
     }
-    this.#tests.push(testObj);
+    this.#registerTest(description, () => {}, 'todo');
   }
 
   testEach(cases) {
@@ -112,6 +121,7 @@ class TestManager {
     this.#tests = [];
     this.#testDepth = [];
     this.#beforeEachArr = [];
+    this.#groupModeStack = [];
   }
 
   getMatchingTests(testNamePattern, testLocation) {
@@ -124,15 +134,35 @@ class TestManager {
 
     if (tests.length === 0) {
       this.clearTests();
-      return {passed: 0, failed: 0};
+      return {passed: 0, failed: 0, skipped: 0, todo: 0};
+    }
+
+    // 파일 단위 only: 같은 파일에 only 가 하나라도 있으면 normal 은 skip 으로 강등.
+    const hasOnly = tests.some(t => t.mode === 'only');
+    if (hasOnly) {
+      for (const t of tests) {
+        if (t.mode === 'normal') t.mode = 'skip';
+      }
     }
 
     if (file !== undefined) reporter.onFileStart(file);
 
     let passed = 0;
     let failed = 0;
+    let skipped = 0;
+    let todo = 0;
 
     for (const test of tests) {
+      if (test.mode === 'skip') {
+        reporter.onTestSkip(test);
+        skipped++;
+        continue;
+      }
+      if (test.mode === 'todo') {
+        reporter.onTestTodo(test);
+        todo++;
+        continue;
+      }
       try {
         await test.fn();
         reporter.onTestPass(test);
@@ -144,11 +174,49 @@ class TestManager {
       }
     }
 
-    reporter.onSuiteDone(passed, failed);
+    reporter.onSuiteDone(passed, failed, skipped, todo);
 
     this.clearTests();
 
-    return {passed, failed};
+    return {passed, failed, skipped, todo};
+  }
+
+  #resolveMode(ownMode) {
+    if (ownMode !== undefined) return ownMode;
+    for (let i = this.#groupModeStack.length - 1; i >= 0; i--) {
+      const groupMode = this.#groupModeStack[i];
+      if (groupMode !== null) return groupMode;
+    }
+    return 'normal';
+  }
+
+  #registerTest(description, fn, ownMode) {
+    const beforeEachHooks = [...this.#beforeEachArr];
+    const mode = this.#resolveMode(ownMode);
+
+    const testObj = {
+      description,
+      fn: async () => {
+        for (const hook of beforeEachHooks) {
+          await hook();
+        }
+        await fn();
+      },
+      path: this.#testDepth.join(RESULT_MSG.DIRECTORY_DELIMITER),
+      location: captureCallSite(),
+      mode,
+    };
+    this.#tests.push(testObj);
+  }
+
+  #describeWithMode(str, fn, mode) {
+    this.#groupModeStack.push(mode);
+    this.#testDepth.push(str);
+    const prevLength = this.#beforeEachArr.length;
+    fn();
+    this.#beforeEachArr.length = prevLength;
+    this.#testDepth.pop();
+    this.#groupModeStack.pop();
   }
 
   #getMatcherForReplace = () => {
@@ -168,3 +236,5 @@ class TestManager {
 }
 
 export const testManager = new TestManager();
+
+export {TestManager};

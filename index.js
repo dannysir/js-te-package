@@ -31,6 +31,31 @@ export const test = (description, fn) => testManager.test(description, fn);
 test.each = (cases) => testManager.testEach(cases);
 
 /**
+ * 같은 파일 안의 일반 테스트를 모두 skip 처리하고, only 표시된 테스트만 실행합니다.
+ *
+ * @example
+ * test.only('focused', () => { expect(1).toBe(1); });
+ * test('skipped while only exists', () => { ... });
+ */
+test.only = (description, fn) => testManager.testOnly(description, fn);
+
+/**
+ * 테스트를 실행하지 않고 skipped 로 보고합니다.
+ *
+ * @example
+ * test.skip('temporarily disabled', () => { ... });
+ */
+test.skip = (description, fn) => testManager.testSkip(description, fn);
+
+/**
+ * 아직 구현되지 않은 테스트를 todo 로 보고합니다. 함수 인자를 받지 않습니다.
+ *
+ * @example
+ * test.todo('write reset password test');
+ */
+test.todo = (description) => testManager.testTodo(description);
+
+/**
  * 테스트 그룹을 정의합니다. 중첩 가능합니다.
  * @param {string} suiteName - 그룹 이름
  * @param {Function} fn - 그룹 내부 테스트들을 정의하는 함수
@@ -43,6 +68,26 @@ test.each = (cases) => testManager.testEach(cases);
  * });
  */
 export const describe = (suiteName, fn) => testManager.describe(suiteName, fn);
+
+/**
+ * 그룹 안의 모든 테스트를 only 로 표시합니다. 같은 파일의 일반 테스트는 skip 으로 강등됩니다.
+ *
+ * @example
+ * describe.only('focused suite', () => {
+ *   test('runs', () => { ... });
+ * });
+ */
+describe.only = (suiteName, fn) => testManager.describeOnly(suiteName, fn);
+
+/**
+ * 그룹 안의 모든 테스트를 skip 으로 표시합니다.
+ *
+ * @example
+ * describe.skip('temporarily disabled suite', () => {
+ *   test('skipped', () => { ... });
+ * });
+ */
+describe.skip = (suiteName, fn) => testManager.describeSkip(suiteName, fn);
 
 /**
  * 각 테스트 실행 전에 실행될 함수를 등록합니다.

@@ -35,11 +35,11 @@ const main = async () => {
     installLoaderHook(mockedPaths);
 
     reporter.onRunStart(totalFileCount, testFiles.length, cliOptions.testNamePattern);
-    const {totalPassed, totalFailed} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern, cliOptions.testLocation);
+    const {totalPassed, totalFailed, totalSkipped, totalTodo} = await runTests(jsTe, mockedPaths, testFiles, reporter, cliOptions.testNamePattern, cliOptions.testLocation);
 
-    const zeroMatched = totalPassed + totalFailed === 0;
+    const zeroMatched = totalPassed + totalFailed + totalSkipped + totalTodo === 0;
     if (zeroMatched) reporter.onNoTestsFound(cliOptions.filePatterns, cliOptions.testNamePattern);
-    reporter.onRunDone(totalPassed, totalFailed);
+    reporter.onRunDone(totalPassed, totalFailed, totalSkipped, totalTodo);
 
     return (totalFailed > 0 || zeroMatched) ? 1 : 0;
   } catch (error) {
