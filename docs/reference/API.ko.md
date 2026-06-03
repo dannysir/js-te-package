@@ -7,6 +7,8 @@
   - [`describe(name, fn)`](#describename-fn)
   - [`beforeEach(fn)`](#beforeeachfn)
   - [`test.each(cases)(template, fn)`](#testeachcasestemplate-fn)
+  - [`test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`](#testonlydesc-fn--testskipdesc-fn--testtododesc)
+  - [`describe.only(name, fn)` / `describe.skip(name, fn)`](#describeonlyname-fn--describeskipname-fn)
 - [Matcher](#matcher)
   - [`expect(value).toBe(expected)`](#expectvaluetobeexpected)
   - [`expect(value).toEqual(expected)`](#expectvaluetoequalexpected)
@@ -139,6 +141,54 @@ test.each([
 ✓ [each placeholder] - input : {"name":"dannysir","age":null}
 */
 ```
+
+### `test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`
+
+개별 테스트에 focus·skip·pending modifier 를 붙입니다.
+
+- `test.only(desc, fn)` — 같은 파일에 하나라도 있으면, 그 파일의 일반 테스트는 모두 `skipped` 로 보고됩니다. 적용 범위는 **파일 단위** 라서 다른 파일은 영향받지 않습니다.
+- `test.skip(desc, fn)` — 함수를 실행하지 않고 `skipped` 로 보고합니다.
+- `test.todo(desc)` — 함수 없는 pending 테스트로 등록합니다. 두 번째 인자로 함수를 넘기면 에러를 던집니다.
+
+```js
+describe('user', () => {
+  test.only('focused', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  test('.only 가 있어 skipped 로 강등', () => {
+    // 실행되지 않음
+  });
+
+  test.skip('명시적으로 skip', () => {
+    // 실행되지 않음
+  });
+
+  test.todo('reset-password 테스트 작성 예정');
+});
+```
+
+`test.only` 와 `describe` modifier 가 충돌하면 **가장 가까운 명시 modifier 가 우선**합니다. `describe.only` 안의 `test.skip` 은 그대로 skip, `describe.skip` 안의 `test.only` 는 그대로 실행됩니다.
+
+### `describe.only(name, fn)` / `describe.skip(name, fn)`
+
+그룹 단위 focus·skip.
+
+- `describe.only(name, fn)` — 그룹 안의 모든 테스트를 `only` 로 표시합니다. `test.only` 와 마찬가지로 같은 파일의 일반 테스트는 `skipped` 로 강등됩니다.
+- `describe.skip(name, fn)` — 그룹 안의 모든 테스트를 `skipped` 로 표시합니다.
+
+```js
+describe.only('focused suite', () => {
+  test('a', () => {});
+  test('b', () => {});
+});
+
+describe.skip('일시 비활성화', () => {
+  test('모두 skipped 로 보고', () => {});
+});
+```
+
+중첩된 `describe` 는 스스로 modifier 를 선언하지 않는 한 가장 가까운 상위의 명시 modifier 를 상속합니다.
 
 ---
 

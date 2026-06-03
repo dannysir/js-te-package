@@ -2,6 +2,25 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [Unreleased]
+
+### Added
+- **`.only` / `.skip` / `.todo`** — Jest/Vitest style focus and skip modifiers:
+  - `test.only(name, fn)` — when present in a file, every other normal test in that file is reported as skipped. Scope is **per file**: other files are unaffected.
+  - `test.skip(name, fn)` — the function is not executed; the test is reported as skipped.
+  - `test.todo(name)` — registers a pending test with no function. Passing a function throws.
+  - `describe.only(name, fn)` / `describe.skip(name, fn)` — apply the modifier to every test in the group. The closest explicit modifier wins (`test.skip` inside `describe.only` stays skipped; `test.only` inside `describe.skip` runs).
+
+### Changed
+- Reporter interface gains `onTestSkip(test)` and `onTestTodo(test)`. `onSuiteDone(passed, failed, skipped, todo)` and `onRunDone(totalPassed, totalFailed, totalSkipped, totalTodo)` are extended with two new counters; existing `onTestPass` / `onTestFail` signatures are unchanged.
+- `testManager.run()` now returns `{passed, failed, skipped, todo}` (new fields are additive). The CLI's `zeroMatched` check counts skipped/todo too, so a file containing only `.skip` / `.todo` no longer triggers "no tests found".
+- JSON reporter — each test entry's `status` may now be `"skipped"` or `"todo"`. `totals` gains `skipped` and `todo` keys, and each `files[]` entry gains matching counters.
+
+### Docs
+- README (en/ko) gains a "Focusing & Skipping" section and lists the new modifiers under Features.
+- CLI reference (en/ko) JSON schema section is updated with the new status values and counters.
+- API reference (en/ko) gains entries for `test.only` / `.skip` / `.todo` and `describe.only` / `.skip`.
+
 ## [0.8.0] 2026-05-28
 
 ### Added

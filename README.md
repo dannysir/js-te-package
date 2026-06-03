@@ -94,7 +94,7 @@ See the [CLI reference](./docs/reference/CLI.md) for full options, matching rule
 
 ## Features
 
-- **Test writing** — `test()`, `describe()`, `beforeEach()`, `test.each()`
+- **Test writing** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `test.only`, `test.skip`, `test.todo`, `describe.only`, `describe.skip`
 - **Matchers** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`, `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`, `.not` chaining
 - **Mock Functions** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`, `mock.calls`
 - **Module Mocking** — `mock(path, mockObj)` (relative & absolute paths), `clearAllMocks`, `unmock`, `isMocked`
@@ -118,6 +118,37 @@ describe('calculator', () => {
   });
 });
 ```
+
+### Focusing & Skipping
+
+```js
+describe('user', () => {
+  test.only('focused — only this runs in this file', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  test('skipped while .only exists in the same file', () => {
+    // not executed
+  });
+
+  test.skip('explicitly skipped', () => {
+    // not executed
+  });
+
+  test.todo('write reset-password test');
+});
+
+describe.only('whole group runs in focus mode', () => {
+  test('a', () => {});
+  test('b', () => {});
+});
+
+describe.skip('temporarily disabled suite', () => {
+  test('all tests inside are reported as skipped', () => {});
+});
+```
+
+`.only` is scoped to a single file: a file with at least one `.only` runs only the focused tests there, while other files are unaffected. The closest explicit modifier wins — `test.skip` inside `describe.only` stays skipped, and `test.only` inside `describe.skip` runs.
 
 ### Module Mocking
 

@@ -117,12 +117,14 @@ js-te auth -t "토큰"
 
 ```json
 {
-  "totals": {"passed": 10, "failed": 1},
+  "totals": {"passed": 10, "failed": 1, "skipped": 2, "todo": 1},
   "files": [
     {
       "path": "/abs/path/foo.test.js",
       "passed": 3,
       "failed": 1,
+      "skipped": 1,
+      "todo": 1,
       "tests": [
         {
           "path": "group > sub",
@@ -136,6 +138,18 @@ js-te auth -t "토큰"
           "status": "failed",
           "location": {"file": "/abs/path/foo.test.js", "line": 50},
           "error": {"message": "expected 1 to equal 2"}
+        },
+        {
+          "path": "",
+          "description": "explicit skip",
+          "status": "skipped",
+          "location": {"file": "/abs/path/foo.test.js", "line": 58}
+        },
+        {
+          "path": "",
+          "description": "write later",
+          "status": "todo",
+          "location": {"file": "/abs/path/foo.test.js", "line": 64}
         }
       ]
     }
@@ -147,14 +161,14 @@ js-te auth -t "토큰"
 
 - `files[].path` 는 테스트 파일의 절대 경로입니다.
 - `tests[].path` 는 감싸는 `describe` 체인을 `" > "` 로 이어 붙인 문자열이며, 최상위 테스트면 `""` 입니다. `tests[].description` 은 `test(...)` 에 직접 넘긴 설명입니다. 두 필드를 합치면 풀네임이 됩니다.
-- `tests[].status` 는 `"passed"` 또는 `"failed"`.
+- `tests[].status` 는 `"passed"`, `"failed"`, `"skipped"`, `"todo"` 중 하나입니다. `"skipped"` 는 `test.skip` / `describe.skip` 뿐 아니라 같은 파일의 `.only` 때문에 강등된 테스트도 포함합니다. `"todo"` 는 `test.todo(desc)` 로 등록한 항목입니다.
 - `tests[].location` 은 `test(...)` 가 호출된 파일과 라인입니다. 스택 파싱이 실패해 호출 위치를 잡지 못한 경우엔 필드 자체가 생략됩니다.
 - `tests[].error` 는 실패한 테스트에만 포함되며, 현재 `message` 만 노출합니다. 스택 트레이스는 의도적으로 포함하지 않습니다.
 
 특수 케이스:
 
-- 필터에 매칭된 테스트가 없으면 payload 는 `{"totals": {"passed": 0, "failed": 0}, "files": [], "noTestsFound": true}` 이며 exit 1 로 종료합니다.
-- 테스트 실행 자체가 실패하면 (예: 셋업 단계 에러) payload 는 `{"totals": {"passed": 0, "failed": 0}, "files": [], "error": {"message": "..."}}` 이며 exit 1 로 종료합니다.
+- 필터에 매칭된 테스트가 없으면 payload 는 `{"totals": {"passed": 0, "failed": 0, "skipped": 0, "todo": 0}, "files": [], "noTestsFound": true}` 이며 exit 1 로 종료합니다.
+- 테스트 실행 자체가 실패하면 (예: 셋업 단계 에러) payload 는 `{"totals": {"passed": 0, "failed": 0, "skipped": 0, "todo": 0}, "files": [], "error": {"message": "..."}}` 이며 exit 1 로 종료합니다.
 
 ## 종료 코드
 

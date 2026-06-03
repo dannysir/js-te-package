@@ -9,6 +9,8 @@ A complete reference for every public API of `@dannysir/js-te`.
   - [`describe(name, fn)`](#describename-fn)
   - [`beforeEach(fn)`](#beforeeachfn)
   - [`test.each(cases)(template, fn)`](#testeachcasestemplate-fn)
+  - [`test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`](#testonlydesc-fn--testskipdesc-fn--testtododesc)
+  - [`describe.only(name, fn)` / `describe.skip(name, fn)`](#describeonlyname-fn--describeskipname-fn)
 - [Matchers](#matchers)
   - [`expect(value).toBe(expected)`](#expectvaluetobeexpected)
   - [`expect(value).toEqual(expected)`](#expectvaluetoequalexpected)
@@ -141,6 +143,54 @@ test.each([
 ✓ [each placeholder] - input : {"name":"dannysir","age":null}
 */
 ```
+
+### `test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`
+
+Focus, skip, and pending markers for individual tests.
+
+- `test.only(desc, fn)` — when present in a file, every other normal test in that file is reported as `skipped`. Scope is **per file** — other files are unaffected.
+- `test.skip(desc, fn)` — the function is not executed; the test is reported as `skipped`.
+- `test.todo(desc)` — registers a pending test with no function. Passing a function as the second argument throws.
+
+```js
+describe('user', () => {
+  test.only('focused', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  test('demoted to skipped because .only exists', () => {
+    // not executed
+  });
+
+  test.skip('explicitly skipped', () => {
+    // not executed
+  });
+
+  test.todo('write reset-password test');
+});
+```
+
+When `test.only` and a `describe` modifier disagree, the **closest explicit modifier wins**: `test.skip` inside `describe.only` stays skipped; `test.only` inside `describe.skip` still runs.
+
+### `describe.only(name, fn)` / `describe.skip(name, fn)`
+
+Group-level focus and skip.
+
+- `describe.only(name, fn)` — marks every test inside the group as `only`. Like `test.only`, this also demotes other normal tests in the same file to `skipped`.
+- `describe.skip(name, fn)` — marks every test inside the group as `skipped`.
+
+```js
+describe.only('focused suite', () => {
+  test('a', () => {});
+  test('b', () => {});
+});
+
+describe.skip('temporarily disabled', () => {
+  test('all reported as skipped', () => {});
+});
+```
+
+Nested `describe` blocks inherit the closest explicit modifier from their ancestors unless they declare their own.
 
 ---
 
