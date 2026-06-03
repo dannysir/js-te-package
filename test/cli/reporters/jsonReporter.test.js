@@ -34,10 +34,10 @@ test('[jsonReporter] 정상 흐름 — 두 파일 × 패스/실패 섞임 → �
     reporter.onTestPass({path: 'g > sub', description: 'b1', location: {file: '/abs/b.test.js', line: 5}});
     reporter.onSuiteDone(1, 0);
 
-    reporter.onRunDone(2, 1);
+    reporter.onRunDone(2, 1, 0, 0);
 
     const payload = parseOutput(spy);
-    expect(payload.totals).toEqual({passed: 2, failed: 1});
+    expect(payload.totals).toEqual({passed: 2, failed: 1, skipped: 0, todo: 0});
     expect(payload.files.length).toBe(2);
 
     expect(payload.files[0].path).toBe('/abs/a.test.js');
@@ -107,10 +107,10 @@ test('[jsonReporter] onNoTestsFound → payload 에 noTestsFound:true, files 빈
     const reporter = createJsonReporter();
     reporter.onRunStart(3, 0, 'no-such');
     reporter.onNoTestsFound(['no-such'], 'no-such');
-    reporter.onRunDone(0, 0);
+    reporter.onRunDone(0, 0, 0, 0);
 
     const payload = parseOutput(spy);
-    expect(payload.totals).toEqual({passed: 0, failed: 0});
+    expect(payload.totals).toEqual({passed: 0, failed: 0, skipped: 0, todo: 0});
     expect(payload.files).toEqual([]);
     expect(payload.noTestsFound).toBe(true);
   });
@@ -122,7 +122,7 @@ test('[jsonReporter] onRunError → payload 에 error.message 포함, 1회 flush
     reporter.onRunError(new Error('setup blew up'));
 
     const payload = parseOutput(spy);
-    expect(payload.totals).toEqual({passed: 0, failed: 0});
+    expect(payload.totals).toEqual({passed: 0, failed: 0, skipped: 0, todo: 0});
     expect(payload.files).toEqual([]);
     expect(payload.error).toEqual({message: 'setup blew up'});
   });
