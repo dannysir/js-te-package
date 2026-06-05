@@ -16,9 +16,9 @@ const serializeTest = (test, status, error) => {
   return entry;
 };
 
-const flush = (state, totalPassed, totalFailed) => {
+const flush = (state, totalPassed, totalFailed, totalSkipped = 0, totalTodo = 0) => {
   const payload = {
-    totals: {passed: totalPassed, failed: totalFailed},
+    totals: {passed: totalPassed, failed: totalFailed, skipped: totalSkipped, todo: totalTodo},
     files: state.files,
   };
   if (state.noTestsFound) payload.noTestsFound = true;
@@ -32,7 +32,7 @@ export const createJsonReporter = () => {
   return {
     onRunStart: () => {},
     onFileStart: (filePath) => {
-      state.currentFile = {path: filePath, passed: 0, failed: 0, tests: []};
+      state.currentFile = {path: filePath, passed: 0, failed: 0, skipped: 0, todo: 0, tests: []};
       state.files.push(state.currentFile);
     },
     onTestPass: (test) => {
@@ -41,20 +41,28 @@ export const createJsonReporter = () => {
     onTestFail: (test, error) => {
       state.currentFile.tests.push(serializeTest(test, 'failed', error));
     },
-    onSuiteDone: (passed, failed) => {
+    onTestSkip: (test) => {
+      state.currentFile.tests.push(serializeTest(test, 'skipped'));
+    },
+    onTestTodo: (test) => {
+      state.currentFile.tests.push(serializeTest(test, 'todo'));
+    },
+    onSuiteDone: (passed, failed, skipped, todo) => {
       state.currentFile.passed = passed;
       state.currentFile.failed = failed;
+      state.currentFile.skipped = skipped;
+      state.currentFile.todo = todo;
       state.currentFile = undefined;
     },
     onNoTestsFound: () => {
       state.noTestsFound = true;
     },
-    onRunDone: (totalPassed, totalFailed) => {
-      flush(state, totalPassed, totalFailed);
+    onRunDone: (totalPassed, totalFailed, totalSkipped, totalTodo) => {
+      flush(state, totalPassed, totalFailed, totalSkipped, totalTodo);
     },
     onRunError: (error) => {
       state.error = error;
-      flush(state, 0, 0);
+      flush(state, 0, 0, 0, 0);
     },
   };
 };

@@ -2,6 +2,8 @@
 
 export type TestFn = () => void | Promise<void>;
 
+export type TestMode = 'normal' | 'only' | 'skip' | 'todo';
+
 export interface Test {
   /** 테스트 케이스를 정의합니다. */
   (description: string, fn: TestFn): void;
@@ -14,13 +16,28 @@ export interface Test {
       cases: readonly unknown[]
     ): (description: string, fn: (...args: unknown[]) => void | Promise<void>) => void;
   };
+  /** 같은 파일의 일반 테스트를 모두 skip 처리하고 이 테스트만 실행합니다. */
+  only: (description: string, fn: TestFn) => void;
+  /** 테스트를 실행하지 않고 skipped 로 보고합니다. */
+  skip: (description: string, fn: TestFn) => void;
+  /** 아직 구현되지 않은 테스트를 todo 로 보고합니다. 함수 인자를 받지 않습니다. */
+  todo: (description: string) => void;
 }
 
 /** 테스트 케이스를 정의합니다. */
 export const test: Test;
 
+export interface Describe {
+  /** 테스트 그룹을 정의합니다. 중첩 가능합니다. */
+  (suiteName: string, fn: () => void): void;
+  /** 그룹 안의 모든 테스트를 only 로 표시합니다. */
+  only: (suiteName: string, fn: () => void) => void;
+  /** 그룹 안의 모든 테스트를 skip 으로 표시합니다. */
+  skip: (suiteName: string, fn: () => void) => void;
+}
+
 /** 테스트 그룹을 정의합니다. 중첩 가능합니다. */
-export const describe: (suiteName: string, fn: () => void) => void;
+export const describe: Describe;
 
 /** 각 테스트 실행 전에 실행될 함수를 등록합니다. */
 export const beforeEach: (fn: TestFn) => void;
@@ -101,6 +118,7 @@ export interface TestCase {
   fn: () => Promise<void>;
   path: string;
   location?: TestLocation;
+  mode: TestMode;
 }
 
 export interface Reporter {
@@ -108,21 +126,30 @@ export interface Reporter {
   onFileStart?(file: string): void;
   onTestPass(test: TestCase): void;
   onTestFail(test: TestCase, error: unknown): void;
-  onSuiteDone(passed: number, failed: number): void;
+  onTestSkip?(test: TestCase): void;
+  onTestTodo?(test: TestCase): void;
+  onSuiteDone(passed: number, failed: number, skipped: number, todo: number): void;
   onNoTestsFound?(filePatterns: string[], testNamePattern?: string): void;
-  onRunDone?(totalPassed: number, totalFailed: number): void;
+  onRunDone?(totalPassed: number, totalFailed: number, totalSkipped: number, totalTodo: number): void;
   onRunError?(error: unknown): void;
 }
 
 export interface RunResult {
   passed: number;
   failed: number;
+  skipped: number;
+  todo: number;
 }
 
 export interface TestManager {
   test(description: string, fn: TestFn): void;
   testEach: Test['each'];
+  testOnly(description: string, fn: TestFn): void;
+  testSkip(description: string, fn: TestFn): void;
+  testTodo(description: string): void;
   describe(suiteName: string, fn: () => void): void;
+  describeOnly(suiteName: string, fn: () => void): void;
+  describeSkip(suiteName: string, fn: () => void): void;
   beforeEach(fn: TestFn): void;
   getTests(): TestCase[];
   clearTests(): void;

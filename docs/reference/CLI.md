@@ -117,12 +117,14 @@ The `json` reporter emits exactly one JSON object on stdout, on a single line, a
 
 ```json
 {
-  "totals": {"passed": 10, "failed": 1},
+  "totals": {"passed": 10, "failed": 1, "skipped": 2, "todo": 1},
   "files": [
     {
       "path": "/abs/path/foo.test.js",
       "passed": 3,
       "failed": 1,
+      "skipped": 1,
+      "todo": 1,
       "tests": [
         {
           "path": "group > sub",
@@ -136,6 +138,18 @@ The `json` reporter emits exactly one JSON object on stdout, on a single line, a
           "status": "failed",
           "location": {"file": "/abs/path/foo.test.js", "line": 50},
           "error": {"message": "expected 1 to equal 2"}
+        },
+        {
+          "path": "",
+          "description": "explicit skip",
+          "status": "skipped",
+          "location": {"file": "/abs/path/foo.test.js", "line": 58}
+        },
+        {
+          "path": "",
+          "description": "write later",
+          "status": "todo",
+          "location": {"file": "/abs/path/foo.test.js", "line": 64}
         }
       ]
     }
@@ -147,14 +161,14 @@ Field notes:
 
 - `files[].path` is the absolute path of the test file.
 - `tests[].path` is the `describe` chain joined with `" > "`, or `""` for top-level tests. `tests[].description` is just the `test(...)` description — together they form the full test name.
-- `tests[].status` is `"passed"` or `"failed"`.
+- `tests[].status` is one of `"passed"`, `"failed"`, `"skipped"`, or `"todo"`. `"skipped"` covers `test.skip`, `describe.skip`, and tests demoted by a sibling `.only`. `"todo"` is registered via `test.todo(desc)`.
 - `tests[].location` is the file and line where `test(...)` was called. It is omitted if the call site could not be captured (e.g., stack-parse failure).
 - `tests[].error` is present only on `"failed"` tests, and currently exposes only `message`. Stack traces are intentionally not included.
 
 Special cases:
 
-- If no test matches the filters, the payload is `{"totals": {"passed": 0, "failed": 0}, "files": [], "noTestsFound": true}` and the exit code is `1`.
-- If the runner itself fails before any test runs (e.g., a setup error), the payload is `{"totals": {"passed": 0, "failed": 0}, "files": [], "error": {"message": "..."}}` and the exit code is `1`.
+- If no test matches the filters, the payload is `{"totals": {"passed": 0, "failed": 0, "skipped": 0, "todo": 0}, "files": [], "noTestsFound": true}` and the exit code is `1`.
+- If the runner itself fails before any test runs (e.g., a setup error), the payload is `{"totals": {"passed": 0, "failed": 0, "skipped": 0, "todo": 0}, "files": [], "error": {"message": "..."}}` and the exit code is `1`.
 
 ## Exit codes
 

@@ -1,10 +1,12 @@
-import {bold, green, red, yellow} from "./colors.js";
+import {bold, cyan, gray, green, red, yellow} from "./colors.js";
 
 export const RESULT_MSG = {
   TESTS: 'Tests: ',
   TOTAL: 'Total Result: ',
   CHECK: '✓ ',
   CROSS: '✗ ',
+  SKIP: '○ ',
+  TODO: '✎ ',
   DIRECTORY_DELIMITER: ' > ',
   EMPTY: '',
 };
@@ -21,17 +23,26 @@ export const formatFailureMessage = (test, error) => {
   return messages.join('\n');
 };
 
-export const getTestResultMsg = (title, success, fail) => {
-  let msg = '\n';
+export const formatSkippedMessage = (test) => {
+  const pathString = test.path === '' ? RESULT_MSG.EMPTY : test.path + RESULT_MSG.DIRECTORY_DELIMITER;
+  return gray(RESULT_MSG.SKIP + pathString + test.description);
+};
 
-  msg += title;
-  msg += green(success + ' passed') + ', ';
-  if (fail) {
-    msg += red(fail + ' failed') + ', ';
-  }
-  msg += bold(success + fail + ' total');
+export const formatTodoMessage = (test) => {
+  const pathString = test.path === '' ? RESULT_MSG.EMPTY : test.path + RESULT_MSG.DIRECTORY_DELIMITER;
+  return cyan(RESULT_MSG.TODO + pathString + test.description);
+};
 
-  return msg;
+export const getTestResultMsg = (title, passed, failed, skipped = 0, todo = 0) => {
+  const segments = [green(passed + ' passed')];
+  if (failed) segments.push(red(failed + ' failed'));
+  if (skipped) segments.push(gray(skipped + ' skipped'));
+  if (todo) segments.push(cyan(todo + ' todo'));
+
+  const total = passed + failed + skipped + todo;
+  segments.push(bold(total + ' total'));
+
+  return '\n' + title + segments.join(', ');
 };
 
 export const getFileCountString = (totalCount, matchedCount = totalCount) => {

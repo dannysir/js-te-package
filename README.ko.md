@@ -93,7 +93,7 @@ js-te --help          # 도움말
 
 ## 핵심 기능
 
-- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`
+- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `test.only`, `test.skip`, `test.todo`, `describe.only`, `describe.skip`
 - **Matcher** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`, `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`, `.not` 체이닝
 - **Mock Function** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`, `mock.calls`
 - **Module Mocking** — `mock(path, mockObj)` (상대/절대 경로 모두 지원), `clearAllMocks`, `unmock`, `isMocked`
@@ -117,6 +117,37 @@ describe('계산기', () => {
   });
 });
 ```
+
+### 집중 실행 & 스킵
+
+```js
+describe('user', () => {
+  test.only('focused — 같은 파일에서 이것만 실행', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  test('같은 파일에 .only 가 있으면 스킵됨', () => {
+    // 실행되지 않음
+  });
+
+  test.skip('명시적으로 스킵', () => {
+    // 실행되지 않음
+  });
+
+  test.todo('reset-password 테스트 작성 예정');
+});
+
+describe.only('그룹 전체 focus 모드로 실행', () => {
+  test('a', () => {});
+  test('b', () => {});
+});
+
+describe.skip('일시적으로 비활성화된 suite', () => {
+  test('안의 테스트는 모두 skipped 로 보고', () => {});
+});
+```
+
+`.only` 는 **파일 단위**입니다. 파일에 `.only` 가 하나라도 있으면 그 파일에서는 focus 된 테스트만 실행하고, 다른 파일은 영향받지 않습니다. 중첩된 경우 **가장 가까운 명시 modifier 가 우선**합니다 — `describe.only` 안의 `test.skip` 은 그대로 skip, `describe.skip` 안의 `test.only` 는 그대로 실행됩니다.
 
 ### 모듈 모킹
 

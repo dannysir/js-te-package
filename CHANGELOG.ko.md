@@ -1,5 +1,24 @@
 # CHANGE LOG
 
+## [0.9.0] 2026-06-05
+
+### 추가
+- **`.only` / `.skip` / `.todo`** — Jest/Vitest 스타일의 focus·skip modifier 지원:
+  - `test.only(name, fn)` — 같은 파일에 하나라도 있으면 그 파일의 일반 테스트는 모두 skipped 로 보고. 적용 범위는 **파일 단위** 라서 다른 파일은 영향 없음.
+  - `test.skip(name, fn)` — 함수를 실행하지 않고 skipped 로 보고.
+  - `test.todo(name)` — 함수 없는 pending 테스트로 등록. 함수 인자를 주면 에러.
+  - `describe.only(name, fn)` / `describe.skip(name, fn)` — 그룹 안의 모든 테스트에 modifier 적용. **가장 가까운 명시 modifier 가 우선** (`describe.only` 안의 `test.skip` 은 skip, `describe.skip` 안의 `test.only` 는 실행).
+
+### 변경
+- 리포터 인터페이스에 `onTestSkip(test)` / `onTestTodo(test)` 추가. `onSuiteDone(passed, failed, skipped, todo)` 와 `onRunDone(totalPassed, totalFailed, totalSkipped, totalTodo)` 시그니처가 카운터 두 개씩 확장됨. 기존 `onTestPass` / `onTestFail` 시그니처는 그대로.
+- `testManager.run()` 반환값이 `{passed, failed, skipped, todo}` 로 확장 (필드 추가). CLI 의 `zeroMatched` 판정에도 skipped/todo 가 포함되어, `.skip` / `.todo` 만 있는 파일도 "no tests found" 로 잘못 분류되지 않음.
+- JSON 리포터 — 각 테스트의 `status` 가 `"skipped"` 또는 `"todo"` 가 될 수 있음. `totals` 에 `skipped` / `todo` 키 추가, 각 `files[]` 엔트리에도 같은 카운터 추가.
+
+### 문서
+- README(영/한) 에 "집중 실행 & 스킵" 섹션 추가, 핵심 기능 목록에 새 modifier 표기.
+- CLI 레퍼런스(영/한) JSON 스키마 섹션을 새 status 값·카운터에 맞춰 갱신.
+- API 레퍼런스(영/한) 에 `test.only` / `.skip` / `.todo` 및 `describe.only` / `.skip` 항목 추가.
+
 ## [0.8.0] 2026-05-28
 
 ### 추가
