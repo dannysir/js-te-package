@@ -1,6 +1,6 @@
 # CHANGE LOG
 
-## [Unreleased]
+## [0.9.0] 2026-06-05
 
 ### 추가
 - **`.only` / `.skip` / `.todo`** — Jest/Vitest 스타일의 focus·skip modifier 지원:

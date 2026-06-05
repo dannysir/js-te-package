@@ -2,7 +2,7 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
-## [Unreleased]
+## [0.9.0] 2026-06-05
 
 ### Added
 - **`.only` / `.skip` / `.todo`** — Jest/Vitest style focus and skip modifiers:
