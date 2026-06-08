@@ -1,4 +1,4 @@
-import {fileURLToPath} from "node:url";
+import {fileURLToPath} from "./fileUrlToPath.js";
 import {RESULT_MSG} from "./view/reportMessages.js";
 import {clearAllMocks} from "./mock/store.js";
 

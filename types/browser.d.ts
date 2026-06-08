@@ -13,6 +13,7 @@ export type {
   MockState,
   TestManager,
   TestCase,
+  TestMode,
   TestLocation,
   Reporter,
   RunResult,
