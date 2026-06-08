@@ -1,5 +1,7 @@
 # API 레퍼런스
 
+> English: [API.md](./API.md)
+
 `@dannysir/js-te` 의 모든 공개 API 를 정리한 문서입니다.
 
 - [테스트 작성](#테스트-작성)

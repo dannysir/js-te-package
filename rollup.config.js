@@ -1,5 +1,19 @@
+import path from 'node:path';
+
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+
+// 브라우저 빌드 전용: testManager 가 끌어오는 ./fileUrlToPath.js (node:url 재export) 를
+// node:url 없는 identity stub 으로 치환해 브라우저 번들에 Node 빌트인이 섞이지 않게 한다.
+const aliasBrowserFileUrl = () => ({
+  name: 'alias-browser-fileurl',
+  resolveId(source, importer) {
+    if (importer && source === './fileUrlToPath.js') {
+      return path.resolve(path.dirname(importer), 'fileUrlToPath.browser.js');
+    }
+    return null;
+  },
+});
 
 export default [
   {
@@ -52,6 +66,7 @@ export default [
     },
     external: [],
     plugins: [
+      aliasBrowserFileUrl(),
       nodeResolve(),
       commonjs()
     ]

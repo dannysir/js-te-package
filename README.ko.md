@@ -4,19 +4,21 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.7.4](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.9.1](./CHANGELOG.ko.md)
 
-### 프로젝트 홈페이지 (0.7.4)
+### 브라우저 번들에서 `node:url` import 제거 (0.9.1)
 
-- `package.json` 에 `homepage` 필드 추가 — npm 패키지 페이지에서 [프로젝트 사이트](https://dannysir-labs.vercel.app/en/libraries/js-te)로 연결. 메타데이터 변경만 있고 API·런타임 동작 변화 없음.
+- `@dannysir/js-te/browser` 번들이 더 이상 `node:url` 빌트인을 import 하지 않아, 브라우저·Web Worker 번들러(Vite, Turbopack 등)에서 정상 로드됩니다. Node CLI(`--testLocation`) 동작은 변화 없습니다. [브라우저 사용](#브라우저-사용) 참고.
 
-### 브라우저 entry & TypeScript 타입 선언 (0.7.3)
+### Focus & skip modifier (0.9.0)
 
-- **브라우저 entry** — `@dannysir/js-te/browser` 가 코어 API(`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`)를 re-export 하여 Node CLI 러너가 동작하지 않는 브라우저·Web Worker 에서도 사용 가능
-- Node 런타임에서 `/browser` 를 import 하면 명확한 에러를 던져 메인 entry 나 `js-te` CLI 로 안내
-- **TypeScript** — 메인 entry 와 `/browser` entry 양쪽에 `.d.ts` 타입 선언을 함께 배포하여 별도 설정 없이 타입 지원
+- **`.only` / `.skip` / `.todo`** — `test` 와 `describe` 에 Jest/Vitest 스타일 focus·skip modifier 추가. [집중 실행 & 스킵](#집중-실행--스킵) 참고.
 
-자세한 내용은 [브라우저 사용](#브라우저-사용) 을 참고하세요.
+### 위치 필터 & JSON 리포터 (0.8.0)
+
+- `--testLocation <경로>:<라인>` 으로 파일·라인 단위 단일 테스트 실행, `--reporter json` 으로 IDE/CI 용 머신 파싱 결과 출력.
+
+이전 릴리스는 전체 [CHANGELOG](./CHANGELOG.ko.md) 를 참고하세요.
 
 ---
 

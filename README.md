@@ -4,19 +4,21 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.7.4](./CHANGELOG.md)
+## [📎 Latest Update — 0.9.1](./CHANGELOG.md)
 
-### Project homepage (0.7.4)
+### Browser bundle drops the `node:url` import (0.9.1)
 
-- `package.json` now declares a `homepage` field, so the npm package page links to the [project site](https://dannysir-labs.vercel.app/en/libraries/js-te). Metadata-only — no API or runtime changes.
+- The `@dannysir/js-te/browser` bundle no longer imports the `node:url` builtin, so it loads correctly in browser/Web Worker bundlers (Vite, Turbopack, …). Node CLI behavior (`--testLocation`) is unchanged. See [Browser usage](#browser-usage).
 
-### Browser entry & TypeScript declarations (0.7.3)
+### Focus & skip modifiers (0.9.0)
 
-- **Browser entry** — `@dannysir/js-te/browser` re-exports the core API (`test`, `describe`, `beforeEach`, `expect`, `fn`, `testManager`) for browsers and Web Workers, where the Node CLI runner can't run
-- Importing `/browser` from a Node runtime throws immediately with a clear error, steering you to the main entry or the `js-te` CLI
-- **TypeScript** — `.d.ts` declarations now ship for both the main and `/browser` entries, so the package is fully typed out of the box
+- **`.only` / `.skip` / `.todo`** — Jest/Vitest-style focus and skip modifiers for `test` and `describe`. See [Focusing & Skipping](#focusing--skipping).
 
-See [Browser usage](#browser-usage) for details.
+### Location filter & JSON reporter (0.8.0)
+
+- `--testLocation <path>:<line>` runs a single test by file and line; `--reporter json` prints machine-readable results for IDE/CI.
+
+See the full [CHANGELOG](./CHANGELOG.md) for earlier releases.
 
 ---
 
