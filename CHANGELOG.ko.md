@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## [0.9.1] 2026-06-08
+
+### 수정
+- **브라우저 번들이 더 이상 `node:url` 을 import 하지 않음.** 0.8.0 의 `--testLocation` 콜사이트 캡처가 `testManager.js` 에 `import {fileURLToPath} from "node:url"` 를 끌어왔고, 번들러가 이를 `dist/browser.mjs` 최상단에도 그대로 내보냈음. 브라우저·Web Worker 환경(예: Turbopack)은 이 Node 빌트인을 풀지 못해 `@dannysir/js-te/browser` 가 로드되지 않거나 멈출 수 있었음. 이제 `fileURLToPath` 의존을 분리해 **브라우저 빌드에서만** no-op stub 으로 치환함. Node CLI(`--testLocation`) 동작은 변화 없음. `/browser` 타입 표면에 `TestMode` re-export 도 추가.
+
 ## [0.9.0] 2026-06-05
 
 ### 추가

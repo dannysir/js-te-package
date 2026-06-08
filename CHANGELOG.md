@@ -2,6 +2,11 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.9.1] 2026-06-08
+
+### Fixed
+- **Browser bundle no longer imports `node:url`.** Since 0.8.0 the `--testLocation` call-site capture pulled `import {fileURLToPath} from "node:url"` into `testManager.js`, which the bundler also emitted at the top of `dist/browser.mjs`. Browser/Web Worker hosts (e.g. Turbopack) cannot resolve that Node builtin, so `@dannysir/js-te/browser` could hang or fail to load. The `fileURLToPath` dependency is now isolated and swapped for a no-op stub in the browser build only; the Node CLI (`--testLocation`) behavior is unchanged. The `/browser` type surface also now re-exports `TestMode`.
+
 ## [0.9.0] 2026-06-05
 
 ### Added
