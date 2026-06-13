@@ -2,6 +2,11 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.9.2] 2026-06-13
+
+### Fixed
+- **Browser entry now defines `.only` / `.skip` / `.todo`.** The `.only` / `.skip` / `.todo` modifiers added in 0.9.0 landed in the main `index.js` entry but were never added to `browser.js`, leaving the runtime out of sync with the shipped type declarations (which already declared them). Calling `test.only` / `test.skip` / `test.todo` or `describe.only` / `describe.skip` from `@dannysir/js-te/browser` therefore threw a `TypeError`. `browser.js` now delegates these to `testManager`, and the Node guard build (`browser-node-stub.js`) covers the modifiers too, so they fail with the guard's pointer error instead of an undefined-property crash. API reference (en/ko) "Exported" list updated to match.
+
 ## [0.9.1] 2026-06-08
 
 ### Fixed

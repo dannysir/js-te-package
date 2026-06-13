@@ -4,7 +4,11 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.9.1](./CHANGELOG.md)
+## [📎 Latest Update — 0.9.2](./CHANGELOG.md)
+
+### Browser entry gains `.only` / `.skip` / `.todo` (0.9.2)
+
+- The `@dannysir/js-te/browser` entry now defines `test.only` / `.skip` / `.todo` and `describe.only` / `.skip`, which were declared in its types but missing at runtime — calling them in the browser previously threw a `TypeError`. See [Browser usage](#browser-usage).
 
 ### Browser bundle drops the `node:url` import (0.9.1)
 
@@ -195,13 +199,13 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**Exported:** `test` (with `test.each`), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+**Exported:** `test` (with `test.each`, `test.only`, `test.skip`, `test.todo`), `describe` (with `describe.only`, `describe.skip`), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`) — these are Node-only and intentionally left out.
 
 > `testManager` is a module-level singleton. If you collect tests more than once on the same page, call `testManager.clearTests()` between runs.
 
-**Node guard** — importing this entry from a Node runtime throws immediately, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI):
+**Node guard** — in a Node runtime this entry resolves to a guard build; calling any of its exports throws, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI):
 
 ```
 @dannysir/js-te/browser cannot be used in a Node.js runtime.

@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## [0.9.2] 2026-06-13
+
+### 수정
+- **브라우저 entry 에 `.only` / `.skip` / `.todo` 추가.** 0.9.0 에서 추가된 `.only` / `.skip` / `.todo` modifier 가 메인 `index.js` entry 에만 반영되고 `browser.js` 에는 빠져 있어, 동봉된 타입 선언(이미 modifier 를 선언함)과 런타임이 어긋나 있었음. 그 결과 `@dannysir/js-te/browser` 에서 `test.only` / `test.skip` / `test.todo` 나 `describe.only` / `describe.skip` 을 호출하면 `TypeError` 가 발생했음. 이제 `browser.js` 가 이들을 `testManager` 로 위임하고, Node 가드 빌드(`browser-node-stub.js`)도 modifier 까지 커버해 undefined 속성 크래시 대신 가드의 안내 에러로 실패함. API 레퍼런스(en/ko)의 "Exported" 목록도 일치하도록 갱신.
+
 ## [0.9.1] 2026-06-08
 
 ### 수정

@@ -4,7 +4,11 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.9.1](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.9.2](./CHANGELOG.ko.md)
+
+### 브라우저 entry 에 `.only` / `.skip` / `.todo` 추가 (0.9.2)
+
+- `@dannysir/js-te/browser` entry 에 `test.only` / `.skip` / `.todo`, `describe.only` / `.skip` 이 추가됐습니다. 타입 선언에는 있었지만 런타임에 빠져 있어, 브라우저에서 호출하면 `TypeError` 가 나던 불일치를 수정했습니다. [브라우저 사용](#브라우저-사용) 참고.
 
 ### 브라우저 번들에서 `node:url` import 제거 (0.9.1)
 
@@ -194,13 +198,13 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**export 되는 것:** `test`(`test.each` 포함), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+**export 되는 것:** `test`(`test.each` / `test.only` / `test.skip` / `test.todo` 포함), `describe`(`describe.only` / `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`) — Node 전용이라 의도적으로 제외합니다.
 
 > `testManager` 는 모듈 레벨 싱글톤입니다. 같은 페이지에서 테스트를 여러 번 collect 한다면 실행 사이에 `testManager.clearTests()` 를 호출하세요.
 
-**Node 가드** — 이 entry 를 Node 런타임에서 import 하면 즉시 에러를 던지며, 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다:
+**Node 가드** — 이 entry 를 Node 런타임에서 불러오면 가드 빌드로 연결되며, export 를 호출하는 순간 에러를 던져 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다:
 
 ```
 @dannysir/js-te/browser cannot be used in a Node.js runtime.
