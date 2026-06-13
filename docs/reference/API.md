@@ -605,7 +605,7 @@ await testManager.run();
 
 `testManager` is a module-level singleton. If you collect tests more than once on the same page, call `testManager.clearTests()` between runs.
 
-**Node guard** — importing this entry from a Node runtime throws immediately, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI).
+**Node guard** — in a Node runtime this entry resolves to a guard build; calling any of its exports throws, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI).
 
 **TypeScript** — declarations ship with the package (`types/browser.d.ts`), so the entry is fully typed with no extra setup.
 

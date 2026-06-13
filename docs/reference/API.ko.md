@@ -605,7 +605,7 @@ await testManager.run();
 
 `testManager` 는 모듈 레벨 싱글톤입니다. 같은 페이지에서 테스트를 여러 번 collect 한다면 실행 사이에 `testManager.clearTests()` 를 호출하세요.
 
-**Node 가드** — 이 entry 를 Node 런타임에서 import 하면 즉시 에러를 던지며, 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다.
+**Node 가드** — 이 entry 를 Node 런타임에서 불러오면 가드 빌드로 연결되며, export 를 호출하는 순간 에러를 던져 메인 `@dannysir/js-te` entry(또는 `js-te` CLI) 로 안내합니다.
 
 **TypeScript** — 타입 선언이 패키지에 동봉되어(`types/browser.d.ts`) 별도 설정 없이 완전한 타입 지원을 받습니다.
 
