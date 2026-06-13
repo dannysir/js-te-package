@@ -599,13 +599,13 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**Exported:** `test` (with `test.each`), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+**Exported:** `test` (with `test.each`, `test.only`, `test.skip`, `test.todo`), `describe` (with `describe.only`, `describe.skip`), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`). These depend on Node and are intentionally left out — the browser and Node entries differ on purpose.
 
 `testManager` is a module-level singleton. If you collect tests more than once on the same page, call `testManager.clearTests()` between runs.
 
-**Node guard** — importing this entry from a Node runtime throws immediately, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI).
+**Node guard** — in a Node runtime this entry resolves to a guard build; calling any of its exports throws, pointing you to the main `@dannysir/js-te` entry (or the `js-te` CLI).
 
 **TypeScript** — declarations ship with the package (`types/browser.d.ts`), so the entry is fully typed with no extra setup.
 
