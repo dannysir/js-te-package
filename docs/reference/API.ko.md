@@ -599,7 +599,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**export 되는 것:** `test`(`test.each` 포함), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+**export 되는 것:** `test`(`test.each`, `test.only`, `test.skip`, `test.todo` 포함), `describe`(`describe.only`, `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`). Node 에 의존하므로 의도적으로 제외합니다 — 브라우저 entry 와 Node entry 의 표면 차이는 의도된 설계입니다.
 

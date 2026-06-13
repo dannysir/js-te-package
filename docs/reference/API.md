@@ -599,7 +599,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**Exported:** `test` (with `test.each`), `describe`, `beforeEach`, `expect`, `fn`, `testManager`.
+**Exported:** `test` (with `test.each`, `test.only`, `test.skip`, `test.todo`), `describe` (with `describe.only`, `describe.skip`), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`). These depend on Node and are intentionally left out — the browser and Node entries differ on purpose.
 

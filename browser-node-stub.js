@@ -6,10 +6,16 @@ const guard = () => {
   throw new Error(MESSAGE);
 };
 
-const guardWithEach = Object.assign(guard, {each: () => guard});
+const testGuard = Object.assign(guard, {
+  each: () => guard,
+  only: guard,
+  skip: guard,
+  todo: guard,
+});
+const describeGuard = Object.assign(guard, {only: guard, skip: guard});
 
-export const describe = guard;
-export const test = guardWithEach;
+export const describe = describeGuard;
+export const test = testGuard;
 export const beforeEach = guard;
 export const expect = guard;
 export const fn = guard;
