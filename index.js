@@ -40,12 +40,38 @@ test.each = (cases) => testManager.testEach(cases);
 test.only = (description, fn) => testManager.testOnly(description, fn);
 
 /**
+ * 데이터 기반 테스트 묶음 전체를 only 로 등록합니다. 같은 파일의 일반 테스트는 skip 으로 강등됩니다.
+ *
+ * @example
+ * test.only.each([
+ *   [1, 2, 3],
+ *   [2, 3, 5],
+ * ])('add(%s, %s) = %s', (a, b, expected) => {
+ *   expect(a + b).toBe(expected);
+ * });
+ */
+test.only.each = (cases) => testManager.testEach(cases, 'only');
+
+/**
  * 테스트를 실행하지 않고 skipped 로 보고합니다.
  *
  * @example
  * test.skip('temporarily disabled', () => { ... });
  */
 test.skip = (description, fn) => testManager.testSkip(description, fn);
+
+/**
+ * 데이터 기반 테스트 묶음 전체를 skip 으로 등록합니다. 함수는 실행되지 않습니다.
+ *
+ * @example
+ * test.skip.each([
+ *   [1, 2, 3],
+ *   [2, 3, 5],
+ * ])('add(%s, %s) = %s', (a, b, expected) => {
+ *   expect(a + b).toBe(expected);
+ * });
+ */
+test.skip.each = (cases) => testManager.testEach(cases, 'skip');
 
 /**
  * 아직 구현되지 않은 테스트를 todo 로 보고합니다. 함수 인자를 받지 않습니다.

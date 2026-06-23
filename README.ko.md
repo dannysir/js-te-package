@@ -99,7 +99,7 @@ js-te --help          # 도움말
 
 ## 핵심 기능
 
-- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `test.only`, `test.skip`, `test.todo`, `describe.only`, `describe.skip`
+- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `test.only`, `test.skip`, `test.todo`, `test.only.each`, `test.skip.each`, `describe.only`, `describe.skip`
 - **Matcher** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`, `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`, `.not` 체이닝
 - **Mock Function** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`, `mock.calls`
 - **Module Mocking** — `mock(path, mockObj)` (상대/절대 경로 모두 지원), `clearAllMocks`, `unmock`, `isMocked`
@@ -198,7 +198,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**export 되는 것:** `test`(`test.each` / `test.only` / `test.skip` / `test.todo` 포함), `describe`(`describe.only` / `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
+**export 되는 것:** `test`(`test.each` / `test.only` / `test.skip` / `test.todo` / `test.only.each` / `test.skip.each` 포함), `describe`(`describe.only` / `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`) — Node 전용이라 의도적으로 제외합니다.
 

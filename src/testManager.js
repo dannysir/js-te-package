@@ -100,11 +100,11 @@ class TestManager {
     this.#registerTest(description, () => {}, 'todo');
   }
 
-  testEach(cases) {
+  testEach(cases, mode) {
     return (description, fn) => {
       cases.forEach(testCase => {
         const args = Array.isArray(testCase) ? testCase : [testCase];
-        this.test(this.#formatDescription(args, description), () => fn(...args));
+        this.#registerTest(this.#formatDescription(args, description), () => fn(...args), mode);
       });
     };
   }

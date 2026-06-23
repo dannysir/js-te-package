@@ -172,6 +172,19 @@ describe('user', () => {
 
 When `test.only` and a `describe` modifier disagree, the **closest explicit modifier wins**: `test.skip` inside `describe.only` stays skipped; `test.only` inside `describe.skip` still runs.
 
+#### Combining with `.each`
+
+`test.only.each(cases)(template, fn)` and `test.skip.each(cases)(template, fn)` apply the modifier to every generated case. `only` focuses the whole batch (and demotes other normal tests in the file to `skipped`); `skip` reports every case as `skipped` without running it.
+
+```js
+test.skip.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s) = %s — temporarily skipped', (a, b, expected) => {
+  expect(a + b).toBe(expected);
+});
+```
+
 ### `describe.only(name, fn)` / `describe.skip(name, fn)`
 
 Group-level focus and skip.

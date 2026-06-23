@@ -172,6 +172,19 @@ describe('user', () => {
 
 `test.only` 와 `describe` modifier 가 충돌하면 **가장 가까운 명시 modifier 가 우선**합니다. `describe.only` 안의 `test.skip` 은 그대로 skip, `describe.skip` 안의 `test.only` 는 그대로 실행됩니다.
 
+#### `.each` 와 조합
+
+`test.only.each(cases)(template, fn)` 와 `test.skip.each(cases)(template, fn)` 는 생성되는 모든 케이스에 modifier 를 적용합니다. `only` 는 묶음 전체를 focus 하고(같은 파일의 다른 일반 테스트는 `skipped` 로 강등), `skip` 은 모든 케이스를 실행하지 않고 `skipped` 로 보고합니다.
+
+```js
+test.skip.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s) = %s — 임시 skip', (a, b, expected) => {
+  expect(a + b).toBe(expected);
+});
+```
+
 ### `describe.only(name, fn)` / `describe.skip(name, fn)`
 
 그룹 단위 focus·skip.

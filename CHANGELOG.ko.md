@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## [Unreleased]
+
+### 추가
+- **`test.only.each` / `test.skip.each`** — modifier 와 데이터 기반(`.each`) 테스트의 조합. `test.only.each(cases)(template, fn)` 는 생성된 묶음 전체를 focus 하고(같은 파일의 다른 일반 테스트는 `skipped` 로 강등), `test.skip.each(cases)(template, fn)` 는 생성된 모든 케이스를 실행하지 않고 `skipped` 로 보고합니다. 메인 entry 와 `/browser` entry 양쪽에서 사용할 수 있습니다. 타입 선언은 `test.only` / `test.skip` 에 `each` 멤버를 추가했습니다.
+
 ## [0.9.2] 2026-06-13
 
 ### 수정
