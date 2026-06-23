@@ -102,6 +102,14 @@ test.each([
   expect(arg.name).toBe('dannysir');
 });
 
+// skip.each 의 케이스는 실행되지 않으므로, 일부러 실패할 단언을 넣어 skip 동작을 검증한다.
+test.skip.each([
+  [1, 2],
+  [3, 4],
+])('[skip.each] - skipped : %s, %s', (a, b) => {
+  expect(a).toBe(b);
+});
+
 describe('[beforeEach test]', () => {
   let counter;
   beforeEach(() => {

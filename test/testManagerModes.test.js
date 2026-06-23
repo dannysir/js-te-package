@@ -133,3 +133,42 @@ describe('[TestManager modes] describe.only / describe.skip', () => {
     expect(result.skipped).toBe(1);
   });
 });
+
+describe('[TestManager modes] testEach + modifier', () => {
+  test('testEach(cases, "only") 는 케이스 전체를 only 로 등록하고 같은 파일 normal 은 skip 강등된다', async () => {
+    const tm = new TestManager();
+    tm.test('normal outside', () => {});
+    tm.testEach([[1, 1], [2, 2]], 'only')('case %s == %s', (a, b) => {
+      expect(a).toBe(b);
+    });
+
+    const result = await tm.run(makeReporter());
+
+    expect(result.passed).toBe(2);
+    expect(result.skipped).toBe(1);
+  });
+
+  test('testEach(cases, "skip") 는 케이스 함수를 실행하지 않고 skip 으로 보고한다', async () => {
+    const tm = new TestManager();
+    let runs = 0;
+    tm.testEach([[1], [2], [3]], 'skip')('case %s', () => { runs++; });
+
+    const reporter = makeReporter();
+    const result = await tm.run(reporter);
+
+    expect(runs).toBe(0);
+    expect(result.skipped).toBe(3);
+    expect(reporter.skipped.length).toBe(3);
+  });
+
+  test('testEach(cases) 는 mode 없이 normal 로 등록된다 (회귀 방지)', async () => {
+    const tm = new TestManager();
+    tm.testEach([[1, 1], [2, 2]])('case %s == %s', (a, b) => {
+      expect(a).toBe(b);
+    });
+
+    const result = await tm.run(makeReporter());
+
+    expect(result).toEqual({passed: 2, failed: 0, skipped: 0, todo: 0});
+  });
+});
