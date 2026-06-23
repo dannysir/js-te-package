@@ -2,7 +2,7 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
-## [Unreleased]
+## [0.9.3] 2026-06-23
 
 ### Added
 - **`test.only.each` / `test.skip.each`** — modifier and data-driven (`.each`) combinations. `test.only.each(cases)(template, fn)` focuses an entire generated batch (other normal tests in the same file are demoted to `skipped`); `test.skip.each(cases)(template, fn)` reports every generated case as `skipped` without running it. Both are available from the main entry and the `/browser` entry. The type declarations extend `test.only` / `test.skip` with an `each` member.

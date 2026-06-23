@@ -4,7 +4,11 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.9.2](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.9.3](./CHANGELOG.ko.md)
+
+### `test.only.each` / `test.skip.each` (0.9.3)
+
+- **`test.only.each` / `test.skip.each`** — `.only` / `.skip` modifier 와 데이터 기반 `.each` 묶음의 조합. `test.only.each(cases)(...)` 는 생성된 묶음 전체를 focus 하고, `test.skip.each(cases)(...)` 는 모든 케이스를 `skipped` 로 보고합니다. [집중 실행 & 스킵](#집중-실행--스킵) 참고.
 
 ### 브라우저 entry 에 `.only` / `.skip` / `.todo` 추가 (0.9.2)
 
@@ -154,6 +158,19 @@ describe.skip('일시적으로 비활성화된 suite', () => {
 ```
 
 `.only` 는 **파일 단위**입니다. 파일에 `.only` 가 하나라도 있으면 그 파일에서는 focus 된 테스트만 실행하고, 다른 파일은 영향받지 않습니다. 중첩된 경우 **가장 가까운 명시 modifier 가 우선**합니다 — `describe.only` 안의 `test.skip` 은 그대로 skip, `describe.skip` 안의 `test.only` 는 그대로 실행됩니다.
+
+`.each` 와 조합하면 데이터 기반 묶음 전체를 focus 하거나 skip 할 수 있습니다:
+
+```js
+test.skip.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s) = %s — 임시 skip', (a, b, expected) => {
+  expect(a + b).toBe(expected);
+});
+```
+
+`test.only.each` 는 생성된 모든 케이스를 focus 하고(파일 내 다른 일반 테스트는 skipped 로 강등), `test.skip.each` 는 모든 케이스를 skipped 로 보고합니다.
 
 ### 모듈 모킹
 

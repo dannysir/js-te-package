@@ -4,7 +4,11 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.9.2](./CHANGELOG.md)
+## [📎 Latest Update — 0.9.3](./CHANGELOG.md)
+
+### `test.only.each` / `test.skip.each` (0.9.3)
+
+- **`test.only.each` / `test.skip.each`** — combine the `.only` / `.skip` modifiers with data-driven `.each` batches. `test.only.each(cases)(...)` focuses the whole generated batch; `test.skip.each(cases)(...)` reports every case as `skipped`. See [Focusing & Skipping](#focusing--skipping).
 
 ### Browser entry gains `.only` / `.skip` / `.todo` (0.9.2)
 
@@ -155,6 +159,19 @@ describe.skip('temporarily disabled suite', () => {
 ```
 
 `.only` is scoped to a single file: a file with at least one `.only` runs only the focused tests there, while other files are unaffected. The closest explicit modifier wins — `test.skip` inside `describe.only` stays skipped, and `test.only` inside `describe.skip` runs.
+
+Combine the modifiers with `.each` to focus or skip a whole data-driven batch:
+
+```js
+test.skip.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s) = %s — temporarily skipped', (a, b, expected) => {
+  expect(a + b).toBe(expected);
+});
+```
+
+`test.only.each` focuses every generated case (other normal tests in the file are demoted to skipped); `test.skip.each` reports every case as skipped.
 
 ### Module Mocking
 
