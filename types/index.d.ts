@@ -17,9 +17,17 @@ export interface Test {
     ): (description: string, fn: (...args: unknown[]) => void | Promise<void>) => void;
   };
   /** 같은 파일의 일반 테스트를 모두 skip 처리하고 이 테스트만 실행합니다. */
-  only: (description: string, fn: TestFn) => void;
+  only: {
+    (description: string, fn: TestFn): void;
+    /** 데이터 기반 테스트 묶음 전체를 only 로 등록합니다. */
+    each: Test['each'];
+  };
   /** 테스트를 실행하지 않고 skipped 로 보고합니다. */
-  skip: (description: string, fn: TestFn) => void;
+  skip: {
+    (description: string, fn: TestFn): void;
+    /** 데이터 기반 테스트 묶음 전체를 skip 으로 등록합니다. */
+    each: Test['each'];
+  };
   /** 아직 구현되지 않은 테스트를 todo 로 보고합니다. 함수 인자를 받지 않습니다. */
   todo: (description: string) => void;
 }

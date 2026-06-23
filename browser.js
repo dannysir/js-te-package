@@ -5,7 +5,9 @@ import {makeMockFnc} from "./src/mock/makeMockFnc.js";
 export const test = (description, fn) => testManager.test(description, fn);
 test.each = (cases) => testManager.testEach(cases);
 test.only = (description, fn) => testManager.testOnly(description, fn);
+test.only.each = (cases) => testManager.testEach(cases, 'only');
 test.skip = (description, fn) => testManager.testSkip(description, fn);
+test.skip.each = (cases) => testManager.testEach(cases, 'skip');
 test.todo = (description) => testManager.testTodo(description);
 
 export const describe = (suiteName, fn) => testManager.describe(suiteName, fn);
