@@ -1,5 +1,9 @@
 # js-te
 
+[![npm version](https://img.shields.io/npm/v/@dannysir/js-te)](https://www.npmjs.com/package/@dannysir/js-te)
+[![npm downloads](https://img.shields.io/npm/dm/@dannysir/js-te)](https://www.npmjs.com/package/@dannysir/js-te)
+[![license](https://img.shields.io/npm/l/@dannysir/js-te)](./LICENSE)
+
 [English](./README.md)
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
