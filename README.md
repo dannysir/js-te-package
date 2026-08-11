@@ -4,7 +4,11 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.9.3](./CHANGELOG.md)
+## [📎 Latest Update — 0.9.4](./CHANGELOG.md)
+
+### Provenance-attested releases (0.9.4)
+
+- Releases are now published from GitHub Actions via npm **Trusted Publishing**, with an automatically generated [provenance attestation](https://docs.npmjs.com/generating-provenance-statements) — look for the verified badge on the npm package page. No runtime changes.
 
 ### `test.only.each` / `test.skip.each` (0.9.3)
 

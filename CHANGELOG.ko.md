@@ -1,5 +1,11 @@
 # CHANGE LOG
 
+## [0.9.4] 2026-08-11
+
+### 변경
+- 배포가 GitHub Actions 의 npm **Trusted Publishing**(OIDC) 방식으로 전환되었습니다. 모든 릴리스에 **provenance 증명(attestation)** 이 자동 생성되며, npm 패키지 페이지에 인증 배지로 표시됩니다. 런타임 변경은 없습니다.
+- `package.json` 의 `prepublishOnly` 스크립트를 제거했습니다 — 빌드는 CI 워크플로우가 직접 수행합니다. (로컬에서 수동 publish 시에는 `npm run build` 를 먼저 실행해야 합니다.)
+
 ## [0.9.3] 2026-06-23
 
 ### 추가

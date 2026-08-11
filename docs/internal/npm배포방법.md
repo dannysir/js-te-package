@@ -219,3 +219,30 @@ npm unpublish js-te --force
 # 패키지 사용 중단 표시
 npm deprecate js-te@0.0.1 "Use version 0.0.2 instead"
 ```
+
+## 11. GitHub Actions Trusted Publishing (현재 배포 방식)
+
+0.9.4부터 배포는 로컬 `npm publish` 대신 GitHub Actions 에서 수행한다 (`.github/workflows/publish.yml`). 토큰 없이 OIDC 로 인증하며, provenance 증명이 자동 생성되어 npm 패키지 페이지에 인증 배지가 표시된다.
+
+### 사전 조건 (1회 설정)
+
+- npmjs.com → 패키지 → Settings → **Trusted Publisher** 등록
+  - Repository: `dannysir/js-te-package`
+  - Workflow filename: `publish.yml`
+  - Environment: 비워둠 (지정하면 워크플로우 job 에도 `environment:` 필요)
+- Trusted Publishing 은 npm 11.5.1+ 필요 → 워크플로우가 `npm install -g npm@latest` 로 해결
+
+### 배포 절차
+
+```bash
+npm version patch   # 또는 minor/major — bump + vX.Y.Z 태그 생성
+git push && git push --tags
+```
+
+이후 GitHub 에서 해당 태그로 **Release 발행** → 워크플로우가 `npm ci` + `npm run build` + `npm publish` 실행.
+
+### 주의사항
+
+- 트리거는 `release: published` — **태그 push 만으로는 배포되지 않음.** Release 를 발행해야 함.
+- `prepublishOnly` 스크립트는 제거됨 (CI 와 빌드 중복 방지). 로컬에서 수동 `npm publish` 가 필요하면 `npm run build` 를 먼저 실행할 것.
+- 배포 후 Actions 로그와 npm 패키지 페이지의 provenance 배지로 성공 확인.

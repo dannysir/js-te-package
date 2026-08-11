@@ -2,6 +2,12 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [0.9.4] 2026-08-11
+
+### Changed
+- Releases are now published from GitHub Actions via npm **Trusted Publishing** (OIDC). Every release ships with an automatically generated **provenance attestation**, shown as a verified badge on the npm package page. No runtime changes.
+- The `prepublishOnly` script was removed from `package.json` — the CI workflow runs the build itself. (Local manual publishes now require running `npm run build` first.)
+
 ## [0.9.3] 2026-06-23
 
 ### Added

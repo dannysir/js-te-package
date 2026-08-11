@@ -4,7 +4,11 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.9.3](./CHANGELOG.ko.md)
+## [📎 최근 업데이트 — 0.9.4](./CHANGELOG.ko.md)
+
+### provenance 증명이 포함된 릴리스 (0.9.4)
+
+- 배포가 GitHub Actions 의 npm **Trusted Publishing** 방식으로 전환되어, 모든 릴리스에 [provenance 증명](https://docs.npmjs.com/generating-provenance-statements)이 자동 생성됩니다 — npm 패키지 페이지의 인증 배지로 확인할 수 있습니다. 런타임 변경은 없습니다.
 
 ### `test.only.each` / `test.skip.each` (0.9.3)
 
