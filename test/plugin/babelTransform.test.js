@@ -1,7 +1,7 @@
 import {transformSync} from '@babel/core';
 import {babelTransform} from '../../src/babelPlugins/babelTransform.js';
 
-const CALLER = '/Users/san/js-te-package/test/plugin/__caller__.js';
+const CALLER = '/project/test/plugin/__caller__.js';
 
 const transform = (code, mockedPaths = null, filename = CALLER) => transformSync(code, {
   filename,

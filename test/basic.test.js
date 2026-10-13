@@ -1,5 +1,8 @@
+import path from "node:path";
 import {play} from "../test-helper/game.js";
 import {add, random} from "../test-helper/random.js";
+
+const RANDOM_ABS_PATH = path.resolve(import.meta.dirname, '../test-helper/random.js');
 
 describe('[describe depth test] - 1단계', () => {
   describe('2단계', () => {
@@ -23,7 +26,7 @@ describe('[function return test] - expect arg', () => {
 
 describe('[mocking] - mocking test', () => {
   test('[mock module] - mocking random function (absolute path)', async () => {
-    mock('/Users/san/js-te-package/test-helper/random.js', {
+    mock(RANDOM_ABS_PATH, {
       random: () => 3,
     });
 
@@ -51,7 +54,7 @@ describe('[mocking] - mocking test', () => {
   });
 
   test('[mock module mockReturnValueOnce] - mocking function test', async () => {
-    const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
+    const mocked = mock(RANDOM_ABS_PATH, {
       random: () => 1,
     });
     const result = 3;
@@ -62,7 +65,7 @@ describe('[mocking] - mocking test', () => {
   });
 
   test('[mock function] - mockReturnValueOnce, mockReturnValue', () => {
-    const mocked = mock('/Users/san/js-te-package/test-helper/random.js', {
+    const mocked = mock(RANDOM_ABS_PATH, {
       random
     });
     const input = [2, 4, 6, 8, 10];
