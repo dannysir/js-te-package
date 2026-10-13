@@ -167,10 +167,12 @@ class TestManager {
         await test.fn();
         reporter.onTestPass(test);
         passed++;
-        clearAllMocks();
       } catch (error) {
         reporter.onTestFail(test, error);
         failed++;
+      } finally {
+        // 실패한 테스트의 mock 이 다음 테스트로 새지 않도록 결과와 무관하게 정리.
+        clearAllMocks();
       }
     }
 
