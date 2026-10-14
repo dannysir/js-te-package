@@ -1,5 +1,27 @@
 # CHANGE LOG
 
+## [1.0.0] 2026-10-14
+
+**정식 릴리스.** 공개 API 를 안정 버전으로 확정하고, 이후로는 시맨틱 버저닝을 따릅니다. 1.0.0 이 마지막 기능 릴리스이며, js-te 는 이제 **유지보수 모드**입니다. 새 기능은 계획하지 않지만, 버그 리포트와 수정은 [Issues](https://github.com/dannysir/js-te-package/issues) 로 계속 받습니다.
+
+### 추가
+- **`describe.each`** — `describe.each(cases)(template, fn)` 는 `cases` 의 원소마다 `describe` 그룹을 하나씩 만들고, 원소의 값을 `fn` 의 인자로 전달해 그룹 안의 모든 테스트에서 사용할 수 있게 합니다. 원소 처리와 `%s` / `%o` 플레이스홀더는 `test.each` 와 같습니다.
+- **`describe.only.each` / `describe.skip.each`** — 생성되는 모든 그룹에 `.only` / `.skip` modifier 를 적용합니다. `describe.only` / `describe.skip` 과 같은 규칙(파일 단위 focus, 가장 가까운 명시 modifier 우선)을 따릅니다.
+- 메인 entry 와 `/browser` entry 양쪽에서 사용할 수 있습니다. 타입 선언에 `Describe.each`, `describe.only` / `describe.skip` 의 `each` 멤버, `TestManager.describeEach` 를 추가했습니다.
+
+### 수정
+- **실패한 테스트의 모듈 mock 이 다음 테스트로 새지 않습니다.** 기존에는 테스트가 *통과했을 때만* `mockStore` 를 비워서, 실패한 테스트에서 등록한 mock 이 다음 테스트(와 다음 파일)까지 남아 연쇄 실패를 일으켰습니다. 이제 통과·실패와 관계없이 매 테스트 뒤에 mock 을 정리합니다.
+
+### 변경
+- 테스트 코드가 더 이상 작성자 PC 에 의존하지 않습니다. 하드코딩된 절대경로를 각 테스트 파일 위치 기준으로 계산하도록 바꿔, 어느 환경에서 clone 해도 `npm test` 가 통과합니다.
+- 일부러 실패하던 데모 테스트(`test/error.test.js`)를 실패 출력과 exit code 를 검증하는 CLI 통합 테스트로 대체했습니다. 이제 `npm test` 가 exit `0` 으로 끝납니다.
+- GitHub Actions 테스트 워크플로를 추가해 Ubuntu·macOS × Node 22.15.0(`engines` 하한)·22.x·24.x 에서 테스트를 실행합니다. 배포 워크플로도 배포 전에 테스트를 실행합니다.
+
+### 문서
+- API 레퍼런스(en/ko)에 `describe.each` 항목과 `describe.only.each` / `describe.skip.each` 조합 설명을 추가했습니다. 브라우저 entry 의 "export 되는 것" 목록에 0.9.3 에서 빠졌던 `test.only.each` / `test.skip.each` 와 `describe.each` 계열을 반영했습니다.
+- CLI 레퍼런스(en/ko)에 `describe.each` 안의 테스트는 위치 필터가 생성된 모든 그룹에 매칭된다는 메모를 추가했습니다.
+- README(en/ko)에 "데이터 기반 그룹" 예시와 프로젝트 상태 안내를 추가했습니다.
+
 ## [0.9.4] 2026-08-11
 
 ### 변경

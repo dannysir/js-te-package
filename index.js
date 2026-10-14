@@ -116,6 +116,43 @@ describe.only = (suiteName, fn) => testManager.describeOnly(suiteName, fn);
 describe.skip = (suiteName, fn) => testManager.describeSkip(suiteName, fn);
 
 /**
+ * 배열 형태의 케이스마다 테스트 그룹을 하나씩 생성합니다.
+ * @param {Array<Array>} cases - 케이스 배열
+ * @returns {Function} 그룹 정의 함수
+ *
+ * @example
+ * describe.each([
+ *   [1, 2, 3],
+ *   [2, 3, 5],
+ * ])('add(%s, %s)', (a, b, expected) => {
+ *   test(`returns ${expected}`, () => {
+ *     expect(a + b).toBe(expected);
+ *   });
+ * });
+ */
+describe.each = (cases) => testManager.describeEach(cases);
+
+/**
+ * 케이스마다 생성되는 그룹 전체를 only 로 표시합니다. 같은 파일의 일반 테스트는 skip 으로 강등됩니다.
+ *
+ * @example
+ * describe.only.each([[1], [2]])('focused %s', (n) => {
+ *   test('runs', () => { ... });
+ * });
+ */
+describe.only.each = (cases) => testManager.describeEach(cases, 'only');
+
+/**
+ * 케이스마다 생성되는 그룹 전체를 skip 으로 표시합니다. 그룹 안의 테스트는 실행되지 않습니다.
+ *
+ * @example
+ * describe.skip.each([[1], [2]])('disabled %s', (n) => {
+ *   test('skipped', () => { ... });
+ * });
+ */
+describe.skip.each = (cases) => testManager.describeEach(cases, 'skip');
+
+/**
  * 각 테스트 실행 전에 실행될 함수를 등록합니다.
  * @param {Function} fn - 전처리 함수
  *

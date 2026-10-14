@@ -81,6 +81,15 @@ class TestManager {
     this.#describeWithMode(str, fn, 'skip');
   }
 
+  describeEach(cases, mode = null) {
+    return (suiteName, fn) => {
+      cases.forEach(testCase => {
+        const args = Array.isArray(testCase) ? testCase : [testCase];
+        this.#describeWithMode(this.#formatDescription(args, suiteName), () => fn(...args), mode);
+      });
+    };
+  }
+
   test(description, fn) {
     this.#registerTest(description, fn, undefined);
   }
@@ -167,10 +176,12 @@ class TestManager {
         await test.fn();
         reporter.onTestPass(test);
         passed++;
-        clearAllMocks();
       } catch (error) {
         reporter.onTestFail(test, error);
         failed++;
+      } finally {
+        // 실패한 테스트의 mock 이 다음 테스트로 새지 않도록 결과와 무관하게 정리.
+        clearAllMocks();
       }
     }
 

@@ -1,9 +1,10 @@
+import path from 'node:path';
 import {mockStore} from '@dannysir/js-te/src/mock/store.js';
 import {greet, farewell} from '../../test-helper/mockstore-collision/target.js';
 import {remember, recall, forget} from '../../test-helper/mockstore-collision/userspace.js';
 
-const TARGET_PATH = '/Users/san/js-te-package/test-helper/mockstore-collision/target.js';
-const USERSPACE_PATH = '/Users/san/js-te-package/test-helper/mockstore-collision/userspace.js';
+const TARGET_PATH = path.resolve(import.meta.dirname, '../../test-helper/mockstore-collision/target.js');
+const USERSPACE_PATH = path.resolve(import.meta.dirname, '../../test-helper/mockstore-collision/userspace.js');
 
 test('[regression-mockstore] 서브패스 mockStore import + mock() 동시 사용 — 동일 globalThis 싱글톤 공유', () => {
   expect(mockStore instanceof Map).toBe(true);

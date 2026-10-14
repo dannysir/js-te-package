@@ -2,6 +2,28 @@
 
 > Korean version: [CHANGELOG.ko.md](./CHANGELOG.ko.md)
 
+## [1.0.0] 2026-10-14
+
+**Stable release.** The public API is now considered stable and follows semantic versioning from here on. 1.0.0 is the final feature release — js-te is now in **maintenance mode**: no new features are planned, but bug reports and fixes are still welcome via [Issues](https://github.com/dannysir/js-te-package/issues).
+
+### Added
+- **`describe.each`** — `describe.each(cases)(template, fn)` creates one `describe` group per row and passes the row's values to `fn`, so every test inside the group can use them. Rows and the `%s` / `%o` placeholders work exactly like `test.each`.
+- **`describe.only.each` / `describe.skip.each`** — apply the `.only` / `.skip` modifier to every generated group, following the same rules as `describe.only` / `describe.skip` (per-file focus, closest explicit modifier wins).
+- Available from both the main entry and the `/browser` entry. The type declarations add `Describe.each`, an `each` member on `describe.only` / `describe.skip`, and `TestManager.describeEach`.
+
+### Fixed
+- **Module mocks no longer leak out of a failing test.** `mockStore` was only cleared after a test *passed*, so a mock registered in a failing test stayed active for the next test (and the next file), causing cascading failures. Mocks are now cleared after every test, whether it passes or fails.
+
+### Changed
+- The test suite no longer depends on the author's machine: hardcoded absolute paths were replaced with paths computed from each test file's location, so `npm test` passes on any checkout.
+- The intentionally failing demo test (`test/error.test.js`) was replaced by a CLI integration test that asserts the failure output and exit code. `npm test` now exits `0` on a clean checkout.
+- A GitHub Actions test workflow now runs the suite on Ubuntu and macOS against Node 22.15.0 (the `engines` minimum), 22.x and 24.x. The publish workflow also runs the tests before publishing.
+
+### Docs
+- API reference (en/ko) gains a `describe.each` entry and the `describe.only.each` / `describe.skip.each` combination. The browser entry "Exported" list now includes `test.only.each` / `test.skip.each` (missed in 0.9.3) and the `describe.each` family.
+- CLI reference (en/ko) notes that a location filter matches a test inside `describe.each` in every generated group.
+- README (en/ko) gains a "Data-driven groups" example and a project status note.
+
 ## [0.9.4] 2026-08-11
 
 ### Changed

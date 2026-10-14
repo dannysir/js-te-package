@@ -11,4 +11,14 @@
 - [x] **코드 레벨 `.only` / `.skip` / `.todo`** — `test.only` / `test.skip` / `test.todo`, `describe.only` / `describe.skip` 지원. `.only` 적용 범위는 파일 단위 (Jest 방식). reporter 인터페이스에 `onTestSkip` / `onTestTodo` 추가, `run()` 반환값에 `skipped` / `todo` 카운터 추가.
 - [x] **JSON reporter** — 테스트 결과를 콘솔 글자 대신 JSON 형태로 출력하는 기능. CI 스크립트나 IDE 확장이 결과를 쉽게 읽어 활용할 수 있게 함. 기존 콘솔 reporter 옆에 `jsonReporter` 를 추가하는 형태.
 - [x] **`test.each` 와 modifier 조합** — `test.only.each(...)` / `test.skip.each(...)` 추가. `testEach(cases, mode)` 로 모드 전달, 양쪽 entry(index/browser) + 타입(`only`/`skip` 에 `each` 멤버) 반영. `test.each(...).only` 체이닝은 Jest/Vitest 표준이 아니라 제외, `describe.only.each` / `describe.skip.each` 는 `describe.each` 가 선결이라 범위 밖.
-- [ ] VSCode / IDEA 확장 (별도 저장소, 위 라인 기반 실행이 선결)
+- [x] **`describe.each` 와 modifier 조합** — `describe.each(...)` / `describe.only.each(...)` / `describe.skip.each(...)` 추가 (1.0.0). `describeEach(cases, mode)` 가 기존 `#describeWithMode` 를 재사용해 modifier 우선순위·파일 단위 only 강등이 그대로 적용됨. 양쪽 entry(index/browser) + Node 가드 + 타입 반영.
+- [ ] VSCode / IDEA 확장 (별도 저장소, 위 라인 기반 실행이 선결) — 이 저장소 범위 밖. 1.0.0 이후에도 별도 저장소 작업으로 남김.
+
+---
+
+## 1.0.0 이후 — 유지보수 모드
+
+1.0.0 을 마지막 기능 릴리스로 두고 유지보수 모드로 전환했습니다. 새 기능은 받지 않고, 버그 리포트·수정만 진행합니다.
+
+- 1.0.0 정리 작업: 실패한 테스트 뒤 mock 누수 수정, 테스트 코드의 하드코딩 절대경로 제거, 의도된 실패 데모를 CLI 통합 테스트로 전환(`npm test` exit 0), GitHub Actions 테스트 워크플로 추가 + 배포 전 테스트.
+- CI 매트릭스는 Ubuntu·macOS × Node 22.15.0 / 22.x / 24.x. Windows 는 검증하지 못해 제외 — 이슈가 들어오면 그때 매트릭스 추가를 검토.

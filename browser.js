@@ -13,6 +13,9 @@ test.todo = (description) => testManager.testTodo(description);
 export const describe = (suiteName, fn) => testManager.describe(suiteName, fn);
 describe.only = (suiteName, fn) => testManager.describeOnly(suiteName, fn);
 describe.skip = (suiteName, fn) => testManager.describeSkip(suiteName, fn);
+describe.each = (cases) => testManager.describeEach(cases);
+describe.only.each = (cases) => testManager.describeEach(cases, 'only');
+describe.skip.each = (cases) => testManager.describeEach(cases, 'skip');
 
 export const beforeEach = (fn) => testManager.beforeEach(fn);
 
