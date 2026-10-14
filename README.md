@@ -8,7 +8,15 @@
 
 A lightweight JavaScript test framework inspired by Jest.
 
-## [📎 Latest Update — 0.9.4](./CHANGELOG.md)
+> **Project status — maintenance mode.** 1.0.0 is the final feature release. No new features are planned, but bug reports and fixes are still welcome via [Issues](https://github.com/dannysir/js-te-package/issues).
+
+## [📎 Latest Update — 1.0.0](./CHANGELOG.md)
+
+### Stable release (1.0.0)
+
+- The public API is now stable and follows semantic versioning.
+- **`describe.each` / `describe.only.each` / `describe.skip.each`** — create one `describe` group per data row. See [Data-driven groups](#data-driven-groups).
+- **Fixed** — a module mock registered in a failing test no longer leaks into the next test.
 
 ### Provenance-attested releases (0.9.4)
 

@@ -8,7 +8,15 @@
 
 Jest에서 영감을 받아 만든 가벼운 JavaScript 테스트 프레임워크입니다.
 
-## [📎 최근 업데이트 — 0.9.4](./CHANGELOG.ko.md)
+> **프로젝트 상태 — 유지보수 모드.** 1.0.0 이 마지막 기능 릴리스입니다. 새 기능은 계획하지 않지만, 버그 리포트와 수정은 [Issues](https://github.com/dannysir/js-te-package/issues) 로 계속 받습니다.
+
+## [📎 최근 업데이트 — 1.0.0](./CHANGELOG.ko.md)
+
+### 정식 릴리스 (1.0.0)
+
+- 공개 API 를 안정 버전으로 확정했고, 이후로는 시맨틱 버저닝을 따릅니다.
+- **`describe.each` / `describe.only.each` / `describe.skip.each`** — 데이터 원소마다 `describe` 그룹을 하나씩 만듭니다. [데이터 기반 그룹](#데이터-기반-그룹) 참고.
+- **수정** — 실패한 테스트에서 등록한 모듈 mock 이 다음 테스트로 새지 않습니다.
 
 ### provenance 증명이 포함된 릴리스 (0.9.4)
 
