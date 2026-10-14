@@ -91,6 +91,7 @@ With `-t "token"`, only the middle test above would run.
 - The line must match the line where `test(...)` is called — not a line inside the test body. Pointing at any other line matches zero tests.
 - Only the file at `<path>` is imported and run; other discovered files are skipped.
 - `test.each(...)` cases all share the line of the `test.each` call, so a location filter cannot single out one generated case.
+- Likewise, a `test(...)` inside `describe.each(...)` has the same line in every generated group, so a location filter matches that test in all groups.
 
 This filter is the reliable way to run **one** test even when several tests share the same name, which a name pattern cannot disambiguate.
 

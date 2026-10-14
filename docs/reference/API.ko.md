@@ -9,6 +9,7 @@
   - [`describe(name, fn)`](#describename-fn)
   - [`beforeEach(fn)`](#beforeeachfn)
   - [`test.each(cases)(template, fn)`](#testeachcasestemplate-fn)
+  - [`describe.each(cases)(template, fn)`](#describeeachcasestemplate-fn)
   - [`test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`](#testonlydesc-fn--testskipdesc-fn--testtododesc)
   - [`describe.only(name, fn)` / `describe.skip(name, fn)`](#describeonlyname-fn--describeskipname-fn)
 - [Matcher](#matcher)
@@ -144,6 +145,34 @@ test.each([
 */
 ```
 
+### `describe.each(cases)(template, fn)`
+
+`cases` 의 각 원소마다 `describe` 그룹을 하나씩 만듭니다. 원소의 값이 `fn` 의 인자로 전달되므로 그룹 안의 모든 테스트에서 사용할 수 있습니다. 원소와 플레이스홀더 규칙은 [`test.each`](#testeachcasestemplate-fn) 와 같습니다. `cases` 는 반드시 **배열 타입**이어야 하고, 배열이 아닌 원소는 인자 하나로 전달됩니다.
+
+```js
+describe.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s)', (a, b, expected) => {
+  test(`returns ${expected}`, () => {
+    expect(a + b).toBe(expected);
+  });
+
+  test('교환법칙', () => {
+    expect(b + a).toBe(expected);
+  });
+});
+
+/* 출력
+✓ add(1, 2) > returns 3
+✓ add(1, 2) > 교환법칙
+✓ add(2, 3) > returns 5
+✓ add(2, 3) > 교환법칙
+*/
+```
+
+콜백 안에서 등록한 `beforeEach` 는 해당 원소로 생성된 그룹에만 적용됩니다.
+
 ### `test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`
 
 개별 테스트에 focus·skip·pending modifier 를 붙입니다.
@@ -204,6 +233,19 @@ describe.skip('일시 비활성화', () => {
 ```
 
 중첩된 `describe` 는 스스로 modifier 를 선언하지 않는 한 가장 가까운 상위의 명시 modifier 를 상속합니다.
+
+#### `.each` 와 조합
+
+`describe.only.each(cases)(template, fn)` 와 `describe.skip.each(cases)(template, fn)` 는 생성되는 모든 그룹에 modifier 를 적용합니다. 각 그룹을 `describe.only` / `describe.skip` 으로 작성한 것과 똑같이 동작합니다.
+
+```js
+describe.skip.each([
+  ['admin'],
+  ['guest'],
+])('%s 권한 — 임시 skip', (role) => {
+  test('읽기 가능', () => {});
+});
+```
 
 ---
 
@@ -612,7 +654,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**export 되는 것:** `test`(`test.each`, `test.only`, `test.skip`, `test.todo` 포함), `describe`(`describe.only`, `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
+**export 되는 것:** `test`(`test.each`, `test.only`, `test.skip`, `test.todo`, `test.only.each`, `test.skip.each` 포함), `describe`(`describe.each`, `describe.only`, `describe.skip`, `describe.only.each`, `describe.skip.each` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`). Node 에 의존하므로 의도적으로 제외합니다 — 브라우저 entry 와 Node entry 의 표면 차이는 의도된 설계입니다.
 

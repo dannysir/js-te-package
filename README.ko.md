@@ -111,7 +111,7 @@ js-te --help          # 도움말
 
 ## 핵심 기능
 
-- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `test.only`, `test.skip`, `test.todo`, `test.only.each`, `test.skip.each`, `describe.only`, `describe.skip`
+- **테스트 작성** — `test()`, `describe()`, `beforeEach()`, `test.each()`, `describe.each()`, `test.only`, `test.skip`, `test.todo`, `test.only.each`, `test.skip.each`, `describe.only`, `describe.skip`, `describe.only.each`, `describe.skip.each`
 - **Matcher** — `toBe`, `toEqual`, `toThrow`, `toBeTruthy`, `toBeFalsy`, `toContain`, `toBeInstanceOf`, `toBeNull`, `toBeUndefined`, `toBeDefined`, `toHaveBeenCalled`, `toHaveBeenCalledWith`, `toHaveBeenCalledTimes`, `.not` 체이닝
 - **Mock Function** — `fn()`, `mockImplementation`, `mockReturnValue`, `mockReturnValueOnce`, `mockClear`, `mock.calls`
 - **Module Mocking** — `mock(path, mockObj)` (상대/절대 경로 모두 지원), `clearAllMocks`, `unmock`, `isMocked`
@@ -178,7 +178,27 @@ test.skip.each([
 });
 ```
 
-`test.only.each` 는 생성된 모든 케이스를 focus 하고(파일 내 다른 일반 테스트는 skipped 로 강등), `test.skip.each` 는 모든 케이스를 skipped 로 보고합니다.
+`test.only.each` 는 생성된 모든 케이스를 focus 하고(파일 내 다른 일반 테스트는 skipped 로 강등), `test.skip.each` 는 모든 케이스를 skipped 로 보고합니다. `describe.only.each` / `describe.skip.each` 는 `describe.each` 로 생성된 모든 그룹에 같은 방식으로 적용됩니다.
+
+### 데이터 기반 그룹
+
+`describe.each` 는 원소마다 그룹을 하나씩 만들고, 그 값을 그룹 안의 모든 테스트에 전달합니다:
+
+```js
+describe.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s)', (a, b, expected) => {
+  test(`returns ${expected}`, () => {
+    expect(a + b).toBe(expected);
+  });
+});
+
+/* 출력
+✓ add(1, 2) > returns 3
+✓ add(2, 3) > returns 5
+*/
+```
 
 ### 모듈 모킹
 
@@ -223,7 +243,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**export 되는 것:** `test`(`test.each` / `test.only` / `test.skip` / `test.todo` / `test.only.each` / `test.skip.each` 포함), `describe`(`describe.only` / `describe.skip` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
+**export 되는 것:** `test`(`test.each` / `test.only` / `test.skip` / `test.todo` / `test.only.each` / `test.skip.each` 포함), `describe`(`describe.each` / `describe.only` / `describe.skip` / `describe.only.each` / `describe.skip.each` 포함), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **export 되지 않는 것:** 모듈 모킹(`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) 과 CLI 러너(`run`) — Node 전용이라 의도적으로 제외합니다.
 
@@ -262,7 +282,7 @@ It is designed for browsers and Web Workers only.
 
 ## 문서
 
-- [상세 API 레퍼런스](./docs/reference/API.ko.md) — `test`, `expect`, `mock`, `fn`, `beforeEach`, `test.each` 전체 사용법
+- [상세 API 레퍼런스](./docs/reference/API.ko.md) — `test`, `expect`, `mock`, `fn`, `beforeEach`, `test.each`, `describe.each` 전체 사용법
 - [CLI 레퍼런스](./docs/reference/CLI.ko.md) — 커맨드라인 옵션·매칭 규칙·종료 코드
 - [로더 훅 기반 인메모리 변환](./docs/internal/로더훅기반인메모리변환.md) — 0.5.0 내부 동작 원리
 - [CHANGELOG](./CHANGELOG.ko.md) — 버전별 변경 내역

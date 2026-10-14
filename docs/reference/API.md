@@ -9,6 +9,7 @@ A complete reference for every public API of `@dannysir/js-te`.
   - [`describe(name, fn)`](#describename-fn)
   - [`beforeEach(fn)`](#beforeeachfn)
   - [`test.each(cases)(template, fn)`](#testeachcasestemplate-fn)
+  - [`describe.each(cases)(template, fn)`](#describeeachcasestemplate-fn)
   - [`test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`](#testonlydesc-fn--testskipdesc-fn--testtododesc)
   - [`describe.only(name, fn)` / `describe.skip(name, fn)`](#describeonlyname-fn--describeskipname-fn)
 - [Matchers](#matchers)
@@ -144,6 +145,34 @@ test.each([
 */
 ```
 
+### `describe.each(cases)(template, fn)`
+
+Creates one `describe` group per row in `cases`. The row's values are passed to `fn`, so every test inside the group can use them. Rows and placeholders work exactly like [`test.each`](#testeachcasestemplate-fn): `cases` **must be an array**, and a row that is not an array is passed as a single argument.
+
+```js
+describe.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('add(%s, %s)', (a, b, expected) => {
+  test(`returns ${expected}`, () => {
+    expect(a + b).toBe(expected);
+  });
+
+  test('is commutative', () => {
+    expect(b + a).toBe(expected);
+  });
+});
+
+/* output
+✓ add(1, 2) > returns 3
+✓ add(1, 2) > is commutative
+✓ add(2, 3) > returns 5
+✓ add(2, 3) > is commutative
+*/
+```
+
+A `beforeEach` registered inside the callback applies only to the group generated for that row.
+
 ### `test.only(desc, fn)` / `test.skip(desc, fn)` / `test.todo(desc)`
 
 Focus, skip, and pending markers for individual tests.
@@ -204,6 +233,19 @@ describe.skip('temporarily disabled', () => {
 ```
 
 Nested `describe` blocks inherit the closest explicit modifier from their ancestors unless they declare their own.
+
+#### Combining with `.each`
+
+`describe.only.each(cases)(template, fn)` and `describe.skip.each(cases)(template, fn)` apply the modifier to every generated group, exactly as if each group were written with `describe.only` / `describe.skip`.
+
+```js
+describe.skip.each([
+  ['admin'],
+  ['guest'],
+])('%s permissions — temporarily skipped', (role) => {
+  test('can read', () => {});
+});
+```
 
 ---
 
@@ -612,7 +654,7 @@ describe('math', () => {
 await testManager.run();
 ```
 
-**Exported:** `test` (with `test.each`, `test.only`, `test.skip`, `test.todo`), `describe` (with `describe.only`, `describe.skip`), `beforeEach`, `expect`, `fn`, `testManager`.
+**Exported:** `test` (with `test.each`, `test.only`, `test.skip`, `test.todo`, `test.only.each`, `test.skip.each`), `describe` (with `describe.each`, `describe.only`, `describe.skip`, `describe.only.each`, `describe.skip.each`), `beforeEach`, `expect`, `fn`, `testManager`.
 
 **Not exported:** module mocking (`mock`, `unmock`, `isMocked`, `clearAllMocks`, `mockStore`) and the CLI runner (`run`). These depend on Node and are intentionally left out — the browser and Node entries differ on purpose.
 
