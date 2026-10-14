@@ -81,6 +81,15 @@ class TestManager {
     this.#describeWithMode(str, fn, 'skip');
   }
 
+  describeEach(cases, mode = null) {
+    return (suiteName, fn) => {
+      cases.forEach(testCase => {
+        const args = Array.isArray(testCase) ? testCase : [testCase];
+        this.#describeWithMode(this.#formatDescription(args, suiteName), () => fn(...args), mode);
+      });
+    };
+  }
+
   test(description, fn) {
     this.#registerTest(description, fn, undefined);
   }

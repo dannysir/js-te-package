@@ -172,3 +172,93 @@ describe('[TestManager modes] testEach + modifier', () => {
     expect(result).toEqual({passed: 2, failed: 0, skipped: 0, todo: 0});
   });
 });
+
+describe('[TestManager modes] describeEach + modifier', () => {
+  test('describeEach(cases) 는 케이스마다 포맷된 이름의 그룹을 만들고 인자를 전달한다', async () => {
+    const tm = new TestManager();
+    tm.describeEach([[1, 2, 3], [2, 3, 5]])('add(%s, %s)', (a, b, expected) => {
+      tm.test(`returns ${expected}`, () => {
+        expect(a + b).toBe(expected);
+      });
+    });
+
+    const tests = tm.getTests();
+    expect(tests.map(t => t.path)).toEqual(['add(1, 2)', 'add(2, 3)']);
+    expect(tests.map(t => t.description)).toEqual(['returns 3', 'returns 5']);
+
+    const result = await tm.run(makeReporter());
+    expect(result).toEqual({passed: 2, failed: 0, skipped: 0, todo: 0});
+  });
+
+  test('describeEach 는 배열이 아닌 케이스를 단일 인자로 전달하고 바깥 describe 경로를 유지한다', () => {
+    const tm = new TestManager();
+    tm.describe('outer', () => {
+      tm.describeEach([{name: 'kim'}])('user %o', (user) => {
+        tm.test(user.name, () => {});
+      });
+    });
+
+    const [only] = tm.getTests();
+    expect(only.path).toBe('outer > user {"name":"kim"}');
+    expect(only.description).toBe('kim');
+  });
+
+  test('describeEach(cases, "only") 는 생성된 그룹 전체를 only 로 등록하고 같은 파일 normal 은 skip 강등된다', async () => {
+    const tm = new TestManager();
+    tm.test('normal outside', () => {});
+    tm.describeEach([[1], [2]], 'only')('group %s', (n) => {
+      tm.test('runs', () => {
+        expect(typeof n).toBe('number');
+      });
+    });
+
+    const result = await tm.run(makeReporter());
+
+    expect(result.passed).toBe(2);
+    expect(result.skipped).toBe(1);
+  });
+
+  test('describeEach(cases, "skip") 는 그룹 안의 테스트를 실행하지 않고 skip 으로 보고한다', async () => {
+    const tm = new TestManager();
+    let runs = 0;
+    tm.describeEach([[1], [2]], 'skip')('group %s', () => {
+      tm.test('a', () => { runs++; });
+      tm.test('b', () => { runs++; });
+    });
+
+    const reporter = makeReporter();
+    const result = await tm.run(reporter);
+
+    expect(runs).toBe(0);
+    expect(result.skipped).toBe(4);
+    expect(reporter.skipped.length).toBe(4);
+  });
+
+  test('describeEach(cases, "skip") 안의 test.only 는 only 가 우선한다', async () => {
+    const tm = new TestManager();
+    tm.describeEach([[1]], 'skip')('group %s', () => {
+      tm.testOnly('focused', () => {});
+      tm.test('skipped', () => {});
+    });
+
+    const result = await tm.run(makeReporter());
+
+    expect(result.passed).toBe(1);
+    expect(result.skipped).toBe(1);
+  });
+
+  test('describeEach 그룹 안의 beforeEach 는 해당 그룹에만 적용된다', async () => {
+    const tm = new TestManager();
+    const seen = [];
+    tm.describeEach([['a'], ['b']])('group %s', (label) => {
+      let current;
+      tm.beforeEach(() => { current = label; });
+      tm.test('reads hook value', () => { seen.push(current); });
+    });
+    tm.test('outside', () => { seen.push('outside'); });
+
+    await tm.run(makeReporter());
+
+    expect(seen).toEqual(['a', 'b', 'outside']);
+  });
+});

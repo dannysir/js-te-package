@@ -12,7 +12,7 @@ const testGuard = Object.assign(guard, {
   skip: guard,
   todo: guard,
 });
-const describeGuard = Object.assign(guard, {only: guard, skip: guard});
+const describeGuard = Object.assign(guard, {each: () => guard, only: guard, skip: guard});
 
 export const describe = describeGuard;
 export const test = testGuard;

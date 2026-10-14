@@ -113,6 +113,24 @@ test.skip.each([
   expect(a).toBe(b);
 });
 
+describe.each([
+  [1, 2, 3],
+  [2, 3, 5],
+])('[describe.each] - add(%s, %s)', (a, b, expected) => {
+  test(`returns ${expected}`, () => {
+    expect(a + b).toBe(expected);
+  });
+});
+
+// describe.skip.each 안의 테스트는 실행되지 않으므로, 일부러 실패할 단언을 넣어 skip 동작을 검증한다.
+describe.skip.each([
+  [1, 2],
+])('[describe.skip.each] - skipped : %s, %s', (a, b) => {
+  test('never runs', () => {
+    expect(a).toBe(b);
+  });
+});
+
 describe('[beforeEach test]', () => {
   let counter;
   beforeEach(() => {

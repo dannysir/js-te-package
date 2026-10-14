@@ -38,10 +38,27 @@ export const test: Test;
 export interface Describe {
   /** 테스트 그룹을 정의합니다. 중첩 가능합니다. */
   (suiteName: string, fn: () => void): void;
+  /** 배열 형태의 케이스마다 테스트 그룹을 하나씩 생성합니다. */
+  each: {
+    <T extends readonly unknown[]>(
+      cases: readonly T[]
+    ): (suiteName: string, fn: (...args: T) => void) => void;
+    (
+      cases: readonly unknown[]
+    ): (suiteName: string, fn: (...args: unknown[]) => void) => void;
+  };
   /** 그룹 안의 모든 테스트를 only 로 표시합니다. */
-  only: (suiteName: string, fn: () => void) => void;
+  only: {
+    (suiteName: string, fn: () => void): void;
+    /** 케이스마다 생성되는 그룹 전체를 only 로 표시합니다. */
+    each: Describe['each'];
+  };
   /** 그룹 안의 모든 테스트를 skip 으로 표시합니다. */
-  skip: (suiteName: string, fn: () => void) => void;
+  skip: {
+    (suiteName: string, fn: () => void): void;
+    /** 케이스마다 생성되는 그룹 전체를 skip 으로 표시합니다. */
+    each: Describe['each'];
+  };
 }
 
 /** 테스트 그룹을 정의합니다. 중첩 가능합니다. */
@@ -158,6 +175,7 @@ export interface TestManager {
   describe(suiteName: string, fn: () => void): void;
   describeOnly(suiteName: string, fn: () => void): void;
   describeSkip(suiteName: string, fn: () => void): void;
+  describeEach: Describe['each'];
   beforeEach(fn: TestFn): void;
   getTests(): TestCase[];
   clearTests(): void;
