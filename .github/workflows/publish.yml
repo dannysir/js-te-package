@@ -2,22 +2,59 @@ name: Publish to npm
 
 on:
   release:
-    types: [published]   # GitHub Release 발행 시 배포 (태그 push 트리거로 바꿔도 됩니다)
+    types: [published]   # GitHub Release 발행 시 실제 배포
+  workflow_dispatch:     # 수동 실행 = dry-run (업로드 없이 build → artifact → publish 흐름만 검증)
+
+permissions:
+  contents: read         # 기본은 읽기 전용. 배포 토큰(id-token)은 publish job 에서만 부여
 
 jobs:
+  # 의존성 설치·빌드·테스트는 배포 권한 없이 실행한다.
+  # 의존성 코드가 탈취되더라도 이 job 에서는 OIDC 배포 토큰을 받을 수 없다.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false   # 릴리스 빌드에는 캐시를 쓰지 않음
+      - run: npm ci --ignore-scripts      # 의존성 install 스크립트 실행 차단
+      - run: npm run build
+      - run: npm test                     # 테스트가 실패하면 배포하지 않음
+      # npm 은 dry-run 에서도 이미 배포된 버전이면 실패하므로, 수동 실행 시에는 임시 prerelease 버전으로 패키징
+      - name: Set dry-run version
+        if: github.event_name == 'workflow_dispatch'
+        run: npm version "0.0.0-dryrun.${{ github.run_id }}" --no-git-tag-version
+      - run: npm pack
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package
+          path: dannysir-js-te-*.tgz
+          if-no-files-found: error
+
+  # 외부 코드(의존성)를 실행하지 않고, build job 이 만든 tarball 만 배포한다.
   publish:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       id-token: write    # OIDC 인증 + provenance에 필수
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm install -g npm@latest   # Trusted Publishing은 npm 11.5.1+ 필요
-      - run: npm ci
-      - run: npm run build
-      - run: npm test      # 테스트가 실패하면 배포하지 않음
-      - run: npm publish
+          package-manager-cache: false
+      - run: npm install -g --ignore-scripts npm@12.2.0   # 버전 고정 (Trusted Publishing 은 npm 11.5.1+ 필요)
+      - uses: actions/download-artifact@v7
+        with:
+          name: package
+      - name: Publish
+        if: github.event_name == 'release'
+        run: npm publish ./dannysir-js-te-*.tgz
+      - name: Publish (dry-run)
+        if: github.event_name == 'workflow_dispatch'
+        run: npm publish ./dannysir-js-te-*.tgz --dry-run --tag dry-run

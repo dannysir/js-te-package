@@ -227,10 +227,28 @@ npm deprecate js-te@0.0.1 "Use version 0.0.2 instead"
 ### 사전 조건 (1회 설정)
 
 - npmjs.com → 패키지 → Settings → **Trusted Publisher** 등록
-  - Repository: `dannysir/js-te-package`
+  - Publisher: GitHub Actions
+  - Organization or user: `dannysir` / Repository: `js-te-package`
   - Workflow filename: `publish.yml`
   - Environment: 비워둠 (지정하면 워크플로우 job 에도 `environment:` 필요)
-- Trusted Publishing 은 npm 11.5.1+ 필요 → 워크플로우가 `npm install -g npm@latest` 로 해결
+  - Allowed actions: **`npm publish` 체크** (`npm stage publish` 는 항상 허용됨)
+    - npm 은 "체크 해제(stage-only)" 를 권장한다는 경고를 띄움. stage-only 로 바꾸려면 워크플로우의 `npm publish` 를 `npm stage publish` 로 바꾸고, 배포마다 npmjs.com 또는 CLI 에서 **2FA 로 승인**해야 공개됨.
+    - 유지보수 모드라 배포가 드물어 현재는 직접 배포(`npm publish`) 유지. 대신 아래 "워크플로우 구조" 로 위험을 줄임.
+- **새로 만든 Trusted Publisher 는 2일 안에 첫 배포가 성공해야 유효해진다.** 그 안에 배포하지 않으면 `Expired` 상태가 되어 수정도 불가 → **삭제 후 새로 생성**하고 바로 배포할 것. (1.0.0 배포 때 이 만료로 `E404` 가 났음)
+- 권장: Settings → **Publishing access** 를 "Require two-factor authentication and disallow tokens" 로 설정. 유출된 토큰으로는 배포할 수 없고, Trusted Publishing 은 영향 없음.
+
+### 워크플로우 구조
+
+배포 토큰(`id-token: write`)을 받는 job 에서는 외부 코드(의존성)를 실행하지 않는다.
+
+| job | 권한 | 하는 일 |
+|---|---|---|
+| `build` | `contents: read` | `npm ci --ignore-scripts` → `npm run build` → `npm test` → `npm pack` → tarball 을 artifact 로 업로드 |
+| `publish` | `id-token: write` | npm 설치 → artifact 다운로드 → `npm publish <tarball>` (의존성 설치·빌드 없음) |
+
+- `--ignore-scripts`: 의존성의 install 스크립트 실행 차단. install 스크립트가 있는 의존성은 macOS 전용 `fsevents` 뿐이라 Ubuntu 빌드 결과에 영향 없음 (1.0.0 배포본과 shasum 동일 확인).
+- npm 버전은 `publish` job 에서 **고정** (`npm@12.2.0`). 올릴 때는 아래 dry-run 으로 먼저 확인하고 바꿀 것. Trusted Publishing 은 npm 11.5.1+ 필요.
+- 릴리스 빌드에서는 setup-node 캐시를 끔 (`package-manager-cache: false`, 캐시 오염 방지).
 
 ### 배포 절차
 
@@ -239,10 +257,28 @@ npm version patch   # 또는 minor/major — bump + vX.Y.Z 태그 생성
 git push && git push --tags
 ```
 
-이후 GitHub 에서 해당 태그로 **Release 발행** → 워크플로우가 `npm ci` + `npm run build` + `npm publish` 실행.
+이후 GitHub 에서 해당 태그로 **Release 발행** → 워크플로우가 build → publish 실행.
+
+PR 로 버전을 올린 경우(1.0.0 방식): PR 안에서 `npm version <type> --no-git-tag-version` 으로 bump 커밋 → 머지 → Release 화면에서 태그 `vX.Y.Z` 를 **새로 입력하고 target 을 `main`** 으로 발행. 태그가 머지된 main 커밋을 가리키게 됨.
+
+### dry-run (배포 없이 흐름 검증)
+
+Actions → **Publish to npm** → *Run workflow* (`workflow_dispatch`).
+
+- build → artifact → `npm publish --dry-run` 까지 실행하고 업로드는 하지 않음.
+- npm 은 dry-run 에서도 이미 배포된 버전이면 실패하므로, 수동 실행 때는 임시 버전 `0.0.0-dryrun.<run_id>` 로 패키징하고 `--tag dry-run` 을 붙임.
+- OIDC 인증·provenance 는 실제 업로드 때만 일어나므로 dry-run 으로는 검증되지 않음.
 
 ### 주의사항
 
 - 트리거는 `release: published` — **태그 push 만으로는 배포되지 않음.** Release 를 발행해야 함.
+- 실패한 배포를 *Re-run* 하면 **태그 시점의 워크플로우 파일**로 다시 실행됨. 워크플로우를 고친 내용은 재실행에 반영되지 않음 (새 태그/릴리스 필요). 재실행은 실행 후 30일 안에만 가능.
 - `prepublishOnly` 스크립트는 제거됨 (CI 와 빌드 중복 방지). 로컬에서 수동 `npm publish` 가 필요하면 `npm run build` 를 먼저 실행할 것.
 - 배포 후 Actions 로그와 npm 패키지 페이지의 provenance 배지로 성공 확인.
+
+### 트러블슈팅
+
+- `npm publish` 단계에서 **`E404 Not Found - PUT .../@dannysir%2fjs-te`** → 패키지가 없는 게 아니라 **OIDC 인증 실패**. npm 은 권한 없는 요청에 404 를 돌려줌.
+  1. npmjs.com 의 Trusted Publisher 상태 확인 (`Expired` 면 삭제 후 재생성, 값이 위 사전 조건과 같은지 확인)
+  2. Allowed actions 에 `npm publish` 가 체크돼 있는지 확인
+  3. 고친 뒤 실패한 실행에서 *Re-run failed jobs*
